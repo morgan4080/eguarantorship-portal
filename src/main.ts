@@ -10,6 +10,8 @@ const app = createApp(App);
 app.use(router);
 app.use(pinia);
 
+const mainStore = useMainStore(pinia);
+
 const spinner: any = document.getElementById("spinner");
 
 if (spinner) {
@@ -17,24 +19,28 @@ if (spinner) {
 }
 
 router.beforeEach((to) => {
-    const mainStore = useMainStore(pinia)
-    // initialize auth routine to determine if user is logged in or not
-    mainStore.initialize().then(response => {
-        mainStore.setAuthState(response);
-        const loader: any = document.getElementById("loader")
-        if (loader) {
-            loader.style.display = "none"
-        }
-    }).catch((error: any) => {
+    if (to.meta.requiresAuth) {
+        mainStore.initialize()
+        .then((data: any) => {
+            mainStore.setAuthState(data);
+            const loader: any = document.getElementById("loader");
+            if (loader) {
+                loader.style.display = "none";
+            }
+        })
+        .catch((e: any) => {
+            console.log("Network error" ,e);
+            const currentUrl = window.location.href;
+            window.location.href = `${import.meta.env.VITE_APP_ROOT_AUTH}?redirect_url=${currentUrl}`;
+        })
+        .then(() => mainStore.fetchLoanProducts())
+        .catch((e: any) => {
+            console.log(JSON.stringify(e))
+        });
+    } else {
         const currentUrl = window.location.href;
         window.location.href = `${import.meta.env.VITE_APP_ROOT_AUTH}?redirect_url=${currentUrl}`;
-        return
-    })
-    // if the route loaded requires authentication redirect to login page
-    if (to.meta.requiresAuth && !mainStore.isLoggedIn) {
-        const currentUrl = window.location.href;
-        window.location.href = `${import.meta.env.VITE_APP_ROOT_AUTH}?redirect_url=${currentUrl}`;
-        return
     }
-})
-app.mount('#app')
+});
+
+app.mount('#app');

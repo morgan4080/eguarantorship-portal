@@ -1,14 +1,74 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
+
+interface LoanProduct {
+    refId: string;
+    name: string;
+    interestRate: number;
+    requiredGuarantors: number;
+}
+
+interface GuarantorData {
+    refId: string,
+    memberNumber: string,
+    memberRefId: string,
+    firstName: string,
+    lastName: string,
+    dateAccepted?: string,
+    isAccepted?: string,
+    dateSigned?: string,
+    isSigned?: boolean,
+    isActive: boolean,
+    committedAmount: number,
+    availableAmount: number,
+    totalDeposits: number
+}
+
+interface LoanRequestData {
+    "refId": string,
+    "loanDate": string,
+    "loanRequestNumber": string,
+    "loanProductName": string,
+    "loanProductRefId": string,
+    "loanAmount": number,
+    "guarantorsRequired": number,
+    "guarantorCount": number,
+    "status": string,
+    "signingStatus": string,
+    "acceptanceStatus": string,
+    "applicationStatus": string,
+    "memberRefId": string,
+    "memberNumber": string,
+    "memberFirstName": string,
+    "memberLastName": string,
+    "phoneNumber": string,
+    "loanRequestProgress": number,
+    "totalDeposits": number,
+    "applicantSigned": boolean,
+    "witnessName": string,
+    "guarantorList": GuarantorData[],
+}
 
 interface MainState {
     isLoggedIn: boolean,
-    user: any,
+    user: null | {
+        keycloakId: string,
+        username: string,
+        email: string,
+        firstName: string,
+        lastName: string,
+        tenantId: string,
+        companyName: string,
+        roles: {}
+    },
     notification: {
         message: string | null,
         success: boolean,
         warning: boolean,
         error: boolean,
-    }
+    },
+    loanProducts: LoanProduct[] | null,
+    loanRequests: LoanRequestData[] | null,
+    loading: boolean
 }
 
 export const useMainStore = defineStore('main', {
@@ -21,6 +81,9 @@ export const useMainStore = defineStore('main', {
             warning: false,
             error: false,
         },
+        loanProducts: null,
+        loanRequests: null,
+        loading: false,
     }),
     getters: {
         getLoggedInState(state) {
@@ -31,23 +94,41 @@ export const useMainStore = defineStore('main', {
         },
         getNotification(state) {
             return state.notification
+        },
+        getLoanProducts(state) {
+            return state.loanProducts
+        },
+        getLoanRequests(state) {
+            return state.loanRequests
+        },
+        getLoadingState(state) {
+            return state.loading
         }
     },
     actions: {
-        initialize(): Promise<any> {
-            return new Promise((resolve, reject) => {
-                fetch(`${import.meta.env.VITE_APP_AUTHENTICATE}`).then((response: Response) => {
-                    resolve(response);
-                }).catch((error: any) => {
-                    reject(error);
-                })
-            })
+        setLoading(payload: boolean): void {
+            this.loading = payload
         },
-        setAuthState(response: Response): void {
-            if (response.ok) {
-                this.user = response.json();
-                this.isLoggedIn = true;
+        async initialize(): Promise<any> {
+            const url = `${import.meta.env.VITE_APP_AUTHENTICATE}`
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (response.status === 200) {
+                    return Promise.resolve(response.json())
+                } else {
+                    return Promise.reject(response.status)
+                }
+            } catch (e: any) {
+                return Promise.reject(e.message)
             }
+        },
+        setAuthState(data: any): void {
+            this.user = data;
+            this.isLoggedIn = true;
         },
         defineNotification(payload: { message: string, success?: boolean, warning?: boolean, error?: boolean }) {
             this.notification = {
@@ -63,5 +144,21 @@ export const useMainStore = defineStore('main', {
                 }
             }, 10000)
         },
+        async fetchLoanProducts(): Promise<any> {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_ROOT_URL}/loans-products`, {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                if (response.status === 200) {
+                    this.loanProducts = await response.json()
+                    return Promise.resolve(response.json())
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan products`)
+                }
+            } catch (e: any) {
+                return Promise.reject(e.message)
+            }
+        }
     }
 })

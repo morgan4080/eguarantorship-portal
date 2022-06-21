@@ -3,17 +3,21 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --port 2000",
+    "dev": "vite --port 5000",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^0.27.2",
+    "d3": "^7.4.0",
     "pinia": "^2.0.14",
     "vue": "^3.2.25",
     "vue-router": "^4.0.15"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.2",
+    "@types/d3": "^7.4.0",
     "@types/node": "^17.0.40",
     "@vitejs/plugin-vue": "^2.3.3",
     "autoprefixer": "^10.4.7",

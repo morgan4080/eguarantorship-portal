@@ -13,7 +13,7 @@ const notification = computed(() => {
 </script>
 
 <template>
-  <TheNavBar v-if="$route.name !== 'Landing' && $route.name !== 'Password-Reset'" />
+  <TheNavBar class="fixed w-screen" />
   <div class="flex min-h-screen" >
     <TheSideBar v-if="$route.name !== 'Landing' && $route.name !== 'Password-Reset'" />
     <router-view></router-view>
@@ -21,5 +21,4 @@ const notification = computed(() => {
       <p>{{ notification.message }}</p>
     </Notification>
   </div>
-  <TheFooter />
 </template>

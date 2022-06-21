@@ -31,10 +31,13 @@
       ::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(to bottom, #27627e, #3b86a4, #4799aa, #819ca8);
       }
+      .scrollCustom::-webkit-scrollbar {
+          width: 1px;
+      }
     </style>
   </head>
   <body>
-      <div id="app" class="font-sans antialiased text-gray-600 flex flex-col min-h-full flex flex-col relative"></div>
+      <div id="app" class="font-sans antialiased text-gray-600 flex flex-col min-h-full flex flex-col relative bg-eg-bgMain"></div>
       <div id="loader" class="min-h-screen flex items-center justify-center bg-blue-600">
           <svg id="spinner" class="animate-spin -ml-1 mr-3 h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="display: none;">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
