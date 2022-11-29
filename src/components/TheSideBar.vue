@@ -10,6 +10,13 @@ const mainStore = useMainStore(pinia);
 const setWidth = ref(false);
 const theUrl = import.meta.env.VITE_DOMAIN_URL;
 
+const setWidthFn = () => {
+  setWidth.value = !setWidth.value;
+  menus.reduce((acc, currentValue) => {
+    currentValue.expanded = false
+    return acc
+  })
+}
 
 const menus = reactive([
   {
@@ -121,7 +128,7 @@ const navigateTo = (item: any) => {
         <TheLogo class="h-12 w-auto" />
         <span v-if="setWidth" class="text-white ml-4 mt-2 font-semibold uppercase text-sm tracking-wide leading-relaxed">{{  organisation }}</span>
       </a>
-      <button v-if="setWidth" @click="setWidth = !setWidth;menus.reduce((acc, currentValue) => {currentValue.expanded = false})" type="button" class="absolute rounded px-1 border-b border-l border-r transform transition-all rotate-90 -right-3 top-2 bg-white" style="background: white;">
+      <button v-if="setWidth" @click="setWidthFn" type="button" class="absolute rounded px-1 border-b border-l border-r transform transition-all rotate-90 -right-3 top-2 bg-white" style="background: white;">
         <svg class="rotate-90 flex-shrink-0 h-5 w-5 transform hover:text-gray-900 transition-colors ease-in-out duration-150 text-gray-500" viewBox="0 0 20 20" aria-hidden="true">
           <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
         </svg>

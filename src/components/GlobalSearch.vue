@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import {ref, watch, toRefs, onMounted} from "vue";
 import mainStore from "../utils/store";
+import {RouteRecordName} from "vue-router";
 
-const changed = ref(<boolean>false)
-const hasContent = ref(<boolean>false)
-const hovering = ref(<string>'')
-const searchTerm = ref(<string>'')
-const selected = ref(<number | null>null)
-const refDropDown = ref(<HTMLDivElement><unknown>null)
+
+const props = defineProps<{
+  ctx: RouteRecordName | null | undefined
+  placeholder: string
+}>()
+
+const { ctx, placeholder } = toRefs(props);
+
+const changed = ref<boolean>(false)
+const hasContent = ref<boolean>(false)
+const hovering = ref<string>('')
+const searchTerm = ref<string>('')
+const selected = ref<number | null>(null)
+const refDropDown = ref<HTMLDivElement | unknown>(null)
 
 
 const doSearch = (e: Event) => {
@@ -55,13 +64,6 @@ watch(changed, () => {
   onClickAway(refDropDown.value, () => changed.value = false)
 })
 
-const props = defineProps<{
-  ctx: string
-  placeholder: string
-}>()
-
-const { ctx, placeholder } = toRefs(props);
-
 onMounted(() => {
   console.log(ctx.value)
 })
@@ -83,7 +85,7 @@ onMounted(() => {
 
         Active: "text-white bg-amber-600", Not Active: "text-gray-900"
       -->
-      <li @click="makeSelection(i)" v-for="(n, i) in 5" :key="i" @mouseenter="hovering = String(i)" @mouseleave="hovering = ''" :class="{'text-white bg-amber-600': hovering === i, 'text-gray-900': hovering !== i }" class="group relative transform translate-all cursor-default select-none py-2 pl-3 pr-9" id="option-0" role="option" :tabindex="i">
+      <li @click="makeSelection(i)" v-for="(n, i) in 5" :key="i" @mouseenter="hovering = `${i}`" @mouseleave="hovering = ''" :class="{'text-white bg-amber-600': hovering === `${i}`, 'text-gray-900': hovering !== `${i}` }" class="group relative transform translate-all cursor-default select-none py-2 pl-3 pr-9" :id="`option-${i}`" role="option" :tabindex="i">
         <!-- Selected: "font-semibold" -->
         <span :class="{'font-semibold': selected === i}" class="block truncate">Leslie Alexander</span>
 
