@@ -83,7 +83,7 @@ onMounted(() => {
 
         Active: "text-white bg-amber-600", Not Active: "text-gray-900"
       -->
-      <li @click="makeSelection(i)" v-for="(n, i) in 5" :key="i" @mouseenter="hovering = i" @mouseleave="hovering = ''" :class="{'text-white bg-amber-600': hovering === i, 'text-gray-900': hovering !== i }" class="group relative transform translate-all cursor-default select-none py-2 pl-3 pr-9" id="option-0" role="option" tabindex="-1">
+      <li @click="makeSelection(i)" v-for="(n, i) in 5" :key="i" @mouseenter="hovering = String(i)" @mouseleave="hovering = ''" :class="{'text-white bg-amber-600': hovering === i, 'text-gray-900': hovering !== i }" class="group relative transform translate-all cursor-default select-none py-2 pl-3 pr-9" id="option-0" role="option" :tabindex="i">
         <!-- Selected: "font-semibold" -->
         <span :class="{'font-semibold': selected === i}" class="block truncate">Leslie Alexander</span>
 

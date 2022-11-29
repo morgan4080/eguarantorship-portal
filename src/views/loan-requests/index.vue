@@ -92,7 +92,7 @@ const route = useRoute()
       </div>
       <LoanRequestsTable>
         <div class="sm:flex-auto">
-          <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="`${route.name}`"/>
+          <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name"/>
         </div>
         <div class="mt-0 ml-16 flex flex-wrap space-x-4">
           <div class="flex items-center">
