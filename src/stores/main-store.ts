@@ -110,7 +110,7 @@ export const useMainStore = defineStore('main', {
             this.loading = payload
         },
         async initialize(): Promise<any> {
-            const url = `${import.meta.env.VITE_APP_AUTHENTICATE}`
+            const url = `${import.meta.env.VITE_APP_USER}`
             try {
                 const response = await fetch(url, {
                     method: 'GET',
@@ -146,7 +146,7 @@ export const useMainStore = defineStore('main', {
         },
         async fetchLoanProducts(): Promise<any> {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_ROOT_URL}/loans-products`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loans-products`, {
                     method: 'GET',
                     credentials: 'include'
                 })

@@ -31,7 +31,7 @@ router.beforeEach((to) => {
         .catch((e: any) => {
             console.log("Network error" ,e);
             const currentUrl = window.location.href;
-            window.location.href = `${import.meta.env.VITE_APP_ROOT_AUTH}?redirect_url=${currentUrl}`;
+            window.location.href = `${import.meta.env.VITE_APP_AUTH}?redirect_url=${currentUrl}`;
         })
         .then(() => mainStore.fetchLoanProducts())
         .catch((e: any) => {
@@ -39,7 +39,7 @@ router.beforeEach((to) => {
         });
     } else {
         const currentUrl = window.location.href;
-        window.location.href = `${import.meta.env.VITE_APP_ROOT_AUTH}?redirect_url=${currentUrl}`;
+        window.location.href = `${import.meta.env.VITE_APP_AUTH}?redirect_url=${currentUrl}`;
     }
 });
 
