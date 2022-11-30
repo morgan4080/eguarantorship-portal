@@ -20,3 +20,7 @@ body {
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
 }
+
+.router-link-active.router-link-exact-active {
+    @apply bg-eg-lightblue;
+}

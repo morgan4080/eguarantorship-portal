@@ -4,7 +4,7 @@
   import {computed, ref, onMounted} from "vue";
   import stores from "../stores";
   const {loanRequestStore} = stores;
-  const loanRequests = computed(() => loanRequestStore.getLoanRequests ? loanRequestStore.getLoanRequests : [
+  const loanRequests = computed(() => (loanRequestStore.getLoanRequests && loanRequestStore.getLoanRequests.length > 0) ? loanRequestStore.getLoanRequests : [
     {
       memberFirstName: 'MORGAN',
       memberLastName: 'MUTUGI MURUNGI',
@@ -269,7 +269,7 @@
               </div>
               <div class="flex-1 flex items-center px-6 relative">
                 <div class="w-full border border-white h-2 rounded-full flex">
-                  <div :style="{ width: hrWidth(i) + '%' }" class="bg-white"></div>
+                  <div :style="{ width: hrWidth(Number(i)) + '%' }" class="bg-white"></div>
                 </div>
 
                 <div class="w-4 bg-white h-4 left-1/4 rounded-full absolute"></div>
