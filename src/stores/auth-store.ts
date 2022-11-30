@@ -7,47 +7,6 @@ interface LoanProduct {
     requiredGuarantors: number;
 }
 
-interface GuarantorData {
-    refId: string,
-    memberNumber: string,
-    memberRefId: string,
-    firstName: string,
-    lastName: string,
-    dateAccepted?: string,
-    isAccepted?: string,
-    dateSigned?: string,
-    isSigned?: boolean,
-    isActive: boolean,
-    committedAmount: number,
-    availableAmount: number,
-    totalDeposits: number
-}
-
-interface LoanRequestData {
-    "refId": string,
-    "loanDate": string,
-    "loanRequestNumber": string,
-    "loanProductName": string,
-    "loanProductRefId": string,
-    "loanAmount": number,
-    "guarantorsRequired": number,
-    "guarantorCount": number,
-    "status": string,
-    "signingStatus": string,
-    "acceptanceStatus": string,
-    "applicationStatus": string,
-    "memberRefId": string,
-    "memberNumber": string,
-    "memberFirstName": string,
-    "memberLastName": string,
-    "phoneNumber": string,
-    "loanRequestProgress": number,
-    "totalDeposits": number,
-    "applicantSigned": boolean,
-    "witnessName": string,
-    "guarantorList": GuarantorData[],
-}
-
 interface MainState {
     isLoggedIn: boolean,
     user: null | {
@@ -67,7 +26,6 @@ interface MainState {
         error: boolean,
     },
     loanProducts: LoanProduct[] | null,
-    loanRequests: LoanRequestData[] | null,
     loading: boolean
 }
 
@@ -82,7 +40,6 @@ export const useMainStore = defineStore('auth-store', {
             error: false,
         },
         loanProducts: null,
-        loanRequests: null,
         loading: false,
     }),
     getters: {
@@ -97,9 +54,6 @@ export const useMainStore = defineStore('auth-store', {
         },
         getLoanProducts(state) {
             return state.loanProducts
-        },
-        getLoanRequests(state) {
-            return state.loanRequests
         },
         getLoadingState(state) {
             return state.loading

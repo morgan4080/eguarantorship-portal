@@ -137,7 +137,7 @@ onMounted(() => {
     <div class="space-y-6 sm:px-6 lg:px-5">
       <div class="flex justify-between items-center">
         <Breadcrumb pageName="Dashboard" linkName="Dashboard" linkUrl="/"  current="General"/>
-        <select class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-sm rounded-md">
+        <select class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
           <option selected>Past Week</option>
           <option>Past Month</option>
           <option>Past Year</option>
