@@ -4,12 +4,16 @@
   </div>
   <div class="mt-8 flex flex-col">
     <div class="inline-block min-w-full py-2 align-middle">
-      <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+      <div class="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+        <div v-if="selectedRequests.length > 0" class="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
+          <button type="button" class="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete all</button>
+          <div class="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"></div>
+        </div>
         <table class="min-w-full divide-y divide-gray-300">
           <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
-              <input type="checkbox" checked class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
+              <input type="checkbox" :checked="indeterminate || selectedRequests.length === data.length" :indeterminate="indeterminate" @change="selectedRequests = $event.target.checked ? data.map((p) => p.id) : []" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
             </th>
             <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Request No</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
@@ -24,14 +28,14 @@
           </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 bg-white">
-          <tr v-for="item in data" :key="item.id">
+          <tr v-for="item in data" :key="item.id" :class="[selectedRequests.includes(item.id) && 'bg-gray-50']">
             <td class="relative w-12 px-6 sm:w-16 sm:px-8">
               <!-- Selected row marker, only show when row is selected. -->
-              <div class="absolute inset-y-0 left-0 w-0.5 bg-eg-bg"></div>
+              <div v-if="selectedRequests.includes(item.id)" class="absolute inset-y-0 left-0 w-0.5 bg-eg-bg"></div>
 
-              <input type="checkbox" checked class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
+              <input type="checkbox" checked class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.id" v-model="selectedRequests">
             </td>
-            <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ item.requestNo }}</td>
+            <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.id) ? 'text-eg-blue' : 'text-gray-900']" >{{ item.requestNo }}</td>
             <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ item.date }}</td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ item.memberName }}</td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.loanType }}</td>
@@ -72,7 +76,7 @@
             <div class="inline-flex shadow-sm rounded-md divide-x divide-eg-bg h-8">
               <div class="relative z-0 inline-flex shadow-sm rounded-md divide-x divide-eg-bg">
                 <div class="relative inline-flex items-center bg-eg-bg py-2 pl-3 pr-4 border border-transparent rounded-l-md shadow-sm text-white">
-                  <p class="ml-2.5 text-xs sm:text-sm font-medium">10</p>
+                  <p class="ml-2.5 text-sm sm:text-sm font-medium">10</p>
                 </div>
                 <button type="button" class="relative inline-flex items-center bg-eg-bg p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-eg-bg focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-eg-bg" aria-haspopup="listbox" aria-expanded="true" aria-labelledby="listbox-label">
                   <span class="sr-only">Change records count</span>
@@ -86,21 +90,21 @@
               <li class="text-gray-900 cursor-pointer select-none relative p-4 text-sm" id="listbox-option-0" role="option">
                 <div class="flex flex-col">
                   <div class="flex justify-between">
-                    <p class="font-normal font-normal text-xs sm:text-sm">10</p>
+                    <p class="font-normal text-sm sm:text-sm">10</p>
                   </div>
                 </div>
               </li>
               <li class="text-gray-900 cursor-pointer select-none relative p-4 text-sm" id="listbox-option-0" role="option">
                 <div class="flex flex-col">
                   <div class="flex justify-between">
-                    <p class="font-normal font-normal text-xs sm:text-sm">50</p>
+                    <p class="font-normal font-normal text-sm sm:text-sm">50</p>
                   </div>
                 </div>
               </li>
               <li class="text-gray-900 cursor-pointer select-none relative p-4 text-sm" id="listbox-option-0" role="option">
                 <div class="flex flex-col">
                   <div class="flex justify-between">
-                    <p class="font-normal font-normal text-xs sm:text-sm">100</p>
+                    <p class="font-normal font-normal text-sm sm:text-sm">100</p>
                   </div>
                 </div>
               </li>
@@ -128,7 +132,9 @@
 </template>
 
 <script setup lang="ts">
-const data: {id: number, requestNo: string, date: string, memberName: string, loanType: string, loanAmount: string, progress: string, status: string}[] = [
+import {computed, ref} from "vue";
+type LoanRequest = {id: number, requestNo: string, date: string, memberName: string, loanType: string, loanAmount: string, progress: string, status: string}
+const data: LoanRequest[] = [
   {
     id: 1,
     requestNo: 'S:429436:04:2017',
@@ -210,4 +216,10 @@ const data: {id: number, requestNo: string, date: string, memberName: string, lo
     status: 'PENDING',
   }
 ]
+
+const selectedRequests = ref([])
+
+const checked = ref(false)
+
+const indeterminate = computed(() => selectedRequests.value.length > 0 && selectedRequests.value.length < data.length)
 </script>

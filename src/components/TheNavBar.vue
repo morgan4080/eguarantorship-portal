@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import TheLogo from './TheLogo.vue'
 import {computed, ref} from "vue";
-import {useMainStore} from "../stores/main-store";
-import {pinia} from "../stores";
+import stores from "../stores";
 import GlobalSearch from "./GlobalSearch.vue";
-import LoadingBar from "./LoadingBar.vue";
 const accountMenu = ref(false);
-const mainStore = useMainStore(pinia);
+const authStore = stores.authStore;
 
-const user = computed(() => mainStore.getLoggedInUser ? mainStore.getLoggedInUser : null)
-const organisation = computed(() => mainStore.getLoggedInUser ? mainStore.getLoggedInUser.companyName : null)
-const loading = computed(() => mainStore.getLoadingState)
+const user = computed(() => authStore.getLoggedInUser ? authStore.getLoggedInUser : null)
 async function doLogout() {
   try {
     await fetch(`${import.meta.env.VITE_APP_LOGOUT_URL}`, {
@@ -25,8 +20,6 @@ async function doLogout() {
     window.location.reload()
   }
 }
-
-let theUrl: any = import.meta.env.VITE_DOMAIN_URL
 
 </script>
 <template>
@@ -44,12 +37,11 @@ let theUrl: any = import.meta.env.VITE_DOMAIN_URL
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span class="flex flex-col justify-start items-start">
-                <span class="inline-flex items-center  text-sm leading-4 font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                <span class="inline-flex items-center text-sm leading-4 font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                   <span class="sr-only">Open user menu</span>
                   {{ user ? user.firstName + ' ' + user.lastName : 'loading..' }}
                   <svg class="mt-1 rotate-90 flex-shrink-0 h-5 w-5 transform group-hover:text-gray-400 transition-colors ease-in-out duration-150 text-eg-bg" viewBox="0 0 20 20" aria-hidden="true" ><path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path></svg>
                 </span>
-                <span class="text-xs">{{ organisation }}</span>
               </span>
             </button>
 

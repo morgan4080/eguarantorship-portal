@@ -3,13 +3,10 @@ import TheNavBar from './components/TheNavBar.vue'
 import TheFooter from './components/TheFooter.vue'
 import TheSideBar from './components/TheSideBar.vue'
 import Notification from './components/Notification.vue'
-import mainStore from "./utils/store"
 import { computed } from "vue"
-const notification = computed(() => {
-  // store.getters.getNotification
-
-  return mainStore.getNotification
-})
+import stores from "./stores"
+const authStore = stores.authStore
+const notification = computed(() => authStore.getNotification)
 </script>
 
 <template>

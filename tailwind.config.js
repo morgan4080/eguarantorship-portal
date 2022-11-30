@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 const defaultTheme = require('tailwindcss/defaultTheme');
 module.exports = {
   content: [
@@ -8,9 +9,12 @@ module.exports = {
     extend: {
       colors: {
         eg: {
-          bgMain: '#F5F5F5',
-          bg: '#00637F',
-          text: '#5992A6'
+          bgMain: '#E7EAEA',
+          bg: '#28637f',
+          blue: '#28637f',
+          text: '#459aab',
+          lightblue: '#459aab',
+          grey: '#829da9'
         },
       },
       spacing: {
@@ -21,6 +25,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Poppins', ...defaultTheme.fontFamily.sans],
+        serif: ['Poppins', ...defaultTheme.fontFamily.serif],
+        mono: ['Poppins', ...defaultTheme.fontFamily.mono]
       }
     }
   },

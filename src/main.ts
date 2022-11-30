@@ -2,15 +2,16 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router/';
 import { pinia } from './stores/';
-import { useMainStore } from "./stores/main-store";
+import stores from "./stores";
 import './index.css';
 
 const app = createApp(App);
 
 app.use(router);
+
 app.use(pinia);
 
-const mainStore = useMainStore(pinia);
+const authStore = stores.authStore;
 
 const spinner: any = document.getElementById("spinner");
 
@@ -20,9 +21,9 @@ if (spinner) {
 
 router.beforeEach((to) => {
     if (to.meta.requiresAuth) {
-        mainStore.initialize()
+        authStore.initialize()
         .then((data: any) => {
-            mainStore.setAuthState(data);
+            authStore.setAuthState(data);
             const loader: any = document.getElementById("loader");
             if (loader) {
                 loader.style.display = "none";
@@ -33,9 +34,9 @@ router.beforeEach((to) => {
             const currentUrl = window.location.href;
             window.location.href = `${import.meta.env.VITE_APP_AUTH}?redirect_url=${currentUrl}`;
         })
-        .then(() => mainStore.fetchLoanProducts())
+        .then(() => authStore.fetchLoanProducts())
         .catch((e: any) => {
-            console.log(JSON.stringify(e))
+            // console.log(JSON.stringify(e))
         });
     } else {
         const currentUrl = window.location.href;

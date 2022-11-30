@@ -1,5 +1,4 @@
-import { useMainStore } from "../stores/main-store"
-import { pinia } from '../stores/'
-const mainStore = useMainStore(pinia)
+import stores from '../stores/'
+const mainStore = stores.authStore
 
 export default mainStore

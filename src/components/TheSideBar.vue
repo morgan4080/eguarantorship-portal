@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import TheLogo from './TheLogo.vue';
 import {computed, reactive, ref} from "vue";
-import {useMainStore} from "../stores/main-store";
-import {pinia} from "../stores";
+import stores from "../stores";
 import Icons from "./Icons.vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-const mainStore = useMainStore(pinia);
+const authStore = stores.authStore;
 const setWidth = ref(false);
 const theUrl = import.meta.env.VITE_DOMAIN_URL;
 
@@ -33,7 +32,7 @@ const menus = reactive([
     expanded: false,
     subMenus: []
   },
-  {
+  /*{
     title: 'LOANS',
     url: '/loans',
     icon: 'loans',
@@ -60,7 +59,7 @@ const menus = reactive([
         url: '/loans/borsa-loans'
       },
     ]
-  },
+  },*/
   {
     title: 'MEMBERS',
     url: '/members',
@@ -107,7 +106,7 @@ const menus = reactive([
   },
 ])
 
-const organisation = computed(() => mainStore.getLoggedInUser ? mainStore.getLoggedInUser.companyName : null)
+const organisation = computed(() => authStore.getLoggedInUser ? authStore.getLoggedInUser.companyName : null)
 
 const navigateTo = (item: any) => {
   item.expanded = !item.expanded;
@@ -122,19 +121,19 @@ const navigateTo = (item: any) => {
 </script>
 
 <template>
-  <div :class="{ 'transition duration-500 ease-in-out w-64': setWidth, 'transition duration-500 ease-in-out w-28': !setWidth }" class="flex flex-col transform transition-all z-50 bg-eg-bg">
+  <div :class="{ 'w-56': setWidth }" class="flex flex-col transform transition-all ease-in-out z-50 trans bg-eg-bg">
     <div class="relative">
-      <a :href="theUrl" :class="{'flex-col' : !setWidth}" class="navbar py-4 flex items-center justify-center">
+      <a :href="theUrl" :class="{'flex-col' : !setWidth}" class="navbar py-5 px-4 flex items-center">
         <TheLogo class="h-12 w-auto" />
-        <span v-if="setWidth" class="text-white ml-4 mt-2 font-semibold uppercase text-sm tracking-wide leading-relaxed">{{  organisation }}</span>
+        <span v-if="setWidth" class="text-white ml-4 mt-2 font-semibold uppercase text-xs tracking-wide leading-relaxed">{{  organisation }}</span>
       </a>
       <button v-if="setWidth" @click="setWidthFn" type="button" class="absolute rounded px-1 border-b border-l border-r transform transition-all rotate-90 -right-3 top-2 bg-white" style="background: white;">
-        <svg class="rotate-90 flex-shrink-0 h-5 w-5 transform hover:text-gray-900 transition-colors ease-in-out duration-150 text-gray-500" viewBox="0 0 20 20" aria-hidden="true">
+        <svg class="rotate-90 opacity-75 flex-shrink-0 h-5 w-5 transform hover:text-gray-900 transition-colors ease-in-out duration-150 text-gray-500" viewBox="0 0 20 20" aria-hidden="true">
           <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
         </svg>
       </button>
       <button v-if="!setWidth" @click="setWidth = !setWidth;" type="button" class="absolute rounded px-1 border-b border-l border-r transform transition-all -rotate-90 -right-3 top-2 bg-white" style="background: white;">
-        <svg class="rotate-90 flex-shrink-0 h-5 w-5 transform hover:text-gray-900 transition-colors ease-in-out duration-150 text-gray-500" viewBox="0 0 20 20" aria-hidden="true">
+        <svg class="rotate-90 opacity-75 flex-shrink-0 h-5 w-5 transform hover:text-gray-900 transition-colors ease-in-out duration-150 text-gray-500" viewBox="0 0 20 20" aria-hidden="true">
           <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
         </svg>
       </button>
@@ -142,19 +141,19 @@ const navigateTo = (item: any) => {
     <div class="flex flex-col flex-grow mt-4 pb-4 overflow-y-auto">
       <nav class="flex-1 px-2 space-y-1" aria-label="Sidebar">
         <div v-for="(item, i) in menus" :key="i">
-          <button @click="navigateTo(item)" type="button" :class="{'flex flex-col space-y-2' : !setWidth, 'flex space-x-6' : setWidth}" class="mt-1 text-white hover:bg-gray-50 hover:text-gray-900 group w-full transform transition-all items-center pl-2 pr-2 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-white" :aria-controls="`sub-menu-${i}`" :aria-expanded="item.expanded">
+          <button @click="navigateTo(item)" type="button" :class="{'flex flex-col space-y-2' : !setWidth, 'flex space-x-6' : setWidth}" class="mt-1 text-white hover:bg-gray-50 hover:text-gray-900 group w-full transform transition-all items-center pl-2 pr-2 py-2 text-left text-xs font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-white" :aria-controls="`sub-menu-${i}`" :aria-expanded="item.expanded">
             <Icons :name="item.icon"/>
 
-            <router-link :to="item.url" class="flex relative">
-              <span class="text-xs font-normal">{{ item.title }}</span>
+            <router-link :to="item.url" class="flex items-end justify-center relative">
+              <span class="text-xs font-medium">{{ item.title }}</span>
 
-              <svg v-if="item.subMenus.length > 0" class="absolute top-0 -right-5 h-5 w-5 transform group-hover:text-gray-400 transition-transform transition-colors ease-in-out duration-150 text-white" viewBox="0 0 20 20" aria-hidden="true" :class="{ 'text-gray-400 rotate-90': item.expanded, 'text-white': !(item.expanded) }">
+              <svg v-if="item.subMenus.length > 0" class="absolute -top-0.5 -right-5 h-5 w-5 transform group-hover:text-gray-400 transition-transform transition-colors ease-in-out duration-150 text-white" viewBox="0 0 20 20" aria-hidden="true" :class="{ 'text-gray-400 rotate-90': item.expanded, 'text-white': !(item.expanded) }">
                 <path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path>
               </svg>
             </router-link>
           </button>
           <div v-if="item.subMenus.length > 0" :class="{'block' : item.expanded, 'hidden' : !item.expanded }" class="space-y-1 transform transition-all" id="sub-menu-2" >
-            <router-link v-for="(sub, index) in item.subMenus" :key="index" :to="sub.url" class="group w-full flex items-center pl-18 pr-2 py-2 text-sm font-medium text-white rounded-md hover:text-gray-900 hover:bg-gray-50">
+            <router-link v-for="(sub, index) in item.subMenus" :key="index" :to="sub.url" class="group w-full flex items-center pl-18 pr-2 py-2 text-xs font-medium text-white rounded-md hover:text-gray-900 hover:bg-gray-50">
               {{ sub.title }}
             </router-link>
           </div>

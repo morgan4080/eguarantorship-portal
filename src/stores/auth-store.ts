@@ -71,7 +71,7 @@ interface MainState {
     loading: boolean
 }
 
-export const useMainStore = defineStore('main', {
+export const useMainStore = defineStore('auth-store', {
     state: (): MainState => ({
         isLoggedIn: false,
         user: null,
@@ -161,4 +161,4 @@ export const useMainStore = defineStore('main', {
             }
         }
     }
-})
+});

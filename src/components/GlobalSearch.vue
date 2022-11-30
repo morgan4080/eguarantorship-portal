@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ref, watch, toRefs, onMounted} from "vue";
-import mainStore from "../utils/store";
 import {RouteRecordName} from "vue-router";
-
+import {ref, watch, toRefs, onMounted} from "vue";
+import stores from "../stores";
+const authStore = stores.authStore;
 
 const props = defineProps<{
   ctx: RouteRecordName | null | undefined
@@ -20,11 +20,11 @@ const refDropDown = ref<HTMLDivElement | unknown>(null)
 
 
 const doSearch = (e: Event) => {
-  mainStore.setLoading(true)
+  authStore.setLoading(true)
   console.log(e)
   changed.value = true
   setTimeout(() => {
-    mainStore.setLoading(false)
+    authStore.setLoading(false)
     hasContent.value = true
   }, 1000)
 }
@@ -65,7 +65,7 @@ watch(changed, () => {
 })
 
 onMounted(() => {
-  console.log(ctx.value)
+  // console.log(ctx.value)
 })
 
 </script>

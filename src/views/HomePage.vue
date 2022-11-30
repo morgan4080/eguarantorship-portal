@@ -2,10 +2,9 @@
 import * as d3 from 'd3';
 import Breadcrumb from "../components/Breadcrumb.vue";
 import {computed, ref, onMounted} from "vue";
-import {useMainStore} from "../stores/main-store";
-import {pinia} from "../stores";
-const mainStore = useMainStore(pinia);
-const loanRequests = computed(() => mainStore.getLoanRequests ? mainStore.getLoanRequests : [
+import stores from "../stores";
+const authStore = stores.authStore;
+const loanRequests = computed(() => authStore.getLoanRequests ? authStore.getLoanRequests : [
   {
     memberFirstName: 'MORGAN',
     memberLastName: 'MUTUGI MURUNGI',
@@ -138,7 +137,7 @@ onMounted(() => {
     <div class="space-y-6 sm:px-6 lg:px-5">
       <div class="flex justify-between items-center">
         <Breadcrumb pageName="Dashboard" linkName="Dashboard" linkUrl="/"  current="General"/>
-        <select class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs rounded-md">
+        <select class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-sm rounded-md">
           <option selected>Past Week</option>
           <option>Past Month</option>
           <option>Past Year</option>
@@ -150,7 +149,7 @@ onMounted(() => {
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
                 <span class="font-semibold text-2xl">20</span>
-                <span class="uppercase text-xs font-normal">Total Requests</span>
+                <span class="uppercase text-sm font-medium">Total Requests</span>
               </div>
               <svg class="w-10" width="61" height="51" viewBox="0 0 61 51" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="21.0477" cy="11.3191" r="7.2381" fill="#FFBD14"/>
@@ -162,14 +161,14 @@ onMounted(() => {
               </svg>
             </div>
             <div class="flex justify-end pt-2">
-              <span class="font-light text-xs rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
+              <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
             </div>
           </div>
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
                 <span class="font-semibold text-2xl">82000</span>
-                <span class="uppercase text-xs font-normal">Total Amount Requested</span>
+                <span class="uppercase text-sm font-medium">Total Amount Requested</span>
               </div>
 
               <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -186,14 +185,14 @@ onMounted(() => {
 
             </div>
             <div class="flex justify-end pt-2">
-              <span class="font-light text-xs rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+13000</span>
+              <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+13000</span>
             </div>
           </div>
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
                 <span class="font-semibold text-2xl">4040</span>
-                <span class="uppercase text-xs font-normal">Closed Loans</span>
+                <span class="uppercase text-sm font-medium">Closed Loans</span>
               </div>
 
               <svg class="w-10" width="63" height="65" viewBox="0 0 63 65" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -209,14 +208,14 @@ onMounted(() => {
               </svg>
             </div>
             <div class="flex justify-end pt-2">
-              <span class="font-light text-xs rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
+              <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
             </div>
           </div>
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
                 <span class="font-semibold text-2xl">43521</span>
-                <span class="uppercase text-xs font-normal">Total Members</span>
+                <span class="uppercase text-sm font-medium">Total Members</span>
               </div>
               <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <mask id="mask0_89_1159" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -236,7 +235,7 @@ onMounted(() => {
               </svg>
             </div>
             <div class="flex justify-end pt-2">
-              <span class="font-light text-xs rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
+              <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
             </div>
           </div>
         </div>
@@ -244,8 +243,8 @@ onMounted(() => {
           <div class="flex-1 p-4 space-y-2">
             <h6 class="text-white text-sm pb-2">Latest Requests</h6>
             <div v-for="(request , i) in loanRequests.slice(0,4)" :key="i" class="space-y-1 py-2 border-b border-gray-50 text-gray-50">
-              <p class="uppercase text-xs">{{ request.memberFirstName }} {{ request.memberLastName }}</p>
-              <p class="text-xs">Requested KES {{ request.loanAmount }} <span class="font-semibold">{{ request.loanProductName }}</span></p>
+              <p class="uppercase text-sm">{{ request.memberFirstName }} {{ request.memberLastName }}</p>
+              <p class="text-sm">Requested KES {{ request.loanAmount }} <span class="font-semibold">{{ request.loanProductName }}</span></p>
             </div>
           </div>
           <div class="flex-1 flex flex-col justify-center items-center bg-white rounded-md space-y-4 py-4">
@@ -261,7 +260,7 @@ onMounted(() => {
           <div class="rounded-md border border-gray-200 overflow-hidden shadow-lg bg-eg-text bg-opacity-90 w-full h-72 py-2 ml-5 scrollCustom overflow-y-scroll">
             <div v-for="(request , i) in loanRequests" :key="i" class="space-y-1 py-1 text-gray-50 px-3 flex items-center justify-center">
               <div class="flex-1">
-                <p class="text-xs text-white font-thin">
+                <p class="text-sm text-white font-thin">
                   Request NO
                   <span class="uppercase">10230120 </span>
                   <span class="uppercase font-normal">{{ request.memberFirstName }} {{ request.memberLastName }}</span>
