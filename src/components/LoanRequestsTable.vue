@@ -13,7 +13,7 @@
           <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
-              <input type="checkbox" :checked="indeterminate || selectedRequests.length === data.length" :indeterminate="indeterminate" @change="selectedRequests = ($event.target && $event.target.checked) ? data.map((p) => p.id) : []" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
+              <input type="checkbox" :checked="indeterminate || selectedRequests.length === data.length" :indeterminate="indeterminate" @change="setSelectedRequest" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
             </th>
             <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Request No</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
@@ -222,4 +222,8 @@ const selectedRequests = ref<number[]>([])
 const checked = ref(false)
 
 const indeterminate = computed(() => selectedRequests.value.length > 0 && selectedRequests.value.length < data.length)
+
+const setSelectedRequest = (e: any) => {
+  selectedRequests.value = (e.target && e.target.checked) ? data.map((p) => p.id) : []
+}
 </script>
