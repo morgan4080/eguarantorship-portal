@@ -13,7 +13,7 @@
           <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="relative w-12 px-6 sm:w-16 sm:px-8">
-              <input type="checkbox" :checked="indeterminate || selectedRequests.length === data.length" :indeterminate="indeterminate" @change="selectedRequests = $event.target.checked ? data.map((p) => p.id) : []" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
+              <input type="checkbox" :checked="indeterminate || selectedRequests.length === data.length" :indeterminate="indeterminate" @change="selectedRequests = ($event.target && $event.target.checked) ? data.map((p) => p.id) : []" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6">
             </th>
             <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Request No</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
@@ -33,7 +33,7 @@
               <!-- Selected row marker, only show when row is selected. -->
               <div v-if="selectedRequests.includes(item.id)" class="absolute inset-y-0 left-0 w-0.5 bg-eg-bg"></div>
 
-              <input type="checkbox" checked class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.id" v-model="selectedRequests">
+              <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.id" v-model="selectedRequests">
             </td>
             <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.id) ? 'text-eg-blue' : 'text-gray-900']" >{{ item.requestNo }}</td>
             <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ item.date }}</td>
@@ -217,7 +217,7 @@ const data: LoanRequest[] = [
   }
 ]
 
-const selectedRequests = ref([])
+const selectedRequests = ref<number[]>([])
 
 const checked = ref(false)
 
