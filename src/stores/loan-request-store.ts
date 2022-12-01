@@ -41,20 +41,29 @@ export interface LoanRequestData {
     guarantorList?: GuarantorData[],
 }
 
-interface PaginationData {
+export interface PaginationData {
     totalPages: number;
     totalElements: number;
+}
+
+interface LoanRequestSummary {
+    averageDaysToComplete: number
+    totalRequests: number
+    todayRequests: number
+    totalRequested: number
 }
 
 interface LoanRequestState {
     loanRequests: LoanRequestData[],
     paginationData: PaginationData | null
+    loanRequestSummary: LoanRequestSummary | null
 }
 
 export const useLoanRequest = defineStore('loan-request-store', {
     state: (): LoanRequestState => ({
         loanRequests: [],
-        paginationData: null
+        paginationData: null,
+        loanRequestSummary: null
     }),
     getters: {
         getLoanRequests(state) {
@@ -62,6 +71,9 @@ export const useLoanRequest = defineStore('loan-request-store', {
         },
         getPaginationData(state) {
             return state.paginationData
+        },
+        getLoanSummary(state) {
+            return state.loanRequestSummary
         }
     },
     actions: {
@@ -84,6 +96,24 @@ export const useLoanRequest = defineStore('loan-request-store', {
                 }
             } catch (e: any) {
                 console.error("fetchLoanRequest",  e);
+                return Promise.reject(e.message);
+            }
+        },
+        async fetchLoanRequestSummary(params?:string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/summary${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const content = await response.json();
+                    this.loanRequestSummary = content;
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan request summary.`);
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequestSummary",  e);
                 return Promise.reject(e.message);
             }
         }

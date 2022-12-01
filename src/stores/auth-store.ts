@@ -19,7 +19,8 @@ interface MainState {
         warning: boolean,
         error: boolean,
     },
-    loading: boolean
+    loading: boolean,
+    dialogue: {title: string, isOpen: boolean}
 }
 
 export const useMainStore = defineStore('auth-store', {
@@ -33,6 +34,10 @@ export const useMainStore = defineStore('auth-store', {
             error: false,
         },
         loading: false,
+        dialogue: {
+            title: '',
+            isOpen: false
+        }
     }),
     getters: {
         getLoggedInState(state) {
@@ -46,6 +51,9 @@ export const useMainStore = defineStore('auth-store', {
         },
         getLoadingState(state) {
             return state.loading
+        },
+        getDialogue(state) {
+            return state.dialogue
         }
     },
     actions: {

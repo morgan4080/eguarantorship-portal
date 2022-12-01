@@ -18,7 +18,7 @@ const { pageName, linkUrl, linkName, current } = toRefs(props);
 
         <li>
           <div class="flex items-center">
-            <router-link :to="linkUrl" class="text-sm font-normal leading-7 text-gray-900 sm:leading-9 sm:truncate" style="color: #9e9e9e">{{ linkName }}</router-link>
+            <router-link :to="linkUrl" class="text-sm font-normal leading-7 text-gray-900 sm:leading-9 sm:truncate" style="color: #9e9e9e;background-color: transparent;">{{ linkName }}</router-link>
           </div>
         </li>
 

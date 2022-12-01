@@ -66,7 +66,7 @@ const menus = reactive([
     icon: 'members',
     expanded: false,
     subMenus: [
-      {
+      /*{
         title: 'All Members',
         url: '/members/all-members/type'
       },
@@ -77,7 +77,7 @@ const menus = reactive([
       {
         title: 'Dormant Members',
         url: '/members/dormant-members/type'
-      },
+      },*/
     ]
   },
   {

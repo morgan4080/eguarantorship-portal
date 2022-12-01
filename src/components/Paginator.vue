@@ -109,13 +109,13 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
               <div class="relative">
                 <div
                     ref="popcorn"
-                    class="inline-flex h-8 divide-x divide-blue-titleBlue rounded-md shadow-sm"
+                    class="inline-flex h-8 divide-x divide-eg-bg rounded-md shadow-sm"
                 >
                   <div
-                      class="relative z-0 inline-flex divide-x divide-blue-titleBlue rounded-md shadow-sm"
+                      class="relative z-0 inline-flex divide-x divide-eg-bg rounded-md shadow-sm"
                   >
                     <div
-                        class="relative inline-flex items-center rounded-l-md border border-transparent bg-blue-500 py-2 pl-3 pr-4 text-white shadow-sm"
+                        class="relative inline-flex items-center rounded-l-md border border-transparent bg-eg-bg py-2 pl-3 pr-4 text-white shadow-sm"
                     >
                       <p class="ml-2.5 text-xs font-medium sm:text-sm">
                         {{ filterForm.recordsPerPage }}
@@ -124,7 +124,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                     <button
                         type="button"
                         @click="pageCountOpen = !pageCountOpen"
-                        class="relative inline-flex items-center rounded-l-none rounded-r-md bg-blue-titleBlue p-2 text-sm font-medium text-white hover:bg-blue-titleBlue focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-titleBlue focus:ring-offset-2 focus:ring-offset-gray-50"
+                        class="relative inline-flex items-center rounded-l-none rounded-r-md bg-eg-bg p-2 text-sm font-medium text-white hover:bg-eg-bg focus:z-10 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-50"
                         aria-haspopup="listbox"
                         aria-expanded="true"
                         aria-labelledby="listbox-label"
@@ -164,7 +164,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                         @mouseenter="activeIndex = i"
                         @mouseleave="activeIndex = null"
                         :class="{
-                        'bg-blue-titleBlue text-white': activeIndex === i,
+                        'bg-eg-bg text-white': activeIndex === i,
                         'text-gray-900': !(activeIndex === i),
                       }"
                         class="relative cursor-pointer select-none p-4 text-sm"
@@ -215,7 +215,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
               </button>
               <div
                   :class="{
-                  'z-10 border-blue-titleBlue bg-blue-50 text-blue-titleBlue':
+                  'z-10 border-eg-bg bg-blue-50 text-eg-bg':
                     currentPage === filterForm.page,
                   'border-gray-300 bg-white text-gray-500 hover:bg-gray-50':
                     currentPage !== filterForm.page,
