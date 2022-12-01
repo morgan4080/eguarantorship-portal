@@ -3,7 +3,94 @@ import Breadcrumb from "../../components/Breadcrumb.vue";
 import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
 import GlobalSearch from "../../components/GlobalSearch.vue";
 import { useRoute } from 'vue-router';
-const route = useRoute()
+import {onMounted, reactive} from "vue";
+import Paginator from "../../components/Paginator.vue";
+import stores from "../../stores";
+const route = useRoute();
+const { loanRequestStore, loanProductStore } = stores;
+
+const filters = reactive({
+  currentPage: 0,
+  fromDate: '',
+  toDate: '',
+  recordsPerPage: 10,
+  searchTerm: '',
+  order: '',
+  page: 0
+})
+
+const searchLoanRequests = (filterData?: {refId: string, searchTerm: string, fromDate: string, toDate: string, recordsPerPage: number, order: string, page: number}) => {
+  let params = ``
+  if (filterData) {
+    // expand params
+    type LoanReqStatuses = "CLOSED" | "OPEN" | "READ"
+
+    type SigningStatus = "COMPLETED" | "INPROGRESS" | "ERROR"
+
+    type AcceptanceStatus = "COMPLETED" | "INPROGRESS" | "ANY"
+
+    type ApplicationStatus =  "COMPLETED" | "INPROGRESS"
+
+    type IncludeInactive = "true" | "false"
+
+    type SearchParamsTypes = {
+      productRefId: string | null;
+      memberRefId: string | null;
+      guarantorRefId: string | null;
+      loanReqStatus: LoanReqStatuses | null,
+      signingStatus: SigningStatus | null,
+      acceptanceStatus: AcceptanceStatus | null,
+      applicationStatus: ApplicationStatus | null,
+      witnessRefId: string | null,
+      loanNumber: string | null,
+      startDate: string | null,
+      endDate: string | null,
+      searchTerm: string | null,
+      order: string | null,
+      pageSize: number | null,
+      pageIndex: number | null,
+      includeInActive: IncludeInactive | null,
+    }
+
+    let searchParams: SearchParamsTypes = {
+      productRefId: null,
+      memberRefId: null,
+      guarantorRefId: null,
+      loanReqStatus: null,
+      signingStatus: null,
+      acceptanceStatus: null,
+      applicationStatus: null,
+      witnessRefId: null,
+      loanNumber: null,
+      startDate: null,
+      endDate: null,
+      searchTerm: null,
+      order: null,
+      pageSize: null,
+      pageIndex: null,
+      includeInActive: null,
+    }
+
+    console.log('updating filters', filterData)
+  }
+
+  loanRequestStore.fetchLoanRequests(params)
+}
+
+const refreshNext = () => {
+
+}
+const refreshPrev = () => {
+
+}
+const refreshCurrent = () => {
+
+}
+
+onMounted(() => {
+  searchLoanRequests()
+})
+
 </script>
 <template>
   <div class="w-full pt-16 pb-32">
@@ -90,19 +177,19 @@ const route = useRoute()
           </div>
         </div>
       </div>
-      <LoanRequestsTable>
+      <LoanRequestsTable :loanRequests="loanRequestStore.getLoanRequests">
         <div class="sm:flex-auto">
-          <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name"/>
+          <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLoanRequests" />
         </div>
         <div class="mt-0 ml-16 flex flex-wrap space-x-4">
           <div class="flex items-center">
             <span class="mx-4 text-gray-500">From</span>
             <div>
-              <input name="start" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-amber-500 dark:focus:border-amber-500" placeholder="Start date">
+              <input v-model="filters.fromDate" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
             </div>
             <span class="mx-4 text-gray-500">To</span>
             <div>
-              <input name="end" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-amber-500 dark:focus:border-amber-500" placeholder="End date">
+              <input v-model="filters.toDate" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
             </div>
           </div>
           <button type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto">
@@ -113,6 +200,15 @@ const route = useRoute()
           </button>
         </div>
       </LoanRequestsTable>
+      <Paginator
+          :current-page="filters.currentPage"
+          :filter-form="filters"
+          @refreshNext="refreshNext"
+          @refreshPrev="refreshPrev"
+          @refreshCurrent="refreshCurrent"
+          :total-pages="loanRequestStore.getPaginationData ? loanRequestStore.getPaginationData.totalPages : 0"
+          :total-elements="loanRequestStore.getPaginationData ? loanRequestStore.getPaginationData.totalElements : 0"
+      />
     </div>
   </div>
 </template>

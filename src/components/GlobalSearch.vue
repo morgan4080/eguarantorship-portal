@@ -1,44 +1,29 @@
 <script setup lang="ts">
 import {RouteRecordName} from "vue-router";
-import {ref, watch, toRefs, onMounted} from "vue";
-import stores from "../stores";
-const authStore = stores.authStore;
+import {ref, watch, toRefs, reactive} from "vue";
 
 const props = defineProps<{
   ctx: RouteRecordName | null | undefined
-  placeholder: string
+  placeholder: string,
+  hasFilter?: boolean,
+  filterEntities?: any,
+  fromDate?: string,
+  toDate?: string,
+  currentPage?: number,
+  update?: (filterData: {refId: string, searchTerm: string, fromDate: string, toDate: string, recordsPerPage: number, order: string, page: number}) => void
 }>()
 
-const { ctx, placeholder } = toRefs(props);
+const { ctx, placeholder, hasFilter, fromDate, toDate, currentPage } = toRefs(props);
 
 const changed = ref<boolean>(false)
 const hasContent = ref<boolean>(false)
 const hovering = ref<string>('')
-const searchTerm = ref<string>('')
 const selected = ref<number | null>(null)
 const refDropDown = ref<HTMLDivElement | unknown>(null)
-
-
-const doSearch = (e: Event) => {
-  authStore.setLoading(true)
-  console.log(e)
-  changed.value = true
-  setTimeout(() => {
-    authStore.setLoading(false)
-    hasContent.value = true
-  }, 1000)
-}
 
 const showList = () => {
   changed.value = !changed.value
   hasContent.value = !hasContent.value
-}
-
-const makeSelection = (val: number) => {
-  changed.value = false
-  selected.value = val
-  searchTerm.value = 'Leslie Alexander'
-  // navigate to searched item
 }
 
 const onClickAway = (ref: any, handler: any) => {
@@ -64,17 +49,38 @@ watch(changed, () => {
   onClickAway(refDropDown.value, () => changed.value = false)
 })
 
-onMounted(() => {
-  // console.log(ctx.value)
+const searchFilter = reactive({
+  refId: '',
+  searchTerm: '',
+  fromDate: fromDate?.value,
+  toDate: toDate?.value,
+  recordsPerPage: 10,
+  order: "ASC",
+  page: currentPage?.value,
 })
+
+const makeSelection = (val: number) => {
+  changed.value = false
+  selected.value = val
+  // searchFilter.searchTerm = 'Leslie Alexander'
+  // navigate to searched item
+}
+
 
 </script>
 <template>
   <div class="relative">
-    <input @mousedown="onMouseDown($event)" @input="doSearch" v-model="searchTerm" id="combobox" type="text" :placeholder="placeholder" class="w-full rounded-full border border-gray-300 bg-white py-2 pl-3 pr-12 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 sm:text-sm" role="combobox" aria-controls="options" :aria-expanded="changed">
+    <div v-if="hasFilter" class="absolute inset-y-0 left-0 flex items-center">
+      <label for="loan-products" class="sr-only">Loan Products</label>
+      <select v-model="searchFilter.refId" id="loan-products" autocomplete="loan-products" class="h-full rounded-full border-transparent bg-transparent py-0 pl-3 pr-10 text-gray-500 border-0 ring-0 focus:ring-eg-bg sm:text-sm">
+        <option :value="``" selected>All Loan Requests</option>
+        <option v-for="loanProd in filterEntities.getLoanProducts" :key="loanProd.refId" :value="loanProd.refId">{{ loanProd.name }}</option>
+      </select>
+    </div>
+    <input @mousedown="onMouseDown($event)" v-model="searchFilter.searchTerm" id="combobox" type="text" :placeholder="placeholder" :class="{'pl-48' : hasFilter, 'pl-6' : !hasFilter}" class="w-full rounded-full border border-gray-300 bg-white py-2 pr-12 shadow-sm ring-0 focus:ring-eg-bg focus:border-eg-bg focus:outline-none sm:text-sm" role="combobox" aria-controls="options" :aria-expanded="changed">
 
-    <button @click="showList" type="button" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-      <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+    <button @click="showList" type="button" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-4 focus:outline-none">
+      <svg class="h-5 w-5 text-eg-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
       </svg>
     </button>

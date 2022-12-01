@@ -1,11 +1,5 @@
 import { defineStore } from 'pinia';
-
-interface LoanProduct {
-    refId: string;
-    name: string;
-    interestRate: number;
-    requiredGuarantors: number;
-}
+// https://eguarantorship-api.presta.co.ke/api/v1/loan-request/summary
 
 interface MainState {
     isLoggedIn: boolean,
@@ -25,7 +19,6 @@ interface MainState {
         warning: boolean,
         error: boolean,
     },
-    loanProducts: LoanProduct[] | null,
     loading: boolean
 }
 
@@ -39,7 +32,6 @@ export const useMainStore = defineStore('auth-store', {
             warning: false,
             error: false,
         },
-        loanProducts: null,
         loading: false,
     }),
     getters: {
@@ -51,9 +43,6 @@ export const useMainStore = defineStore('auth-store', {
         },
         getNotification(state) {
             return state.notification
-        },
-        getLoanProducts(state) {
-            return state.loanProducts
         },
         getLoadingState(state) {
             return state.loading
@@ -98,21 +87,5 @@ export const useMainStore = defineStore('auth-store', {
                 }
             }, 10000)
         },
-        async fetchLoanProducts(): Promise<any> {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/loans-products`, {
-                    method: 'GET',
-                    credentials: 'include'
-                })
-                if (response.status === 200) {
-                    this.loanProducts = await response.json()
-                    return Promise.resolve(response.json())
-                } else {
-                    return Promise.reject(`${response.status}: Failed to fetch loan products`)
-                }
-            } catch (e: any) {
-                return Promise.reject(e.message)
-            }
-        }
     }
 });
