@@ -42,12 +42,14 @@ const actions = [
   {
     id: 1,
     name: 'Create Member',
-    icon: UserPlusIcon
+    icon: UserPlusIcon,
+    href: '/members/create'
   },
   {
     id: 2,
     name: 'Import Members',
-    icon: ArrowUpTrayIcon
+    icon: ArrowUpTrayIcon,
+    href: '/members/import'
   }
 ]
 </script>

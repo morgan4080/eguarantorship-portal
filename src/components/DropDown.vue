@@ -1,8 +1,8 @@
 <template>
   <Menu as="div" class="relative inline-block text-left">
     <div>
-      <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-        Options
+      <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+        Actions
         <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
       </MenuButton>
     </div>
@@ -11,10 +11,10 @@
       <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg  drop-shadow ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div v-for="item in items" :key="item.id" class="py-1">
           <MenuItem v-slot="{ active }">
-            <a href="#" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
+            <router-link :to="item.href" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
               <component v-if="item.icon" :is="item.icon" class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
               {{ item.name }}
-            </a>
+            </router-link>
           </MenuItem>
         </div>
       </MenuItems>
@@ -24,12 +24,13 @@
 
 <script setup lang="ts">
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import stores from "../stores";
 import {
   ChevronDownIcon,
 } from '@heroicons/vue/20/solid'
 import {toRefs} from "vue";
 const props = defineProps<{
-  items: {id: number, name: string, icon?: string}[]
+  items: {id: number, name: string, icon?: any, href?: string}[]
 }>()
 const { items } = toRefs(props)
 </script>

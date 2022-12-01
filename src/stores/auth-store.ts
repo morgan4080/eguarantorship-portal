@@ -95,5 +95,8 @@ export const useMainStore = defineStore('auth-store', {
                 }
             }, 10000)
         },
+        setDialogue(payload: {title: string, isOpen: boolean}) {
+            this.dialogue = payload
+        }
     }
 });

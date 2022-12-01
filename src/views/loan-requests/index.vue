@@ -75,6 +75,7 @@ const searchLoanRequests = (filterData?: {refId: string, searchTerm: string, fro
   }
 
   loanRequestStore.fetchLoanRequests(params)
+  loanRequestStore.fetchLoanRequestSummary()
 }
 
 const refreshNext = () => {
@@ -102,8 +103,8 @@ onMounted(() => {
         <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
           <div class="flex-1 flex justify-between items-start">
             <div class="flex flex-col space-y-2">
-              <span class="uppercase text-sm font-medium">Total Amount Requested</span>
-              <span class="font-semibold text-2xl">82000</span>
+              <span class="uppercase text-sm font-medium">Total Requests</span>
+              <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanSummary ? loanRequestStore.getLoanSummary.totalRequests : 0 }}</span>
             </div>
             <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
               <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -121,8 +122,8 @@ onMounted(() => {
         <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
           <div class="flex-1 flex justify-between items-start">
             <div class="flex flex-col space-y-2">
-              <span class="uppercase text-sm font-medium">Total Loans Requested</span>
-              <span class="font-semibold text-2xl">82000</span>
+              <span class="uppercase text-sm font-medium">Today Requests</span>
+              <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanSummary ? loanRequestStore.getLoanSummary.todayRequests : 0 }}</span>
             </div>
             <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
               <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -141,7 +142,7 @@ onMounted(() => {
           <div class="flex-1 flex justify-between items-start">
             <div class="flex flex-col space-y-2">
               <span class="uppercase text-sm font-medium">Average Days To Complete</span>
-              <span class="font-semibold text-2xl">82000</span>
+              <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanSummary ? loanRequestStore.getLoanSummary.averageDaysToComplete : 0 }}</span>
             </div>
 
             <svg class="w-10" width="79" height="75" viewBox="0 0 79 75" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -161,7 +162,7 @@ onMounted(() => {
           <div class="flex-1 flex justify-between items-start">
             <div class="flex flex-col space-y-2">
               <span class="uppercase text-sm font-medium">Total Amount Requested</span>
-              <span class="font-semibold text-2xl">82000</span>
+              <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanSummary ? loanRequestStore.getLoanSummary.totalRequested : 0 }}</span>
             </div>
             <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
               <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">

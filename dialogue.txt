@@ -1,0 +1,14 @@
+<Dialogue v-if="item.isModal" :title="authStore.getDialogue.title" :is-open="authStore.getDialogue.isOpen">
+              <template v-slot:modalOpener>
+                <div @click.exact="authStore.setDialogue({title: item.name, isOpen: true})" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']" class="cursor-pointer">
+                  <component v-if="item.icon" :is="item.icon" class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                  {{ item.name }}
+                </div>
+              </template>
+              <template v-slot:content>
+
+              </template>
+              <template v-slot:actionButtons>
+
+              </template>
+            </Dialogue>
