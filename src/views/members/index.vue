@@ -4,11 +4,13 @@ import MembersTable from "../../components/MembersTable.vue";
 import {onMounted, reactive} from "vue";
 import {
   UserPlusIcon,
-  ArrowUpTrayIcon
+  ArrowUpTrayIcon,
+  ChevronDownIcon,
 } from '@heroicons/vue/20/solid'
 import GlobalSearch from "../../components/GlobalSearch.vue";
 import DropDown from "../../components/DropDown.vue";
 import stores from "../../stores";
+import {MenuButton} from "@headlessui/vue";
 const { memberStore } = stores;
 
 const searchMembers = () => {
@@ -58,7 +60,12 @@ const actions = [
     <div class="space-y-6 sm:px-6 lg:px-5">
       <div class="flex justify-between items-center">
         <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
-        <DropDown :items="actions"/>
+        <DropDown :items="actions">
+          <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+            Actions
+            <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+          </MenuButton>
+        </DropDown>
       </div>
       <div class="sm:grid sm:grid-cols-4 sm:gap-3">
         <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
@@ -154,7 +161,7 @@ const actions = [
               <input v-model="filters.toDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
             </div>
           </div>
-          <button type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto">
+          <button type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
             </svg>

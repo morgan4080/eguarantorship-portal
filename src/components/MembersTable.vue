@@ -4,7 +4,7 @@
   </div>
   <div class="mt-8 flex flex-col">
     <div class="inline-block min-w-full py-2 align-middle">
-      <div class="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+      <div class="relative shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <div v-if="selectedRequests.length > 0" class="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
           <button type="button" class="inline-flex items-center rounded border border-gray-300 bg-pink-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete all</button>
           <button type="button" class="inline-flex items-center rounded border border-gray-300 bg-green-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Export</button>
@@ -46,12 +46,24 @@
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.totalShares }}</td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.memberStatus }}</td>
             <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-              <button type="button" class="text-eg-text hover:text-eg-bg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
-                <span class="sr-only">, {{ item.refId }}</span>
-              </button>
+              <DropDown :items="[
+                {
+                  id: 1,
+                  name: 'View Member',
+                  icon: EyeIcon,
+                  href: `/members/${item.refId}/view`
+                },
+                {
+                  id: 2,
+                  name: 'Edit Members',
+                  icon: PencilIcon,
+                  href: `/members/${item.refId}/edit`
+                }
+              ]">
+                <MenuButton class="text-eg-text hover:text-eg-bg">
+                  <EllipsisVerticalIcon class="h-6 w-6" aria-hidden="true" />
+                </MenuButton>
+              </DropDown>
             </td>
           </tr>
           </tbody>
@@ -64,6 +76,9 @@
 <script setup lang="ts">
 import {computed, ref, toRefs} from "vue";
 import {Member} from "../stores/member-store";
+import {MenuButton} from "@headlessui/vue";
+import DropDown from "./DropDown.vue";
+import {EllipsisVerticalIcon, EyeIcon, PencilIcon} from "@heroicons/vue/20/solid";
 
 const props = defineProps<{
   members: Member[]

@@ -31,6 +31,7 @@ interface MemberState {
     members: Member[]
     paginationData: PaginationData | null
     memberSummary: MemberSummary | null
+    memberDetails: Member | null
 }
 interface MemberDetailSubmit {
     firstName: string,
@@ -54,6 +55,7 @@ export const useMember = defineStore('member-store', {
         members: [],
         paginationData: null,
         memberSummary: null,
+        memberDetails: null
     }),
     getters: {
         getMembers(state) {
@@ -62,6 +64,9 @@ export const useMember = defineStore('member-store', {
         getPaginationData(state) {
             return state.paginationData
         },
+        getMemberDetails(state) {
+            return state.memberDetails
+        }
     },
     actions: {
         async fetchMembers(params?: string) {
@@ -71,17 +76,20 @@ export const useMember = defineStore('member-store', {
                     credentials: 'include'
                 });
                 if (response.status === 200) {
-                    const {list, total} = await response.json();
-                    this.members = list;
+                    const {list, total} = await response.json()
+                    this.members = list
                     this.paginationData = {
                         totalPages: total/10, // TODO: check query param and remove 10
                         totalElements: total,
-                    };
+                    }
+                    return Promise.resolve(list)
                 } else {
-                    console.error(`${response.status}: Failed to fetch members.`);
+                    console.error(`${response.status}: Failed to fetch members.`)
+                    return Promise.reject(`${response.status}: Failed to fetch members.`)
                 }
             } catch (e: any) {
-                console.error("fetchMembers",  e.message);
+                console.error("fetchMembers",  e.message)
+                return Promise.reject(e.message)
             }
         },
         async fetchMembersSummary(params?: string) {
@@ -91,28 +99,82 @@ export const useMember = defineStore('member-store', {
                     credentials: 'include'
                 });
                 if (response.status === 200) {
-                    this.memberSummary = await response.json();
+                    const data = await response.json()
+                    this.memberSummary = data
+                    return Promise.resolve(data)
                 } else {
-                    console.log(`${response.status}: Failed to fetch member summary.`);
+                    console.log(`${response.status}: Failed to fetch member summary.`)
+                    return Promise.reject(`${response.status}: Failed to fetch member summary.`)
                 }
             } catch (e: any) {
-                console.error("fetchMembersSummary",  e.message);
+                console.error("fetchMembersSummary",  e.message)
+                return Promise.reject(e.message)
             }
         },
         async submitMemberDetails(payload: MemberDetailSubmit[]) {
             try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/members`, {
                     method: 'POST',
                     credentials: 'include',
+                    headers: myHeaders,
                     body: JSON.stringify(payload)
                 });
                 if (response.status === 200) {
-                    this.router.push('/members')
+                    const data = await response.json()
+                    console.log(`${response.status}`, data)
+                    return Promise.resolve(data)
                 } else {
                     console.error(`${response.status}: Failed to submit member details.`)
+                    return Promise.reject(`${response.status}: Failed to submit member details.`)
                 }
             } catch (e: any) {
                 console.error("submitMemberDetails",  e.message)
+                return Promise.reject(e.message)
+            }
+        },
+        async editMemberDetails(payload: Omit<MemberDetailSubmit, 'memberNumber'>, refId: string) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/members/${refId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: myHeaders,
+                    body: JSON.stringify(payload)
+                });
+                if (response.status === 200) {
+                    const data = await response.json()
+                    console.log(`${response.status}`, data)
+                    return Promise.resolve(data)
+                } else {
+                    console.error(`${response.status}: Failed to edit member details.`)
+                    return Promise.reject(`${response.status}: Failed to edit member details.`)
+                }
+            } catch (e: any) {
+                console.error("editMemberDetails",  e.message)
+                return Promise.reject(e.message)
+            }
+        },
+        async fetchMember(refId: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/members/${refId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const data = await response.json()
+                    console.log(`${response.status}`, data)
+                    this.memberDetails = data
+                    return Promise.resolve(data)
+                } else {
+                    console.error(`${response.status}: Failed to fetch member details.`)
+                    return Promise.reject(`${response.status}: Failed to fetch member details.`)
+                }
+            } catch (e: any) {
+                console.error("fetchMember",  e.message)
+                return Promise.reject(e.message)
             }
         }
     }

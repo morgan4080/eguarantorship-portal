@@ -8,11 +8,12 @@ import "../node_modules/nprogress/nprogress.css";
 import './index.css';
 
 const app = createApp(App);
-
-app.use(router);
 pinia.use(({ store }) => {
     store.router = markRaw(router);
 });
+
+app.use(router);
+
 app.use(pinia);
 
 app.config.globalProperties.$filters = {
@@ -51,7 +52,11 @@ window.fetch = new Proxy(window.fetch, {
                         }
                         if (response.status >= 500 && response.status < 600) {
                             const {message} = JSON.parse(text)
-                            await authStore.defineNotification({message, error: true})
+                            await authStore.defineNotification({
+                                id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+                                message: `${message}`,
+                                error: true
+                            })
                         }
                         throw err;
                     });

@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 // https://eguarantorship-api.presta.co.ke/api/v1/loan-request/summary
 interface NotificationType {
+    id: string,
     message: string,
-    success: boolean,
-    warning: boolean,
-    error: boolean,
+    success?: boolean,
+    warning?: boolean,
+    error?: boolean,
 }
 interface MainState {
     isLoggedIn: boolean,
@@ -76,11 +77,14 @@ export const useMainStore = defineStore('auth-store', {
             this.user = data;
             this.isLoggedIn = true;
         },
+        clearNotification(id: string) {
+            this.notification = this.notification.filter(
+                notification => notification.id !== id
+            );
+        },
         defineNotification(payload: NotificationType) {
             this.notification.push(payload)
-            setTimeout(() => {
-                this.notification = []
-            }, 50000)
+            setTimeout(() => this.clearNotification(payload.id), 5000)
         },
         setDialogue(payload: {title: string, isOpen: boolean}) {
             this.dialogue = payload
