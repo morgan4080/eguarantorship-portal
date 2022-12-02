@@ -24,3 +24,7 @@ body {
 .router-link-active.router-link-exact-active {
     @apply bg-eg-lightblue;
 }
+
+.input-errors {
+    @apply p-1;
+}

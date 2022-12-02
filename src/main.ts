@@ -43,14 +43,15 @@ window.fetch = new Proxy(window.fetch, {
         result
             .then(response => {
                 if (!response.ok) {
-                    response.text().then(text => {
+                    response.text().then(async (text) => {
                         const err = new Error("HTTP status code: " + response.status);
                         err.message = text;
                         if (response.status === 401) {
 
                         }
                         if (response.status >= 500 && response.status < 600) {
-
+                            const {message} = JSON.parse(text)
+                            await authStore.defineNotification({message, error: true})
                         }
                         throw err;
                     });

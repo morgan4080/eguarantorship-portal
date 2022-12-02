@@ -13,5 +13,5 @@ const authStore = stores.authStore
     <TheSideBar v-if="$route.name !== 'Landing' && $route.name !== 'Password-Reset'" />
     <router-view></router-view>
   </div>
-  <Notification :message="authStore.getNotification.message" :success="authStore.getNotification.success" :warning="authStore.getNotification.warning" :error="authStore.getNotification.error" />
+  <Notification />
 </template>
