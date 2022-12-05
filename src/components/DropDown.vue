@@ -8,7 +8,7 @@
       <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg  drop-shadow ring-1 ring-black ring-opacity-5 focus:outline-none">
         <div v-for="item in items" :key="item.id" class="py-1">
           <MenuItem v-slot="{ active }">
-            <router-link :to="item.href" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
+            <router-link :to="`${item.href}`" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm']">
               <component v-if="item.icon" :is="item.icon" class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
               {{ item.name }}
             </router-link>

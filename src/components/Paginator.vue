@@ -25,7 +25,7 @@ const changePage = (act: string): void => {
 };
 const popcorn = ref(<any>null);
 const tooltip = ref(<any>null);
-const lots = ref(<number[]>[10, 50, 100, 500]);
+const lots = ref(<number[]>[10, 50, 100]);
 const activeIndex = ref(<any>null);
 const selectedIndex = ref(<any>null);
 const choose = (index: number) => {
@@ -43,6 +43,12 @@ watch(pageCountOpen, () => {
           name: "offset",
           options: {
             offset: [5, 10],
+          },
+        },
+        {
+          name: 'flip',
+          options: {
+            fallbackPlacements: ['top', 'right'],
           },
         },
       ],

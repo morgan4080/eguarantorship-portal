@@ -72,7 +72,7 @@ export const useLoanRequest = defineStore('loan-request-store', {
         getPaginationData(state) {
             return state.paginationData
         },
-        getLoanSummary(state) {
+        getLoanRequestsSummary(state) {
             return state.loanRequestSummary
         }
     },

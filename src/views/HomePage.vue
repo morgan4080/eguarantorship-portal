@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import * as d3 from 'd3';
   import Breadcrumb from "../components/Breadcrumb.vue";
-  import {computed, ref, onMounted} from "vue";
+  import {computed, ref, onMounted, watch} from "vue";
   import stores from "../stores";
-  const {loanRequestStore} = stores;
+  import generateDateRange from "../utils/generateDateRange";
+  const {loanRequestStore, memberStore, loanStore} = stores;
   const loanRequests = computed(() => (loanRequestStore.getLoanRequests && loanRequestStore.getLoanRequests.length > 0) ? loanRequestStore.getLoanRequests : [
-    {
+    /*{
       memberFirstName: 'MORGAN',
       memberLastName: 'MUTUGI MURUNGI',
       loanAmount: 500000,
@@ -40,13 +41,11 @@
       memberLastName: 'MUTUGI MURUNGI',
       loanAmount: 500000,
       loanProductName: 'Inua Loan'
-    }
+    }*/
   ]);
   const hrWidth = (step: number = 0) => {
     return (step * 100) / 3
   };
-
-  const filter = ref('Past Week')
 
   const data = [2,4,6,8,10,14,20]
 
@@ -54,7 +53,9 @@
 
   const targetD30 = ref(null)
 
-  onMounted(() => {
+  const filter = ref('year')
+
+  onMounted(async () => {
     if (targetD3.value) {
       (() => {
         let svg = d3.select(targetD3.value)
@@ -129,6 +130,26 @@
         }).attr('class', 'text-xxs font-semibold fill-red-500').text('KES 20M');
       })()
     }
+
+    // fetching summary
+    const { startDate, endDate } = generateDateRange(filter.value)
+    const query = `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`
+
+    await Promise.all([
+      memberStore.fetchMembersSummary(query),
+      loanRequestStore.fetchLoanRequestSummary(query),
+      loanStore.fetchLoanSummary(query)
+    ])
+  })
+
+  watch(filter, async () => {
+    const { startDate, endDate } = generateDateRange(filter.value)
+    const query = `?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`
+    await Promise.all([
+      memberStore.fetchMembersSummary(query),
+      loanRequestStore.fetchLoanRequestSummary(query),
+      loanStore.fetchLoanSummary(query)
+    ])
   })
 
 </script>
@@ -137,10 +158,11 @@
     <div class="space-y-6 sm:px-6 lg:px-5">
       <div class="flex justify-between items-center">
         <Breadcrumb pageName="Dashboard" linkName="Dashboard" linkUrl="/"  current="General"/>
-        <select class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
-          <option selected>Past Week</option>
-          <option>Past Month</option>
-          <option>Past Year</option>
+        <select v-model="filter" class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+          <option value="day">Past Day</option>
+          <option value="week">Past Week</option>
+          <option value="month">Past Month</option>
+          <option value="year">Past Year</option>
         </select>
       </div>
       <div class="sm:grid sm:gap-8 sm:grid-cols-2 text-eg-text">
@@ -148,7 +170,7 @@
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
-                <span class="font-semibold text-2xl">20</span>
+                <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanRequestsSummary?.totalRequests }}</span>
                 <span class="uppercase text-sm font-medium">Total Requests</span>
               </div>
               <svg class="w-10" width="61" height="51" viewBox="0 0 61 51" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -167,7 +189,7 @@
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
-                <span class="font-semibold text-2xl">82000</span>
+                <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanRequestsSummary?.totalRequested }}</span>
                 <span class="uppercase text-sm font-medium">Total Amount Requested</span>
               </div>
 
@@ -191,7 +213,7 @@
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
-                <span class="font-semibold text-2xl">4040</span>
+                <span class="font-semibold text-2xl">{{ loanStore.getLoanSummary?.CLOSED }}</span>
                 <span class="uppercase text-sm font-medium">Closed Loans</span>
               </div>
 
@@ -214,7 +236,7 @@
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
-                <span class="font-semibold text-2xl">43521</span>
+                <span class="font-semibold text-2xl">{{ memberStore.getMemberSummary?.ACTIVE }}</span>
                 <span class="uppercase text-sm font-medium">Total Members</span>
               </div>
               <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
