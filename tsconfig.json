@@ -22,8 +22,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "currency_filters.d.ts",
-    "pinia.d.ts"
+    "types/**/*.d.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

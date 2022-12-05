@@ -1,5 +1,7 @@
-declare module "vue/types/vue" {
-    interface Vue {
+export {}
+
+declare module 'vue' {
+    interface ComponentCustomProperties {
         $filters: {
             currencyKES: (money: number) => string
         }

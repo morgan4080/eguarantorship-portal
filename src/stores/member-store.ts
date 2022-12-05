@@ -169,32 +169,7 @@ export const useMember = defineStore('member-store', {
                 if (response.status === 200) {
                     const data = await response.json()
                     console.log(`${response.status}`, data)
-                    this.memberDetails = {
-                        "email": "",
-                        "idNumber": "",
-                        "isTermsAccepted": false,
-                        "refId": "IyJ8lmaCsT6yANkS",
-                        "created": "11/05/2022 08:39",
-                        "createdBy": "39fc32a7-675e-4584-b9c7-496bfe31093c",
-                        "updated": "18/10/2022 07:53",
-                        "updatedBy": "39fc32a7-675e-4584-b9c7-496bfe31093c",
-                        "firstName": "HERMAN",
-                        "fullName": "HERMAN KIMANI CHEGE",
-                        "lastName": "CHEGE",
-                        "memberNumber": "33",
-                        "phoneNumber": "254721578854",
-                        "totalShares": 25000,
-                        "totalDeposits": 15000,
-                        "committedAmount": 0,
-                        "availableAmount": 0,
-                        "memberStatus": "ACTIVE",
-                        "details": {
-                            "mname": {
-                                "value": "KIMANI",
-                                "type": "TEXT"
-                            }
-                        }
-                    }
+                    this.memberDetails = data
                     return Promise.resolve(data)
                 } else {
                     console.error(`${response.status}: Failed to fetch member details.`)
