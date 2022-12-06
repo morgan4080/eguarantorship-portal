@@ -11,39 +11,30 @@
         </div>
         <table class="min-w-full divide-y divide-gray-300">
           <thead class="bg-gray-50">
-          <tr>
-            <th v-for="(header, i) in form.columns" :key="`${header}${i}`" scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">
-              <div class="flex flex-col space-y-2">
-                <span>{{ header.label }}</span>
-                <select
-                    class="block h-8 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md"
-                    @change="exchangeValues($event.target.value, header.label)"
-                >
-                  <option hidden>Select For</option>
-                  <option
-                      v-for="(item , index) in form.items"
-                      :key="index"
-                      :value="item"
+            <tr>
+              <th v-for="(header, i) in form.columns" :key="`${header}${i}`" scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <div class="flex flex-col space-y-2">
+                  <span>{{ header.label }}</span>
+                  <select
+                      class="block h-8 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md"
+                      @change="exchangeValues($event.target.value, header.label)"
                   >
-                    {{ item }}
-                  </option>
-                </select>
-              </div>
-            </th>
-          </tr>
+                    <option hidden>Select For</option>
+                    <option
+                        v-for="(item , index) in form.items"
+                        :key="index"
+                        :value="item"
+                    >
+                      {{ item }}
+                    </option>
+                  </select>
+                </div>
+              </th>
+            </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 bg-white">
-            <tr v-for="(member, i) in form.rows" :key="i">
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.memberNumber }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.firstName }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.lastName }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.email }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.idNumber }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.phoneNumber }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.pinSecret }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.availableAmount }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.totalDeposits }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ member.totalDeposits }}</td>
+            <tr v-for="(row, i) in form.rows" :key="`r${i}`">
+              <td v-for="(column, index) in form.columns" :key="`c${index}`" class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ row[column.label] }}</td>
             </tr>
           </tbody>
         </table>
