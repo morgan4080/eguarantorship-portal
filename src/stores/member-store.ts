@@ -32,6 +32,8 @@ interface MemberState {
     paginationData: PaginationData | null
     memberSummary: MemberSummary | null
     memberDetails: Member | null
+    memberViewData: string | null
+    memberHeader: any[]
 }
 interface MemberDetailSubmit {
     firstName: string,
@@ -55,7 +57,9 @@ export const useMember = defineStore('member-store', {
         members: [],
         paginationData: null,
         memberSummary: null,
-        memberDetails: null
+        memberDetails: null,
+        memberViewData: null,
+        memberHeader: []
     }),
     getters: {
         getMembers(state) {
@@ -69,6 +73,12 @@ export const useMember = defineStore('member-store', {
         },
         getMemberSummary(state) {
             return state.memberSummary
+        },
+        getMemberViewData(state) {
+            return state.memberViewData
+        },
+        getMemberHeader(state) {
+            return state.memberHeader
         }
     },
     actions: {
@@ -137,7 +147,7 @@ export const useMember = defineStore('member-store', {
                 return Promise.reject(e.message)
             }
         },
-        async editMemberDetails(payload: Omit<MemberDetailSubmit, 'memberNumber'>, refId: string) {
+        async editMemberDetails(payload: Omit<MemberDetailSubmit, 'pinSecret' | 'memberNumber'>, refId: string) {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
@@ -179,6 +189,12 @@ export const useMember = defineStore('member-store', {
                 console.error("fetchMember",  e.message)
                 return Promise.reject(e.message)
             }
+        },
+        setMemberViewData(str: string) {
+            this.memberViewData = str
+        },
+        setMemberHeader(headers: []) {
+            this.memberHeader = headers
         }
     }
 })

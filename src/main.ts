@@ -28,12 +28,6 @@ app.config.globalProperties.$filters = {
 
 const { authStore, loanProductStore } = stores;
 
-const spinner: any = document.getElementById("spinner");
-
-if (spinner) {
-    spinner.style.display = "block";
-}
-
 window.fetch = new Proxy(window.fetch, {
     apply(fetch, that, args: any) {
         // Forward function call to the original fetch
@@ -77,10 +71,6 @@ router.beforeEach((to) => {
         authStore.initialize()
             .then((data: any) => {
                 authStore.setAuthState(data);
-                const loader: any = document.getElementById("loader");
-                if (loader) {
-                    loader.style.display = "none";
-                }
             })
             .catch((e: any) => {
                 console.log("Network error" ,e);

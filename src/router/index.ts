@@ -11,6 +11,7 @@ const routes = [
     { path:'/members', name: 'Members', component: () => import("@/views/members/index.vue"), meta: { requiresAuth: true } },
     { path:'/members/create', name: 'MembersCreate', component: () => import("@/views/members/create.vue"), meta: { requiresAuth: true } },
     { path:'/members/import', name: 'MembersImport', component: () => import("@/views/members/import.vue"), meta: { requiresAuth: true } },
+    { path:'/members/import/upload', name: 'MembersImportUpload', component: () => import("@/views/members/ImportTable.vue"), meta: { requiresAuth: true } },
     { path:'/members/:refId/view', name: 'MemberView', component: () => import("@/views/members/_refId.vue"), meta: { requiresAuth: true } },
     { path:'/members/:refId/edit', name: 'MemberEdit', component: () => import("@/views/members/edit/_refId.vue"), meta: { requiresAuth: true } },
     { path:'/members/:type/type', name: 'MemberTypes', component: () => import("@/views/members/_type.vue"), meta: { requiresAuth: true } },
