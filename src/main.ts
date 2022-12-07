@@ -26,7 +26,7 @@ app.config.globalProperties.$filters = {
     },
 };
 
-const { authStore, loanProductStore } = stores;
+const { authStore } = stores;
 
 window.fetch = new Proxy(window.fetch, {
     apply(fetch, that, args: any) {
@@ -77,7 +77,6 @@ router.beforeEach((to) => {
                 const currentUrl = window.location.href;
                 window.location.href = `${import.meta.env.VITE_APP_AUTH}?redirect_url=${currentUrl}`;
             })
-            .then(() => loanProductStore.fetchLoanProducts())
             .catch((e: any) => {
                 console.log(JSON.stringify(e))
             });

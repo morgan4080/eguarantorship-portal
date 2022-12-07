@@ -20,6 +20,8 @@ const routes = [
     { path:'/loans/:type/type', name: 'LoanTypes', component: () => import("@/views/loans/_type.vue"), meta: { requiresAuth: true } },
     { path:'/settings', name: 'Settings', component: () => import("@/views/settings/index.vue"), meta: { requiresAuth: true } },
     { path:'/settings/:type', name: 'SettingsTypes', component: () => import("@/views/settings/_type.vue"), meta: { requiresAuth: true } },
+    { path:'/settings/loan-products/create', name: 'CreateLoanProducts', component: () => import("@/views/settings/loan-product/create.vue"), meta: { requiresAuth: true } },
+    { path:'/settings/loan-products/:refId/edit', name: 'EditLoanProducts', component: () => import("@/views/settings/loan-product/_refId.vue"), meta: { requiresAuth: true } },
 ]
 
 const router = createRouter({

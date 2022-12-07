@@ -98,10 +98,10 @@ const menus = reactive([
         title: 'Client Settings',
         url: '/settings/client-settings'
       },
-      {
+      /*{
         title: 'Provider',
         url: '/settings/provider'
-      },
+      },*/
     ]
   },
 ])

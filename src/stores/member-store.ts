@@ -195,6 +195,16 @@ export const useMember = defineStore('member-store', {
         },
         setMemberHeader(headers: []) {
             this.memberHeader = headers
+        },
+        async importapi(data: any) {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", `application/json`);
+            return await fetch(`${import.meta.env.VITE_API_URL}/members`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                credentials: 'include',
+                headers: myHeaders,
+            })
         }
     }
 })

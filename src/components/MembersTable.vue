@@ -6,8 +6,8 @@
     <div class="inline-block min-w-full py-2 align-middle">
       <div class="relative shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <div v-if="selectedRequests.length > 0" class="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
-          <button type="button" class="inline-flex items-center rounded border border-gray-400 bg-pink-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete all</button>
-          <button type="button" class="inline-flex items-center rounded border border-gray-400 bg-green-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Export</button>
+          <button @click="deleteSelectedMembers" type="button" class="inline-flex items-center rounded border border-gray-400 bg-pink-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete all</button>
+          <button @click="exportSelectedMembers" type="button" class="inline-flex items-center rounded border border-gray-400 bg-green-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Export</button>
         </div>
         <table class="min-w-full divide-y divide-gray-300">
           <thead class="bg-gray-50">
@@ -106,5 +106,15 @@ const indeterminate = computed(() => selectedRequests.value.length > 0 && select
 
 const setSelectedRequest = (e: any) => {
   selectedRequests.value = (e.target && e.target.checked) ? members.value.map((p) => p.refId) : []
+}
+const deleteSelectedMembers = () => {
+  if (confirm('Feature Not Supported')) {
+
+  }
+}
+const exportSelectedMembers = () => {
+  if (confirm('You are about to export, ' + selectedRequests.value.length + 'Members. Proceed?' )) {
+    console.log('exporting', selectedRequests.value)
+  }
 }
 </script>

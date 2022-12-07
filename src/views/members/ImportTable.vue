@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full pt-16 pb-32">
-    <div class="space-y-6 sm:px-6 lg:px-5">
+  <div class="overflow-hidden w-full pt-16 pb-32">
+    <div class="space-y-4 sm:px-6 lg:px-5">
       <div class="flex justify-between items-center">
         <Breadcrumb pageName="" linkName="Import Members" linkUrl="/members/import"  current="Import Table"/>
       </div>
@@ -9,14 +9,23 @@
           <h3 class="text-lg font-medium leading-6 text-gray-900">Import Data</h3>
           <p class="mt-1 max-w-2xl text-sm text-gray-500">From .xls, .xlsx, or .csv file.</p>
         </div>
-        <table class="min-w-full divide-y divide-gray-300">
-          <thead class="bg-gray-50">
+        <div class="relative w-full overflow-x-auto">
+          <table class="w-full max-w-full border-collapse table-auto">
+            <thead class="bg-gray-50">
             <tr>
               <th v-for="(header, i) in form.columns" :key="`${header}${i}`" scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">
                 <div class="flex flex-col space-y-2">
+                  <span>
+                    <input
+                        type="checkbox"
+                        class="mr-1 focus:ring-eg-lightblue focus:border-eg-lightblue text-eg-text rounded-md bg-gray-200 border-gray-300"
+                        :checked="header.checked"
+                        @change="columnChecked(header.label)"
+                    >
+                  </span>
                   <span>{{ header.label }}</span>
                   <select
-                      class="block h-8 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md"
+                      class="block h-8 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue text-xs font-normal rounded-md"
                       @change="exchangeValues($event.target.value, header.label)"
                   >
                     <option hidden>Select For</option>
@@ -31,13 +40,26 @@
                 </div>
               </th>
             </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
             <tr v-for="(row, i) in form.rows" :key="`r${i}`">
               <td v-for="(column, index) in form.columns" :key="`c${index}`" class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ row[column.label] }}</td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex pt-12 justify-between">
+          <div>
+            {{ ' '+form.imported+' ' }} from {{ ' '+form.total }}
+          </div>
+          <div class="space-x-4 flex justify-end">
+            <button @click="router.push('/members')" type="button" class="inline-flex items-center rounded-md border border-transparent bg-red-200 px-4 py-2 text-base font-medium text-red-500 hover:bg-red-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2">Cancel</button>
+            <button @click="router.push('/members/import')" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-base font-medium text-eg-bg hover:bg-eg-lightblue hover:text-white focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2">New Import</button>
+            <button :disabled="authStore.getLoadingState || form.loaded" v-if="!form.isContinue" @click="importData" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-eg-lightblue focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2">Import Data</button>
+            <button :disabled="authStore.getLoadingState || form.loaded" v-if="form.isContinue" @click="importData" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-eg-lightblue focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2">Continue</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -49,13 +71,16 @@ import { useRouter } from "vue-router"
 import stores from "../../stores"
 import Breadcrumb from "../../components/Breadcrumb.vue"
 const router = useRouter()
-const {memberStore} = stores
-
-const form = reactive<{ columns: any, rows: any, searchTerm: string, items: string[], model: any, batchData: any[], importLength: number, allData: any[], index: number, total: number, pageLength: number}>({
+const {memberStore, authStore} = stores
+type reactiveFormType = { columns: any[], rows: any[], searchTerm: string, items: string[], isContinue: boolean, loaded: boolean, imported: number, model: any, batchData: any[], importLength: number, allData: any[], index: number, total: number, pageLength: number}
+const form = reactive<reactiveFormType>({
   columns: [],
   rows: [],
   searchTerm: '',
   items: ['firstName', 'lastName', 'fullName', 'idNumber', 'memberNumber', 'phoneNumber', 'email', 'totalShares', 'totalDeposits', 'committedAmount', 'availableamount', 'memberStatus', 'loanCount', 'details'],
+  isContinue: false,
+  loaded: false,
+  imported: 0,
   model: {
     data: {
       rows: [
@@ -107,6 +132,81 @@ const rowsData = (data: any) => {
     }
   }
   return r;
+}
+
+const importData = () => {
+  let data: any[] = [];
+  form.batchData.forEach((item)=>{
+    let col: Record<any, any> = {}
+    let others: Record<any, any> = {}
+    form.columns.forEach(column=>{
+      if(column.checked && column.selectFor){
+        if(column.selectFor==='details'){
+          let a = typeof(item[column.label]);
+          others[column.label]={
+            value: item[column.label],
+            type: 'TEXT'
+          };
+          col[column.selectFor]=others;
+        } else{
+          if(column.selectFor !== ''){
+            col[column.selectFor]=item[column.label];
+          }else{
+            authStore.defineNotification({
+              id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+              message: 'Something went wrong !!',
+              error: true
+            })
+            return false;
+          }
+        }
+      }
+    })
+    data.push(col);
+  })
+  form.model.data.rows=data;
+  authStore.defineNotification({
+    id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+    message: 'Import Started Successfully!!',
+    success: true
+  })
+  form.loaded = true;
+  memberStore.importapi(form.model.data.rows).then(data => data.json()).then((res) => {
+    form.loaded=false;
+    console.log(res.rowsImported)
+    if (res.rowsImported) {
+
+      if (form.importLength === form.total) {
+        router.push('/members')
+      } else {
+        form.imported = form.importLength;
+        form.isContinue = true;
+        form.index = form.index + 1;
+        form.batchData = form.allData[form.index];
+        // this.rows=this.rowsData(this.batchData);
+        form.importLength = form.importLength+form.batchData.length;
+      }
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Successfully Imported !!',
+        success: true
+      })
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Something went wrong !!',
+        error: true
+      })
+    }
+  }).catch((error: any) => {
+    form.loaded = false;
+    console.log('import member error', error)
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Something went wrong !!',
+      error: true
+    })
+  });
 }
 
 onMounted(() => {

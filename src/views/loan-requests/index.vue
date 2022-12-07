@@ -71,9 +71,13 @@ const searchLoanRequests = (filterData?: {refId: string, searchTerm: string, fro
 
     console.log('updating filters', filterData)
   }
-
-  loanRequestStore.fetchLoanRequests(params)
-  loanRequestStore.fetchLoanRequestSummary()
+  (async () => {
+    await Promise.allSettled([
+      loanProductStore.fetchLoanProducts(),
+      loanRequestStore.fetchLoanRequests(params),
+      loanRequestStore.fetchLoanRequestSummary(),
+    ])
+  })()
 }
 
 const refreshNext = () => {
