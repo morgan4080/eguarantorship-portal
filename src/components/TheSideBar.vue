@@ -18,13 +18,13 @@ const setWidthFn = () => {
 }
 
 const menus = reactive([
-  {
+  /*{
     title: 'DASHBOARD',
     url: '/dashboard',
     icon: 'dashboard',
     expanded: false,
     subMenus: []
-  },
+  },*/
   {
     title: 'REQUESTS',
     url: '/loan-requests',
@@ -121,7 +121,7 @@ const navigateTo = (item: any) => {
 </script>
 
 <template>
-  <div :class="{ 'w-56': setWidth }" class="flex flex-col transform transition-all ease-in-out z-50 trans bg-eg-bg">
+  <div class="flex flex-col transform transition-all ease-in-out z-50 trans bg-eg-bg">
     <div class="relative">
       <a :href="theUrl" :class="{'flex-col' : !setWidth}" class="navbar py-5 px-4 flex items-center">
         <TheLogo class="h-12 w-auto" />
@@ -138,7 +138,7 @@ const navigateTo = (item: any) => {
         </svg>
       </button>
     </div>
-    <div class="flex flex-col flex-grow mt-4 pb-4 overflow-y-auto">
+    <div class="flex flex-col flex-grow mt-4 pb-4 overflow-y-auto overflow-x-hidden">
       <nav class="flex-1 px-2 space-y-1" aria-label="Sidebar">
         <div v-for="(item, i) in menus" :key="i">
           <router-link :to="item.url" @click="navigateTo(item)" type="button" :class="{'flex flex-col space-y-2' : !setWidth, 'flex space-x-6' : setWidth}" class="mt-1 text-white hover:bg-gray-50 hover:text-gray-900 group w-full transform transition-all items-center pl-2 pr-2 py-2 text-left text-xs font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-white" :aria-controls="`sub-menu-${i}`" :aria-expanded="item.expanded">

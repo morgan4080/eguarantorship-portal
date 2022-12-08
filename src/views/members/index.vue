@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Breadcrumb from "../../components/Breadcrumb.vue";
 import MembersTable from "../../components/MembersTable.vue";
-import {onMounted, reactive} from "vue";
+import {computed, ComputedRef, onMounted, reactive} from "vue";
 import {
   UserPlusIcon,
   ArrowUpTrayIcon,
@@ -14,28 +14,40 @@ import {MenuButton} from "@headlessui/vue";
 import Paginator from "../../components/Paginator.vue";
 const { memberStore } = stores;
 
-const searchMembers = () => {
-  memberStore.fetchMembers()
-}
-
 const filters = reactive({
-  currentPage: 0,
-  fromDate: '',
-  toDate: '',
   recordsPerPage: 10,
   searchTerm: '',
-  order: '',
-  page: 0
+  order: 'ASC',
+  page: 1
 })
 
-const refreshNext = () => {
+const queryMembers: ComputedRef<string> = computed(() => {
+  return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+})
 
+const searchMembers = (customFilters?: {searchTerm?: string}) => {
+  if (customFilters) {
+    const {searchTerm} = customFilters
+    if (searchTerm) {
+      memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
+    } else {
+      memberStore.fetchMembers(queryMembers.value)
+    }
+  } else {
+    memberStore.fetchMembers(queryMembers.value)
+  }
 }
-const refreshPrev = () => {
 
+const refreshNext = (cP: number) => {
+  filters.page = cP + 1;
+  searchMembers();
+}
+const refreshPrev = (cP: number) => {
+  filters.page = cP - 1;
+  searchMembers();
 }
 const refreshCurrent = () => {
-
+  searchMembers();
 }
 const actions = [
   {
@@ -158,19 +170,9 @@ const exportMembers = () => {
       </div>
       <MembersTable :members="memberStore.getMembers">
         <div class="sm:flex-auto">
-          <GlobalSearch :placeholder="'Search Members'" :ctx="$route.name" @update="searchMembers" />
+          <GlobalSearch :placeholder="'Search Members (case sensitive)'" :ctx="$route.name" @update="searchMembers" />
         </div>
         <div class="mt-0 ml-16 flex flex-wrap space-x-4">
-          <div class="flex items-center">
-            <span class="mx-4 text-gray-500">From</span>
-            <div>
-              <input v-model="filters.fromDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
-            </div>
-            <span class="mx-4 text-gray-500">To</span>
-            <div>
-              <input v-model="filters.toDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
-            </div>
-          </div>
           <button @click="exportMembers" type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
@@ -180,7 +182,7 @@ const exportMembers = () => {
         </div>
       </MembersTable>
       <Paginator
-          :current-page="filters.currentPage"
+          :current-page="filters.page"
           :filter-form="filters"
           @refreshNext="refreshNext"
           @refreshPrev="refreshPrev"

@@ -1,71 +1,67 @@
 <script setup lang="ts">
-import {RouteRecordName} from "vue-router";
-import {ref, watch, toRefs, reactive} from "vue";
+  import {RouteRecordName} from "vue-router";
+  import {ref, watch, toRefs, reactive} from "vue";
 
-const props = defineProps<{
-  ctx: RouteRecordName | null | undefined
-  placeholder: string,
-  hasFilter?: boolean,
-  filterEntities?: any,
-  fromDate?: string,
-  toDate?: string,
-  currentPage?: number,
-  update?: (filterData: {refId: string, searchTerm: string, fromDate: string, toDate: string, recordsPerPage: number, order: string, page: number}) => void
-}>()
+  const props = defineProps<{
+    ctx: RouteRecordName | null | undefined
+    placeholder: string,
+    hasFilter?: boolean,
+    filterEntities?: any,
+  }>()
 
-const { ctx, placeholder, hasFilter, fromDate, toDate, currentPage } = toRefs(props);
+  const { ctx, placeholder, hasFilter } = toRefs(props);
 
-const changed = ref<boolean>(false)
-const hasContent = ref<boolean>(false)
-const hovering = ref<string>('')
-const selected = ref<number | null>(null)
-const refDropDown = ref<HTMLDivElement | unknown>(null)
+  const changed = ref<boolean>(false)
+  const hasContent = ref<boolean>(false)
+  const hovering = ref<string>('')
+  const selected = ref<number | null>(null)
+  const refDropDown = ref<HTMLDivElement | unknown>(null)
 
-const showList = () => {
-  changed.value = !changed.value
-  hasContent.value = !hasContent.value
-}
+  const showList = () => {
+    changed.value = !changed.value
+    hasContent.value = !hasContent.value
+  }
 
-const onClickAway = (ref: any, handler: any) => {
-  const listener = (event: any) => {
-    if (!ref || ref.contains(event.target)) {
-      return;
-    }
-    handler(event);
-  };
-  document.addEventListener("mousedown", listener);
-  document.addEventListener("touchstart", listener);
-  return () => {
-    document.removeEventListener("mousedown", listener);
-    document.removeEventListener("touchstart", listener);
-  };
-}
+  const onClickAway = (ref: any, handler: any) => {
+    const listener = (event: any) => {
+      if (!ref || ref.contains(event.target)) {
+        return;
+      }
+      handler(event);
+    };
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
+    return () => {
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
+    };
+  }
 
-const onMouseDown = (e:any) => {
-  if (changed.value) e.preventDefault()
-}
+  const onMouseDown = (e:any) => {
+    if (changed.value) e.preventDefault()
+  }
 
-watch(changed, () => {
-  onClickAway(refDropDown.value, () => changed.value = false)
-})
+  watch(changed, () => {
+    onClickAway(refDropDown.value, () => changed.value = false)
+  })
 
-const searchFilter = reactive({
-  refId: '',
-  searchTerm: '',
-  fromDate: fromDate?.value,
-  toDate: toDate?.value,
-  recordsPerPage: 10,
-  order: "ASC",
-  page: currentPage?.value,
-})
+  const searchFilter = reactive({
+    refId: '',
+    searchTerm: ''
+  })
 
-const makeSelection = (val: number) => {
-  changed.value = false
-  selected.value = val
-  // searchFilter.searchTerm = 'Leslie Alexander'
-  // navigate to searched item
-}
+  const makeSelection = (val: number) => {
+    changed.value = false
+    selected.value = val
+    // searchFilter.searchTerm = 'Leslie Alexander'
+    // navigate to searched item
+  }
 
+  const emit = defineEmits(['update'])
+
+  watch(searchFilter, () => {
+    emit('update', searchFilter)
+  })
 
 </script>
 <template>

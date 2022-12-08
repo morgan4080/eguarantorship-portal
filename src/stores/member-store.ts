@@ -147,7 +147,7 @@ export const useMember = defineStore('member-store', {
                 return Promise.reject(e.message)
             }
         },
-        async editMemberDetails(payload: Omit<MemberDetailSubmit, 'pinSecret' | 'memberNumber'>, refId: string) {
+        async editMemberDetails(payload: Omit<MemberDetailSubmit, 'pinSecret' | 'memberNumber'> | {refId: string, details: Record<any, any>}, refId: string) {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);

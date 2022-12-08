@@ -4,7 +4,7 @@ import {useRoute, useRouter} from "vue-router";
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline"
 import stores from "../../stores";
-const { memberStore } = stores;
+const { memberStore, authStore } = stores;
 const router = useRouter();
 const route = useRoute();
 onMounted(async () => {
@@ -68,8 +68,15 @@ const keyString = ref('')
 const addingKey = ref(false)
 
 const saveMemberDetails = () => {
-  console.log(form)
   otherDetailsEdit.value = false
+  memberStore.editMemberDetails({
+    refId: `${route.params.refId}`,
+    details: form.details
+  }, `${route.params.refId}`).then(() => memberStore.fetchMember(`${route.params.refId}`)).then(() => authStore.defineNotification({
+    id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+    message: `Member Details Updated`,
+    success: true
+  }))
 }
 </script>
 <template>

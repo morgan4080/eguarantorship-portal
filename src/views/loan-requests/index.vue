@@ -2,7 +2,7 @@
 import Breadcrumb from "../../components/Breadcrumb.vue";
 import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
 import GlobalSearch from "../../components/GlobalSearch.vue";
-import {onMounted, reactive} from "vue";
+import {onMounted, reactive, watch} from "vue";
 import Paginator from "../../components/Paginator.vue";
 import stores from "../../stores";
 const { loanRequestStore, loanProductStore } = stores;
@@ -17,7 +17,7 @@ const filters = reactive({
   page: 0
 })
 
-const searchLoanRequests = (filterData?: {refId: string, searchTerm: string, fromDate: string, toDate: string, recordsPerPage: number, order: string, page: number}) => {
+const searchLoanRequests = (filterData?: {refId?: string, searchTerm?: string, fromDate?: string, toDate?: string, recordsPerPage?: number, order?: string, page?: number}) => {
   let params = ``
   if (filterData) {
     // expand params
@@ -70,6 +70,24 @@ const searchLoanRequests = (filterData?: {refId: string, searchTerm: string, fro
     }
 
     console.log('updating filters', filterData)
+
+    const {refId, searchTerm, fromDate, toDate} = filterData
+
+    if (refId) {
+      console.log(refId)
+    }
+
+    if (searchTerm) {
+      console.log(searchTerm)
+    }
+
+    if (fromDate) {
+      console.log(fromDate)
+    }
+
+    if (toDate) {
+      console.log(toDate)
+    }
   }
   (async () => {
     await Promise.allSettled([
@@ -92,6 +110,13 @@ const refreshCurrent = () => {
 
 onMounted(() => {
   searchLoanRequests()
+})
+
+watch(() => filters.fromDate, (fromDate) =>{
+  searchLoanRequests({fromDate})
+})
+watch(() => filters.toDate, (toDate) =>{
+  searchLoanRequests({toDate})
 })
 
 </script>
@@ -195,7 +220,7 @@ onMounted(() => {
                 <input v-model="filters.toDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
             </div>
           </div>
-          <button type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto">
+          <button type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
             </svg>

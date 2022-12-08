@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {useRoute, useRouter} from "vue-router";
   import stores from "../../stores";
-  import {onMounted, reactive, watch} from "vue";
+  import {computed, onMounted, reactive, watch} from "vue";
   import Breadcrumb from "../../components/Breadcrumb.vue";
   import {required} from "@vuelidate/validators";
   import useVuelidate from "@vuelidate/core";
@@ -9,6 +9,7 @@
   import DropDown from "../../components/DropDown.vue";
   import {MenuButton} from "@headlessui/vue";
   import {EllipsisVerticalIcon, PencilIcon, TrashIcon} from "@heroicons/vue/20/solid";
+  import Paginator from "../../components/Paginator.vue";
   const route = useRoute()
   const router = useRouter()
   const { zohoStore, authStore, loanProductStore, clientStore } = stores
@@ -37,6 +38,18 @@
 
   const v$ = useVuelidate(zohoIntegrationValidationRules, zohoIntegrationForm, { $lazy: true, $autoDirty: true});
 
+  const filters = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    order: 'ASC',
+    page: 1
+  })
+
+  const query = computed(() => {
+    // &pageIndex=${filters.page}
+    return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&includeInActive=false`)
+  })
+
   onMounted(async () => {
     if (route.params.type === 'zoho-integration') {
       const [zohoCredentialsStatus] = await Promise.allSettled([
@@ -52,7 +65,7 @@
 
     if (route.params.type === 'loan-products') {
       await Promise.allSettled([
-        loanProductStore.fetchLoanProducts()
+        loanProductStore.fetchLoanProducts(query.value)
       ])
     }
 
@@ -82,7 +95,7 @@
 
     if (type === 'loan-products') {
       await Promise.allSettled([
-        loanProductStore.fetchLoanProducts()
+        loanProductStore.fetchLoanProducts(query.value)
       ])
     }
     if (type === 'client-settings') {
@@ -126,7 +139,7 @@
 
   const deleteLoanProduct = (refId: string) => {
     if (confirm('Are you sure you want to delete this loan product?')) {
-      loanProductStore.deleteLoanProduct(refId).then(() => loanProductStore.fetchLoanProducts()).then(() => authStore.defineNotification({
+      loanProductStore.deleteLoanProduct(refId).then(() => loanProductStore.fetchLoanProducts(query.value)).then(() => authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
         message: `Loan Product Deleted`,
         success: true
@@ -167,6 +180,23 @@
 
   }
 
+  const refreshNext = async (cP: number) => {
+    filters.page = cP + 1;
+    await Promise.allSettled([
+      loanProductStore.fetchLoanProducts(query.value)
+    ])
+  }
+  const refreshPrev = async (cP: number) => {
+    filters.page = cP - 1;
+    await Promise.allSettled([
+      loanProductStore.fetchLoanProducts(query.value)
+    ])
+  }
+  const refreshCurrent = async () => {
+    await Promise.allSettled([
+      loanProductStore.fetchLoanProducts(query.value)
+    ])
+  }
 
 </script>
 <template>
@@ -285,6 +315,15 @@
           </tbody>
         </table>
       </div>
+      <Paginator
+          :current-page="filters.page"
+          :filter-form="filters"
+          @refreshNext="refreshNext"
+          @refreshPrev="refreshPrev"
+          @refreshCurrent="refreshCurrent"
+          :total-pages="loanProductStore.getPaginationData ? loanProductStore.getPaginationData.totalPages : 0"
+          :total-elements="loanProductStore.getPaginationData ? loanProductStore.getPaginationData.totalElements : 0"
+      />
     </div>
   </div>
   <div v-if="route.params.type === 'client-settings'" class="overflow-hidden w-full pt-16 pb-32">

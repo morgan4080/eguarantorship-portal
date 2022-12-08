@@ -38,17 +38,12 @@ watch(pageCountOpen, () => {
   console.log("pageCountOpen", pageCountOpen.value);
   if (pageCountOpen.value) {
     createPopper(popcorn.value, tooltip.value, {
+      placement: 'top-start',
       modifiers: [
         {
           name: "offset",
           options: {
-            offset: [5, 10],
-          },
-        },
-        {
-          name: 'flip',
-          options: {
-            fallbackPlacements: ['top', 'right'],
+            offset: [50, 165],
           },
         },
       ],
@@ -115,7 +110,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
               <div class="relative">
                 <div
                     ref="popcorn"
-                    class="inline-flex h-8 divide-x divide-eg-bg rounded-md shadow-sm"
+                    class="inline-flex h-8 divide-x divide-eg-bg rounded-md shadow-2xl"
                 >
                   <div
                       class="relative z-0 inline-flex divide-x divide-eg-bg rounded-md shadow-sm"
@@ -157,7 +152,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                   <ul
                       ref="refDropDown"
                       v-show="pageCountOpen"
-                      class="absolute right-0 z-10 w-12 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 drop-shadow-2xl focus:outline-none"
+                      class="absolute border border-gray-300 right-0 z-10 w-12 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 drop-shadow-2xl focus:outline-none"
                       tabindex="-1"
                       role="listbox"
                       aria-labelledby="listbox-label"

@@ -1,4 +1,5 @@
 import {defineStore} from "pinia";
+import {PaginationData} from "./loan-request-store";
 
 interface LoanProduct {
     refId: string;
@@ -21,11 +22,13 @@ type LoanProductItem = {
 interface LoanProductState {
     loanProducts: LoanProduct[],
     loanProduct: LoanProductItem | null
+    paginationData: PaginationData | null
 }
 export const useLoanProduct = defineStore('loan-product-store', {
     state: (): LoanProductState => ({
         loanProducts: [],
-        loanProduct: null
+        loanProduct: null,
+        paginationData: null,
     }),
     getters: {
         getLoanProducts(state) {
@@ -34,17 +37,24 @@ export const useLoanProduct = defineStore('loan-product-store', {
         getLoanProduct(state) {
             return state.loanProduct
         },
+        getPaginationData(state) {
+            return state.paginationData
+        }
     },
     actions: {
-        async fetchLoanProducts(): Promise<any> {
+        async fetchLoanProducts(query?: string): Promise<any> {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/loans-products`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loans-products${query ? query : ''}`, {
                     method: 'GET',
                     credentials: 'include'
                 })
                 if (response.status === 200) {
-                    const {list} = await response.json()
+                    const {list, total} = await response.json()
                     this.loanProducts = list
+                    this.paginationData = {
+                        totalPages: 1,
+                        totalElements: total
+                    }
                     return Promise.resolve(list)
                 } else {
                     return Promise.reject(`${response.status}: Failed to fetch loan products`)
