@@ -6,8 +6,7 @@
     <div class="inline-block min-w-full py-2 align-middle">
       <div class="relative shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <div v-if="selectedRequests.length > 0" class="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
-          <button @click="deleteSelectedMembers" type="button" class="inline-flex items-center rounded border border-gray-400 bg-pink-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete all</button>
-          <button @click="exportSelectedMembers" type="button" class="inline-flex items-center rounded border border-gray-400 bg-green-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Export</button>
+         <button @click="exportSelectedMembers" type="button" class="inline-flex items-center rounded border border-gray-400 bg-green-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Export</button>
         </div>
         <table class="min-w-full divide-y divide-gray-300">
           <thead class="bg-gray-50">
@@ -52,7 +51,7 @@
               <router-link :to="`/members/${item.refId}/view`">{{ item.email }}</router-link>
             </td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
-              <router-link :to="`/members/${item.refId}/view`">{{ item.totalShares }}</router-link>
+              <router-link :to="`/members/${item.refId}/view`">{{ $filters.currencyKES(item.totalShares) }}</router-link>
             </td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
               <router-link :to="`/members/${item.refId}/view`">{{ item.memberStatus }}</router-link>

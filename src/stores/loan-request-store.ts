@@ -116,6 +116,23 @@ export const useLoanRequest = defineStore('loan-request-store', {
                 console.error("fetchLoanRequestSummary",  e);
                 return Promise.reject(e.message);
             }
+        },
+        async exportLoanRequests(params?:string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/members${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const content = await response.blob();
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan request summary.`);
+                }
+            } catch (e: any) {
+                console.error("exportLoanRequests",  e);
+                return Promise.reject(e.message);
+            }
         }
     }
 })

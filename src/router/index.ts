@@ -8,6 +8,7 @@ const routes = [
     { path:'/', name: 'Home', redirect: '/loan-requests' /*component: () => import("@/views/HomePage.vue"), meta: { requiresAuth: true }*/ },
     { path:'/dashboard', redirect: '/loan-requests' /*name: 'Dashboard', component: () => import("@/views/HomePage.vue"), meta: { requiresAuth: true }*/ },
     { path:'/loan-requests', name: 'LoanRequests', component: () => import("@/views/loan-requests/index.vue"), meta: { requiresAuth: true } },
+    { path:'/loan-requests/:refId/view', name: 'LoanRequestsView', component: () => import("@/views/loan-requests/_refId.vue"), meta: { requiresAuth: true } },
     { path:'/members', name: 'Members', component: () => import("@/views/members/index.vue"), meta: { requiresAuth: true } },
     { path:'/members/create', name: 'MembersCreate', component: () => import("@/views/members/create.vue"), meta: { requiresAuth: true } },
     { path:'/members/import', name: 'MembersImport', component: () => import("@/views/members/import.vue"), meta: { requiresAuth: true } },

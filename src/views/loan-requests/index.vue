@@ -2,7 +2,7 @@
 import Breadcrumb from "../../components/Breadcrumb.vue";
 import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
 import GlobalSearch from "../../components/GlobalSearch.vue";
-import {onMounted, reactive, watch} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import Paginator from "../../components/Paginator.vue";
 import stores from "../../stores";
 const { loanRequestStore, loanProductStore } = stores;
@@ -119,6 +119,8 @@ watch(() => filters.toDate, (toDate) =>{
   searchLoanRequests({toDate})
 })
 
+const exportQuery = ref(`?order=ASC&pageSize=10&pageIndex=0`)
+
 </script>
 <template>
   <div class="w-full pt-16 pb-32">
@@ -189,7 +191,7 @@ watch(() => filters.toDate, (toDate) =>{
           <div class="flex-1 flex justify-between items-start">
             <div class="flex flex-col space-y-2">
               <span class="uppercase text-sm font-medium">Total Amount Requested</span>
-              <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanRequestsSummary?.totalRequested }}</span>
+              <span class="font-semibold text-2xl">{{ $filters.currencyKES(loanRequestStore.getLoanRequestsSummary?.totalRequested) }}</span>
             </div>
             <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
               <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -209,7 +211,7 @@ watch(() => filters.toDate, (toDate) =>{
         <div class="sm:flex-auto">
           <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLoanRequests" />
         </div>
-        <div class="mt-0 ml-16 flex flex-wrap space-x-4">
+        <div class="mt-0 ml-auto flex flex-wrap space-x-4">
           <div class="flex items-center">
             <span class="mx-4 text-gray-500">From</span>
             <div>
@@ -220,7 +222,7 @@ watch(() => filters.toDate, (toDate) =>{
                 <input v-model="filters.toDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
             </div>
           </div>
-          <button type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+          <button type="button" class="inline-flex hidden items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
             </svg>

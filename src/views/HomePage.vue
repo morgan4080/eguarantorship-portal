@@ -189,7 +189,7 @@
           <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
             <div class="flex-1 flex justify-between items-start">
               <div class="flex flex-col space-y-2">
-                <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanRequestsSummary?.totalRequested }}</span>
+                <span class="font-semibold text-2xl">{{ $filters.currencyKES(loanRequestStore.getLoanRequestsSummary?.totalRequested) }}</span>
                 <span class="uppercase text-sm font-medium">Total Amount Requested</span>
               </div>
 

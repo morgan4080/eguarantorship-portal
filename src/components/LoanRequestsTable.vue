@@ -40,13 +40,13 @@
 
               <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.refId" v-model="selectedRequests">
             </td>
-            <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.refId) ? 'text-eg-blue' : 'text-gray-900']" >{{ item.loanRequestNumber }}</td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ item.loanDate }}</td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ item.memberFirstName }} {{ item.memberLastName }}</td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.loanProductName }}</td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.loanAmount }}</td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.guarantorCount }}</td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ item.status }}</td>
+            <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.refId) ? 'text-eg-blue' : 'text-gray-900']" ><router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestNumber }}</router-link></td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900"><router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanDate }}</router-link></td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900"><router-link :to="`/loan-requests/${item.refId}/view`">{{ item.memberFirstName }} {{ item.memberLastName }}</router-link></td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500"><router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanProductName }}</router-link></td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500"><router-link :to="`/loan-requests/${item.refId}/view`">{{ $filters.currencyKES(item.loanAmount) }}</router-link></td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500"><router-link :to="`/loan-requests/${item.refId}/view`">{{ item.guarantorCount }}</router-link></td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500"><router-link :to="`/loan-requests/${item.refId}/view`">{{ item.status }}</router-link></td>
             <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
               <button type="button" class="text-eg-text hover:text-eg-bg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

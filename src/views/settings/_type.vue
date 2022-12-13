@@ -267,11 +267,9 @@
         </DropDown>
       </div>
       <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-        <div class="px-4 py-5 sm:px-6">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">Loan Products</h3>
-          <p class="mt-1 max-w-2xl text-sm text-gray-500">Configured loan products for the organisation.</p>
-        </div>
-        <table class="min-w-full">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Loan Products</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Configured loan products for the organisation.</p>
+        <table class="min-w-full mt-6">
           <thead class="bg-gray-50">
           <tr>
             <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Loan Name</th>
