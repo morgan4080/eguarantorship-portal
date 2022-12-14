@@ -54,6 +54,7 @@ interface LoanRequestSummary {
 }
 
 interface LoanRequestState {
+    loanRequest: LoanRequestData | null,
     loanRequests: LoanRequestData[],
     paginationData: PaginationData | null
     loanRequestSummary: LoanRequestSummary | null
@@ -61,11 +62,15 @@ interface LoanRequestState {
 
 export const useLoanRequest = defineStore('loan-request-store', {
     state: (): LoanRequestState => ({
+        loanRequest: null,
         loanRequests: [],
         paginationData: null,
         loanRequestSummary: null
     }),
     getters: {
+        getLoanRequest(state) {
+            return state.loanRequest
+        },
         getLoanRequests(state) {
             return state.loanRequests
         },
@@ -77,6 +82,24 @@ export const useLoanRequest = defineStore('loan-request-store', {
         }
     },
     actions: {
+        async fetchLoanRequest(refId: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const data = await response.json();
+                    this.loanRequest = data;
+                    return Promise.resolve(data);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan request.`);
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject(e.message);
+            }
+        },
         async fetchLoanRequests(params?: string) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request${params ? params : ''}`, {
@@ -131,6 +154,23 @@ export const useLoanRequest = defineStore('loan-request-store', {
                 }
             } catch (e: any) {
                 console.error("exportLoanRequests",  e);
+                return Promise.reject(e.message);
+            }
+        },
+        async deleteLoanRequest(loanRequestNumber: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${loanRequestNumber}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const data = await response.text();
+                    return Promise.resolve(data);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to delete loan request.`);
+                }
+            } catch (e: any) {
+                console.error("deleteLoanRequest",  e);
                 return Promise.reject(e.message);
             }
         }

@@ -6,8 +6,7 @@
     <div class="inline-block min-w-full py-2 align-middle">
       <div class="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <div v-if="selectedRequests.length > 0" class="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16">
-          <button type="button" class="inline-flex items-center rounded border border-gray-300 bg-pink-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete all</button>
-          <button type="button" class="inline-flex items-center rounded border border-gray-300 bg-green-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Export</button>
+          <button @click="deleteLoanRequest" type="button" class="inline-flex items-center rounded border border-gray-300 bg-pink-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30">Delete</button>
         </div>
         <table class="min-w-full divide-y divide-gray-300">
           <thead class="bg-gray-50">
@@ -33,14 +32,14 @@
               <span class="pl-4">No Available Loan Requests</span>
             </td>
           </tr>
-          <tr v-for="item in loanRequests" :key="item.refId" :class="[selectedRequests.includes(item.refId) && 'bg-gray-100']">
+          <tr v-for="item in loanRequests" :key="item.refId" :class="[selectedRequests.includes(item.loanRequestNumber) && 'bg-gray-100']">
             <td class="relative w-12 px-6 sm:w-16 sm:px-8">
               <!-- Selected row marker, only show when row is selected. -->
-              <div v-if="selectedRequests.includes(item.refId)" class="absolute inset-y-0 left-0 w-0.5 bg-eg-bg"></div>
+              <div v-if="selectedRequests.includes(item.loanRequestNumber)" class="absolute inset-y-0 left-0 w-0.5 bg-eg-bg"></div>
 
-              <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.refId" v-model="selectedRequests">
+              <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.loanRequestNumber" v-model="selectedRequests">
             </td>
-            <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.refId) ? 'text-eg-blue' : 'text-gray-900']" >
+            <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.loanRequestNumber) ? 'text-eg-blue' : 'text-gray-900']" >
               <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestNumber }}</router-link>
             </td>
             <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
@@ -84,25 +83,41 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, toRefs} from "vue";
-import {LoanRequestData} from "../stores/loan-request-store";
-import DropDown from "./DropDown.vue";
-import {EllipsisVerticalIcon, EyeIcon} from "@heroicons/vue/20/solid";
-import {MenuButton} from "@headlessui/vue";
+  import {computed, ref, toRefs} from "vue";
+  import {LoanRequestData} from "../stores/loan-request-store";
+  import DropDown from "./DropDown.vue";
+  import {EllipsisVerticalIcon, EyeIcon} from "@heroicons/vue/20/solid";
+  import {MenuButton} from "@headlessui/vue";
+  import stores from "../stores";
+  const { loanRequestStore, authStore } = stores;
 
-const props = defineProps<{
-  loanRequests: LoanRequestData[]
-}>()
+  const props = defineProps<{
+    loanRequests: LoanRequestData[]
+  }>()
 
-const { loanRequests } = toRefs(props)
+  const { loanRequests } = toRefs(props)
 
-const selectedRequests = ref<string[]>([])
+  const selectedRequests = ref<string[]>([])
 
-const checked = ref(false)
+  const checked = ref(false)
 
-const indeterminate = computed(() => selectedRequests.value.length > 0 && selectedRequests.value.length < loanRequests.value.length)
+  const indeterminate = computed(() => selectedRequests.value.length > 0 && selectedRequests.value.length < loanRequests.value.length)
 
-const setSelectedRequest = (e: any) => {
-  selectedRequests.value = (e.target && e.target.checked) ? loanRequests.value.map((p) => p.refId) : []
-}
+  const setSelectedRequest = (e: any) => {
+    selectedRequests.value = (e.target && e.target.checked) ? loanRequests.value.map((p) => p.loanRequestNumber) : []
+  }
+  const deleteLoanRequest = async () => {
+    if (confirm(`Are you sure you want to delete: ${selectedRequests.value.length} loan request?`)) {
+      await Promise.allSettled([...new Set(selectedRequests.value)].map(async (loanRequestNumber: string) => {
+        await loanRequestStore.deleteLoanRequest(loanRequestNumber)
+      }));
+      await loanRequestStore.fetchLoanRequests(`?order=ASC&pageSize=10&pageIndex=0`);
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Deleted Loan requests successfully',
+        success: true
+      })
+      selectedRequests.value = []
+    }
+  }
 </script>
