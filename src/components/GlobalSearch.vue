@@ -46,7 +46,7 @@
   })
 
   const searchFilter = reactive({
-    refId: '',
+    productRefId: '',
     searchTerm: ''
   })
 
@@ -68,7 +68,7 @@
   <div class="relative">
     <div v-if="hasFilter" class="absolute inset-y-0 left-0 flex items-center">
       <label for="loan-products" class="sr-only">Loan Products</label>
-      <select v-model="searchFilter.refId" id="loan-products" autocomplete="loan-products" class="h-full rounded-full border-transparent bg-transparent py-0 pl-3 pr-10 text-gray-500 border-0 ring-0 focus:ring-eg-bg sm:text-sm">
+      <select v-model="searchFilter.productRefId" id="loan-products" autocomplete="loan-products" class="h-full rounded-full border-transparent bg-transparent py-0 pl-3 pr-10 text-gray-500 border-0 ring-0 focus:ring-eg-bg sm:text-sm">
         <option :value="``" selected>All Loan Requests</option>
         <option v-for="loanProd in filterEntities.getLoanProducts" :key="loanProd.refId" :value="loanProd.refId">{{ loanProd.name }}</option>
       </select>

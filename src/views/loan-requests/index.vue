@@ -1,125 +1,115 @@
 <script setup lang="ts">
-import Breadcrumb from "../../components/Breadcrumb.vue";
-import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
-import GlobalSearch from "../../components/GlobalSearch.vue";
-import {onMounted, reactive, ref, watch} from "vue";
-import Paginator from "../../components/Paginator.vue";
-import stores from "../../stores";
-const { loanRequestStore, loanProductStore } = stores;
+  import {debounce} from "lodash"
+  import Breadcrumb from "../../components/Breadcrumb.vue";
+  import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
+  import GlobalSearch from "../../components/GlobalSearch.vue";
+  import {computed, ComputedRef, onMounted, reactive, watch} from "vue";
+  import Paginator from "../../components/Paginator.vue";
+  import stores from "../../stores";
+  const { loanRequestStore, loanProductStore } = stores;
 
-const filters = reactive({
-  currentPage: 0,
-  fromDate: '',
-  toDate: '',
-  recordsPerPage: 10,
-  searchTerm: '',
-  order: '',
-  page: 0
-})
+  type LoanReqStatuses = "CLOSED" | "OPEN" | "READ" | null
 
-const searchLoanRequests = (filterData?: {refId?: string, searchTerm?: string, fromDate?: string, toDate?: string, recordsPerPage?: number, order?: string, page?: number}) => {
-  let params = ``
-  if (filterData) {
-    // expand params
-    type LoanReqStatuses = "CLOSED" | "OPEN" | "READ"
+  type SigningStatus = "COMPLETED" | "INPROGRESS" | "ERROR" | null
 
-    type SigningStatus = "COMPLETED" | "INPROGRESS" | "ERROR"
+  type AcceptanceStatus = "COMPLETED" | "INPROGRESS" | "ANY" | null
 
-    type AcceptanceStatus = "COMPLETED" | "INPROGRESS" | "ANY"
+  type ApplicationStatus =  "COMPLETED" | "INPROGRESS" | null
 
-    type ApplicationStatus =  "COMPLETED" | "INPROGRESS"
+  type IncludeInactive = "true" | "false" | null
 
-    type IncludeInactive = "true" | "false"
-
-    type SearchParamsTypes = {
-      productRefId: string | null;
-      memberRefId: string | null;
-      guarantorRefId: string | null;
-      loanReqStatus: LoanReqStatuses | null,
-      signingStatus: SigningStatus | null,
-      acceptanceStatus: AcceptanceStatus | null,
-      applicationStatus: ApplicationStatus | null,
-      witnessRefId: string | null,
-      loanNumber: string | null,
-      startDate: string | null,
-      endDate: string | null,
-      searchTerm: string | null,
-      order: string | null,
-      pageSize: number | null,
-      pageIndex: number | null,
-      includeInActive: IncludeInactive | null,
-    }
-
-    let searchParams: SearchParamsTypes = {
-      productRefId: null,
-      memberRefId: null,
-      guarantorRefId: null,
-      loanReqStatus: null,
-      signingStatus: null,
-      acceptanceStatus: null,
-      applicationStatus: null,
-      witnessRefId: null,
-      loanNumber: null,
-      startDate: null,
-      endDate: null,
-      searchTerm: null,
-      order: null,
-      pageSize: null,
-      pageIndex: null,
-      includeInActive: null,
-    }
-
-    console.log('updating filters', filterData)
-
-    const {refId, searchTerm, fromDate, toDate} = filterData
-
-    if (refId) {
-      console.log(refId)
-    }
-
-    if (searchTerm) {
-      console.log(searchTerm)
-    }
-
-    if (fromDate) {
-      console.log(fromDate)
-    }
-
-    if (toDate) {
-      console.log(toDate)
-    }
+  type customFiltersType = {
+    productRefId?: string,
+    memberRefId?: string,
+    guarantorRefId?: string,
+    loanReqStatus?: LoanReqStatuses,
+    signingStatus?: SigningStatus,
+    acceptanceStatus?: AcceptanceStatus,
+    applicationStatus?: ApplicationStatus,
+    witnessRefId?: string | null,
+    loanNumber?: string | null,
+    startDate?: string | null,
+    endDate?: string | null,
+    includeInActive?: IncludeInactive,
   }
-  (async () => {
+
+  const filters = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    order: 'ASC',
+    page: 1
+  })
+
+  const customFilters =  reactive<customFiltersType>({
+    productRefId: '',
+    memberRefId: '',
+    guarantorRefId: '',
+    loanReqStatus: null,
+    signingStatus: null,
+    acceptanceStatus: null,
+    applicationStatus: null,
+    witnessRefId: '',
+    loanNumber: '',
+    startDate: '',
+    endDate: '',
+    includeInActive: null,
+  })
+
+  const queryLoanRequests: ComputedRef<string> = computed(() => {
+    return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+  })
+
+  onMounted(async () => {
     await Promise.allSettled([
       loanProductStore.fetchLoanProducts(),
-      loanRequestStore.fetchLoanRequests(params),
+      loanRequestStore.fetchLoanRequests(queryLoanRequests.value),
       loanRequestStore.fetchLoanRequestSummary(),
     ])
-  })()
-}
+  })
 
-const refreshNext = () => {
+  const searchLR = (customFilter?: customFiltersType) => {
+    if (customFilter) {
+      const payload = {
+        ...customFilters,
+        ...customFilter,
+      }
 
-}
-const refreshPrev = () => {
+      let urlString = queryLoanRequests.value
 
-}
-const refreshCurrent = () => {
+      for (const [key, value] of Object.entries(payload)) {
+        if (value) {
+          if (key == 'startDate' || key == 'endDate') {
+            let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
+            urlString += `&${key}=${theDate}`
+          } else {
+            urlString += `&${key}=${value}`
+          }
+        }
+      }
 
-}
+      console.log(urlString)
 
-onMounted(() => {
-  searchLoanRequests()
-})
+      loanRequestStore.fetchLoanRequests(urlString)
+    } else {
+      loanRequestStore.fetchLoanRequests(queryLoanRequests.value)
+    }
+  }
 
-watch(() => filters.fromDate, (fromDate) =>{
-  searchLoanRequests({fromDate})
-})
-watch(() => filters.toDate, (toDate) =>{
-  searchLoanRequests({toDate})
-})
+  const refreshNext = (cP: number) => {
+    filters.page = cP + 1;
+    searchLR();
+  }
+  const refreshPrev = (cP: number) => {
+    filters.page = cP - 1;
+    searchLR();
+  }
+  const refreshCurrent = () => {
+    searchLR();
+  }
 
-const exportQuery = ref(`?order=ASC&pageSize=10&pageIndex=0`)
+  watch(customFilters, (customFilters) => {
+    searchLR(customFilters)
+  })
 
 </script>
 <template>
@@ -191,7 +181,7 @@ const exportQuery = ref(`?order=ASC&pageSize=10&pageIndex=0`)
           <div class="flex-1 flex justify-between items-start">
             <div class="flex flex-col space-y-2">
               <span class="uppercase text-sm font-medium">Total Amount Requested</span>
-              <span class="font-semibold text-2xl">{{ $filters.currencyKES(loanRequestStore.getLoanRequestsSummary?.totalRequested) }}</span>
+              <span class="font-semibold text-2xl">{{ loanRequestStore.getLoanRequestsSummary ? $filters.currencyKES(loanRequestStore.getLoanRequestsSummary?.totalRequested) : 0 }}</span>
             </div>
             <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
               <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -209,17 +199,17 @@ const exportQuery = ref(`?order=ASC&pageSize=10&pageIndex=0`)
       </div>
       <LoanRequestsTable :loanRequests="loanRequestStore.getLoanRequests">
         <div class="sm:flex-auto">
-          <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLoanRequests" />
+          <GlobalSearch :placeholder="'Search Loan Requests (case sensitive)'" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLR" />
         </div>
         <div class="mt-0 ml-auto flex flex-wrap space-x-4">
           <div class="flex items-center">
             <span class="mx-4 text-gray-500">From</span>
             <div>
-              <input v-model="filters.fromDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
+              <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
             </div>
             <span class="mx-4 text-gray-500">To</span>
             <div>
-                <input v-model="filters.toDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
+                <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
             </div>
           </div>
           <button type="button" class="inline-flex hidden items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
@@ -231,7 +221,7 @@ const exportQuery = ref(`?order=ASC&pageSize=10&pageIndex=0`)
         </div>
       </LoanRequestsTable>
       <Paginator
-          :current-page="filters.currentPage"
+          :current-page="filters.page"
           :filter-form="filters"
           @refreshNext="refreshNext"
           @refreshPrev="refreshPrev"

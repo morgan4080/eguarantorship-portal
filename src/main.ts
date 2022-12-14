@@ -55,7 +55,7 @@ window.fetch = new Proxy(window.fetch, {
                         throw err;
                     });
                 }
-                console.log("fetch completed!", args, response);
+                console.log("fetch completed!", args, response.status);
             })
             .finally(() => {
                 authStore.loading = false;
