@@ -82,6 +82,23 @@ export const useMember = defineStore('member-store', {
         }
     },
     actions: {
+        async exportMembers(params?:string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/members${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const content = await response.blob();
+                    return Promise.resolve(URL.createObjectURL(content));
+                } else {
+                    return Promise.reject(`${response.status}: Failed to export members.`);
+                }
+            } catch (e: any) {
+                console.error("exportMembers",  e);
+                return Promise.reject(e.message);
+            }
+        },
         async fetchMembers(params?: string) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/members${params ? params : ''}`, {

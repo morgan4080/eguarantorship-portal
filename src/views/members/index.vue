@@ -71,10 +71,13 @@ onMounted(async () => {
   ])
 })
 
-const exportMembers = () => {
-  if (confirm('You are about to export all members. Proceed?' )) {
-    console.log('exporting')
-  }
+const exportMembers = async () => {
+  const url = await memberStore.exportMembers(queryMembers.value)
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', new Date() + 'loan-requests.csv');
+  document.body.appendChild(link);
+  link.click();
 }
 </script>
 <template>

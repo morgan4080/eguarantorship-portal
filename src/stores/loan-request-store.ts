@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 
-interface GuarantorData {
+export interface GuarantorData {
     refId: string,
     memberNumber: string,
     memberRefId: string,
@@ -10,6 +10,7 @@ interface GuarantorData {
     isAccepted?: string,
     dateSigned?: string,
     isSigned?: boolean,
+    isApproved?: boolean,
     isActive: boolean,
     committedAmount: number,
     availableAmount: number,
@@ -38,7 +39,16 @@ export interface LoanRequestData {
     totalDeposits?: number,
     applicantSigned?: boolean,
     witnessName?: string,
+    zohoDocumentId?: string,
+    zohoRequestId?: string,
     guarantorList?: GuarantorData[],
+    pdfThumbNail?: string,
+    pendingReason?: string,
+    readableErrorMessage?: string,
+    witnessRefId?: string,
+    witnessMemberNo?: string,
+    witnessAccepted?: boolean,
+    witnessSigned?: boolean,
 }
 
 export interface PaginationData {
@@ -82,6 +92,86 @@ export const useLoanRequest = defineStore('loan-request-store', {
         }
     },
     actions: {
+        async downloadLoanRequestForm(payload: { zohoRequestId: string}) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/zoho/PDF`, {
+                    method: 'POST',
+                    headers: myHeaders,
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                if (response.status === 200) {
+                    return Promise.resolve('Loan request form downloaded!');
+                } else {
+                    return Promise.reject('Could not download loan request form!');
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject('Could not download loan request form!');
+            }
+        },
+        async downloadCompletionCertificate(payload: { zohoRequestId: string}) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/zoho/completioncertificate`, {
+                    method: 'POST',
+                    headers: myHeaders,
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                if (response.status === 200) {
+                    const data = await response.text();
+                    console.log(data)
+                    return Promise.resolve(data);
+                } else {
+                    return Promise.reject('Could not resubmit loan request for signing!');
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject('Could not resubmit loan request for signing!');
+            }
+        },
+        async resubmitForSigning(refId: string) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}/sign`, {
+                    method: 'POST',
+                    headers: myHeaders,
+                    credentials: 'include',
+                });
+                if (response.status === 200) {
+                    return Promise.resolve('Loan request resubmission successful!');
+                } else {
+                    return Promise.reject('Could not resubmit loan request for signing!');
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject('Could not resubmit loan request for signing!');
+            }
+        },
+        async submitToCoBanking(loanRequestNumber: string) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/jumbostar/save-loan/${loanRequestNumber}`, {
+                    method: 'POST',
+                    headers: myHeaders,
+                    credentials: 'include',
+                });
+                if (response.status === 200) {
+                    return Promise.resolve('Loan request submission successful!');
+                } else {
+                    return Promise.reject('Could not submit loan request to co-banking!');
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject('Could not submit loan request to co-banking!');
+            }
+        },
         async fetchLoanRequest(refId: string) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}`, {
@@ -142,15 +232,15 @@ export const useLoanRequest = defineStore('loan-request-store', {
         },
         async exportLoanRequests(params?:string) {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/members${params ? params : ''}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/loans${params ? params : ''}`, {
                     method: 'GET',
                     credentials: 'include'
                 });
                 if (response.status === 200) {
                     const content = await response.blob();
-                    return Promise.resolve(content);
+                    return Promise.resolve(URL.createObjectURL(content));
                 } else {
-                    return Promise.reject(`${response.status}: Failed to fetch loan request summary.`);
+                    return Promise.reject(`${response.status}: Failed to export loan requests.`);
                 }
             } catch (e: any) {
                 console.error("exportLoanRequests",  e);
