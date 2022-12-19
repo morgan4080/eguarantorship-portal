@@ -92,24 +92,25 @@ export const useLoanRequest = defineStore('loan-request-store', {
         }
     },
     actions: {
-        async downloadLoanRequestForm(payload: { zohoRequestId: string}) {
+        async closeLoanRequest(refId: string) {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/zoho/PDF`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}/status/CLOSED`, {
                     method: 'POST',
                     headers: myHeaders,
-                    credentials: 'include',
-                    body: JSON.stringify(payload)
+                    credentials: 'include'
                 });
                 if (response.status === 200) {
-                    return Promise.resolve('Loan request form downloaded!');
+                    const data = await response.text();
+                    console.log(data);
+                    return Promise.resolve('Loan request closed!');
                 } else {
-                    return Promise.reject('Could not download loan request form!');
+                    return Promise.reject('Could not close loan request!');
                 }
             } catch (e: any) {
-                console.error("fetchLoanRequest",  e);
-                return Promise.reject('Could not download loan request form!');
+                console.error("closeLoanRequest",  e);
+                return Promise.reject('Could not close loan request!');
             }
         },
         async downloadCompletionCertificate(payload: { zohoRequestId: string}) {
@@ -134,11 +135,11 @@ export const useLoanRequest = defineStore('loan-request-store', {
                 return Promise.reject('Could not resubmit loan request for signing!');
             }
         },
-        async resubmitForSigning(refId: string) {
+        async resubmitForSigning(refId: string, sendNotification = false) {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}/sign`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}/retry?sendNotification=${sendNotification}`, {
                     method: 'POST',
                     headers: myHeaders,
                     credentials: 'include',
@@ -157,7 +158,7 @@ export const useLoanRequest = defineStore('loan-request-store', {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/jumbostar/save-loan/${loanRequestNumber}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/core-banking/forward-loan-request/${loanRequestNumber}`, {
                     method: 'POST',
                     headers: myHeaders,
                     credentials: 'include',
@@ -192,7 +193,7 @@ export const useLoanRequest = defineStore('loan-request-store', {
         },
         async fetchLoanRequests(params?: string) {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request${params ? params : ''}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/query${params ? params : ''}`, {
                     method: 'GET',
                     credentials: 'include'
                 });

@@ -1,84 +1,145 @@
 <script setup lang="ts">
-import Breadcrumb from "../../components/Breadcrumb.vue";
-import MembersTable from "../../components/MembersTable.vue";
-import {computed, ComputedRef, onMounted, reactive} from "vue";
-import {
-  UserPlusIcon,
-  ArrowUpTrayIcon,
-  ChevronDownIcon,
-} from '@heroicons/vue/20/solid'
-import GlobalSearch from "../../components/GlobalSearch.vue";
-import DropDown from "../../components/DropDown.vue";
-import stores from "../../stores";
-import {MenuButton} from "@headlessui/vue";
-import Paginator from "../../components/Paginator.vue";
-const { memberStore } = stores;
+  import {debounce} from "lodash"
+  import Breadcrumb from "../../components/Breadcrumb.vue";
+  import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
+  import GlobalSearch from "../../components/GlobalSearch.vue";
+  import {computed, ComputedRef, onMounted, reactive, watch} from "vue";
+  import Paginator from "../../components/Paginator.vue";
+  import stores from "../../stores";
+  const { loanRequestStore, loanProductStore } = stores;
 
-const filters = reactive({
-  recordsPerPage: 10,
-  searchTerm: '',
-  order: 'ASC',
-  page: 1
-})
+  type LoanReqStatuses = "CLOSED" | "OPEN" | "READ" | null
 
-const queryMembers: ComputedRef<string> = computed(() => {
-  return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
-})
+  type SigningStatus = "COMPLETED" | "INPROGRESS" | "ERROR" | null
 
-const searchMembers = (customFilters?: {searchTerm?: string}) => {
-  if (customFilters) {
-    const {searchTerm} = customFilters
-    if (searchTerm) {
-      memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
+  type AcceptanceStatus = "COMPLETED" | "INPROGRESS" | "ANY" | null
+
+  type ApplicationStatus =  "COMPLETED" | "INPROGRESS" | null
+
+  type IncludeInactive = "true" | "false" | null
+
+  type customFiltersType = {
+    productRefId?: string,
+    memberRefId?: string,
+    guarantorRefId?: string,
+    loanReqStatus?: LoanReqStatuses,
+    signingStatus?: SigningStatus,
+    acceptanceStatus?: AcceptanceStatus,
+    applicationStatus?: ApplicationStatus,
+    witnessRefId?: string | null,
+    loanNumber?: string | null,
+    startDate?: string | null,
+    endDate?: string | null,
+    includeInActive?: IncludeInactive,
+  }
+
+  const filters = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    order: 'ASC',
+    page: 1
+  })
+
+  const customFilters =  reactive<customFiltersType>({
+    productRefId: '',
+    memberRefId: '',
+    guarantorRefId: '',
+    loanReqStatus: null,
+    signingStatus: null,
+    acceptanceStatus: null,
+    applicationStatus: null,
+    witnessRefId: '',
+    loanNumber: '',
+    startDate: '',
+    endDate: '',
+    includeInActive: null,
+  })
+
+  const queryLoanRequests: ComputedRef<string> = computed(() => {
+    return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+  })
+
+  onMounted(async () => {
+    await Promise.allSettled([
+      loanProductStore.fetchLoanProducts(),
+      loanRequestStore.fetchLoanRequests(queryLoanRequests.value),
+      loanRequestStore.fetchLoanRequestSummary(),
+    ])
+  })
+
+  const searchLR = (customFilter?: customFiltersType) => {
+    if (customFilter) {
+      const payload = {
+        ...customFilters,
+        ...customFilter,
+      }
+
+      let urlString = queryLoanRequests.value
+
+      for (const [key, value] of Object.entries(payload)) {
+        if (value) {
+          if (key == 'startDate' || key == 'endDate') {
+            let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
+            urlString += `&${key}=${theDate}`
+          } else {
+            urlString += `&${key}=${value}`
+          }
+        }
+      }
+
+      console.log(urlString)
+
+      loanRequestStore.fetchLoanRequests(urlString)
     } else {
-      memberStore.fetchMembers(queryMembers.value)
+      loanRequestStore.fetchLoanRequests(queryLoanRequests.value)
     }
-  } else {
-    memberStore.fetchMembers(queryMembers.value)
   }
-}
 
-const refreshNext = (cP: number) => {
-  filters.page = cP + 1;
-  searchMembers();
-}
-const refreshPrev = (cP: number) => {
-  filters.page = cP - 1;
-  searchMembers();
-}
-const refreshCurrent = () => {
-  searchMembers();
-}
-const actions = [
-  {
-    id: 1,
-    name: 'Create Member',
-    icon: UserPlusIcon,
-    href: '/members/create'
-  },
-  {
-    id: 2,
-    name: 'Import Members',
-    icon: ArrowUpTrayIcon,
-    href: '/members/import'
+  const refreshNext = (cP: number) => {
+    filters.page = cP + 1;
+    searchLR();
   }
-]
+  const refreshPrev = (cP: number) => {
+    filters.page = cP - 1;
+    searchLR();
+  }
+  const refreshCurrent = () => {
+    searchLR();
+  }
 
-onMounted(async () => {
-  await Promise.all([
-    memberStore.fetchMembersSummary(),
-    memberStore.fetchMembers(),
-  ])
-})
+  watch(customFilters, (customFilters) => {
+    searchLR(customFilters)
+  })
 
-const exportMembers = async () => {
-  const url = await memberStore.exportMembers(queryMembers.value)
-  const link = document.createElement('a');
-  link.href = url;
-  link.setAttribute('download', new Date() + 'loan-requests.csv');
-  document.body.appendChild(link);
-  link.click();
-}
+  const exportLoanRequests = async () => {
+    const payload = {
+      ...customFilters,
+    }
+
+    let urlString = queryLoanRequests.value
+
+    for (const [key, value] of Object.entries(payload)) {
+      if (value) {
+        if (key == 'startDate' || key == 'endDate') {
+          let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
+          urlString += `&${key}=${theDate}`
+        } else {
+          urlString += `&${key}=${value}`
+        }
+      }
+    }
+
+    console.log(urlString)
+
+    const url = await loanRequestStore.exportLoanRequests(urlString)
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', new Date() + 'loan-requests.csv');
+    document.body.appendChild(link);
+    link.click();
+  }
+
 </script>
 <template>
   <div class="flex flex-1 flex-col md:pl-24">
@@ -86,20 +147,20 @@ const exportMembers = async () => {
       <div class="py-16">
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
-            <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
-            <DropDown :items="actions">
-              <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Actions
-                <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-              </MenuButton>
-            </DropDown>
+            <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
+            <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+              <option :value="null">Select Request Status</option>
+              <option value="CLOSED">CLOSED</option>
+              <option value="OPEN">OPEN</option>
+              <option value="READ">READ</option>
+            </select>
           </div>
           <div class="sm:grid sm:grid-cols-4 sm:gap-2">
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
-                  <span class="uppercase text-sm font-medium">Total Members</span>
-                  <span class="font-semibold text-lg">{{ memberStore.getMemberSummary ? (memberStore.getMemberSummary?.ACTIVE +  memberStore.getMemberSummary?.DORMANT + memberStore.getMemberSummary?.EXITED) : 0 }}</span>
+                  <span class="uppercase text-sm font-medium">Total Requests</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.totalRequests }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -117,8 +178,8 @@ const exportMembers = async () => {
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
-                  <span class="uppercase text-sm font-medium">Active Members</span>
-                  <span class="font-semibold text-lg">{{ memberStore.getMemberSummary?.ACTIVE }}</span>
+                  <span class="uppercase text-sm font-medium">Today Requests</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.todayRequests }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -136,28 +197,28 @@ const exportMembers = async () => {
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
-                  <span class="uppercase text-sm font-medium">Dormant Members</span>
-                  <span class="font-semibold text-lg">{{ memberStore.getMemberSummary?.DORMANT }}</span>
+                  <span class="uppercase text-sm font-medium">Average Days To Complete</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.averageDaysToComplete }}</span>
                 </div>
 
-                <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
-                    <rect x="28.6216" y="30.9397" width="29.3687" height="29.3687" fill="#D9D9D9"/>
+                <svg class="w-10" width="79" height="75" viewBox="0 0 79 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <mask id="mask0_217_1888" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="40" y="42" width="34" height="33">
+                    <rect x="40.3567" y="42" width="33" height="33" fill="#C4C4C4"/>
                   </mask>
-                  <g mask="url(#mask0_89_1150)">
-                    <path d="M51.8717 48.0714C51.525 48.0714 51.2346 47.954 51.0005 47.719C50.7655 47.4849 50.648 47.1945 50.648 46.8477V44.4003H48.2007C47.8539 44.4003 47.5635 44.2829 47.3294 44.0479C47.0944 43.8138 46.977 43.5234 46.977 43.1766C46.977 42.8299 47.0944 42.5391 47.3294 42.3042C47.5635 42.07 47.8539 41.953 48.2007 41.953H50.648V39.5056C50.648 39.1588 50.7655 38.868 51.0005 38.6331C51.2346 38.3989 51.525 38.2819 51.8717 38.2819C52.2185 38.2819 52.5089 38.3989 52.743 38.6331C52.978 38.868 53.0954 39.1588 53.0954 39.5056V41.953H55.5428C55.8895 41.953 56.18 42.07 56.4141 42.3042C56.6491 42.5391 56.7665 42.8299 56.7665 43.1766C56.7665 43.5234 56.6491 43.8138 56.4141 44.0479C56.18 44.2829 55.8895 44.4003 55.5428 44.4003H53.0954V46.8477C53.0954 47.1945 52.978 47.4849 52.743 47.719C52.5089 47.954 52.2185 48.0714 51.8717 48.0714ZM39.6348 45.624C38.2887 45.624 37.1364 45.1448 36.1778 44.1862C35.2193 43.2276 34.74 42.0753 34.74 40.7293C34.74 39.3832 35.2193 38.2309 36.1778 37.2723C37.1364 36.3138 38.2887 35.8345 39.6348 35.8345C40.9808 35.8345 42.1332 36.3138 43.0917 37.2723C44.0503 38.2309 44.5296 39.3832 44.5296 40.7293C44.5296 42.0753 44.0503 43.2276 43.0917 44.1862C42.1332 45.1448 40.9808 45.624 39.6348 45.624ZM31.0689 55.4136C30.7222 55.4136 30.4318 55.2961 30.1976 55.0612C29.9627 54.8271 29.8452 54.5366 29.8452 54.1899V51.9873C29.8452 51.2938 30.0239 50.6563 30.3812 50.0746C30.7377 49.4938 31.2117 49.0504 31.8031 48.7445C33.0676 48.1122 34.3525 47.6378 35.6578 47.3213C36.963 47.0056 38.2887 46.8477 39.6348 46.8477C40.9808 46.8477 42.3065 47.0056 43.6118 47.3213C44.9171 47.6378 46.202 48.1122 47.4664 48.7445C48.0579 49.0504 48.5319 49.4938 48.8884 50.0746C49.2457 50.6563 49.4244 51.2938 49.4244 51.9873V54.1899C49.4244 54.5366 49.3069 54.8271 49.0719 55.0612C48.8378 55.2961 48.5474 55.4136 48.2007 55.4136H31.0689ZM32.2926 52.9662H46.977V51.9873C46.977 51.7629 46.9211 51.559 46.8093 51.3754C46.6967 51.1919 46.5487 51.0491 46.3651 50.9471C45.2638 50.3965 44.1523 49.9833 43.0305 49.7075C41.9088 49.4326 40.7769 49.2951 39.6348 49.2951C38.4927 49.2951 37.3607 49.4326 36.239 49.7075C35.1173 49.9833 34.0058 50.3965 32.9045 50.9471C32.7209 51.0491 32.5732 51.1919 32.4615 51.3754C32.3489 51.559 32.2926 51.7629 32.2926 51.9873V52.9662ZM39.6348 43.1766C40.3078 43.1766 40.8842 42.9368 41.3639 42.4571C41.8427 41.9782 42.0822 41.4023 42.0822 40.7293C42.0822 40.0562 41.8427 39.4803 41.3639 39.0014C40.8842 38.5217 40.3078 38.2819 39.6348 38.2819C38.9617 38.2819 38.3858 38.5217 37.9069 39.0014C37.4272 39.4803 37.1874 40.0562 37.1874 40.7293C37.1874 41.4023 37.4272 41.9782 37.9069 42.4571C38.3858 42.9368 38.9617 43.1766 39.6348 43.1766Z" fill="#5992A6"/>
+                  <g mask="url(#mask0_217_1888)">
+                    <path d="M56.8567 61.25C56.4671 61.25 56.1408 61.118 55.8777 60.854C55.6137 60.5909 55.4817 60.2646 55.4817 59.875C55.4817 59.4854 55.6137 59.1586 55.8777 58.8946C56.1408 58.6315 56.4671 58.5 56.8567 58.5C57.2463 58.5 57.5731 58.6315 57.8371 58.8946C58.1001 59.1586 58.2317 59.4854 58.2317 59.875C58.2317 60.2646 58.1001 60.5909 57.8371 60.854C57.5731 61.118 57.2463 61.25 56.8567 61.25ZM51.3567 61.25C50.9671 61.25 50.6403 61.118 50.3763 60.854C50.1132 60.5909 49.9817 60.2646 49.9817 59.875C49.9817 59.4854 50.1132 59.1586 50.3763 58.8946C50.6403 58.6315 50.9671 58.5 51.3567 58.5C51.7463 58.5 52.0731 58.6315 52.3371 58.8946C52.6001 59.1586 52.7317 59.4854 52.7317 59.875C52.7317 60.2646 52.6001 60.5909 52.3371 60.854C52.0731 61.118 51.7463 61.25 51.3567 61.25ZM62.3567 61.25C61.9671 61.25 61.6408 61.118 61.3777 60.854C61.1137 60.5909 60.9817 60.2646 60.9817 59.875C60.9817 59.4854 61.1137 59.1586 61.3777 58.8946C61.6408 58.6315 61.9671 58.5 62.3567 58.5C62.7463 58.5 63.0726 58.6315 63.3357 58.8946C63.5997 59.1586 63.7317 59.4854 63.7317 59.875C63.7317 60.2646 63.5997 60.5909 63.3357 60.854C63.0726 61.118 62.7463 61.25 62.3567 61.25ZM56.8567 66.75C56.4671 66.75 56.1408 66.618 55.8777 66.354C55.6137 66.0909 55.4817 65.7646 55.4817 65.375C55.4817 64.9854 55.6137 64.6591 55.8777 64.396C56.1408 64.132 56.4671 64 56.8567 64C57.2463 64 57.5731 64.132 57.8371 64.396C58.1001 64.6591 58.2317 64.9854 58.2317 65.375C58.2317 65.7646 58.1001 66.0909 57.8371 66.354C57.5731 66.618 57.2463 66.75 56.8567 66.75ZM51.3567 66.75C50.9671 66.75 50.6403 66.618 50.3763 66.354C50.1132 66.0909 49.9817 65.7646 49.9817 65.375C49.9817 64.9854 50.1132 64.6591 50.3763 64.396C50.6403 64.132 50.9671 64 51.3567 64C51.7463 64 52.0731 64.132 52.3371 64.396C52.6001 64.6591 52.7317 64.9854 52.7317 65.375C52.7317 65.7646 52.6001 66.0909 52.3371 66.354C52.0731 66.618 51.7463 66.75 51.3567 66.75ZM62.3567 66.75C61.9671 66.75 61.6408 66.618 61.3777 66.354C61.1137 66.0909 60.9817 65.7646 60.9817 65.375C60.9817 64.9854 61.1137 64.6591 61.3777 64.396C61.6408 64.132 61.9671 64 62.3567 64C62.7463 64 63.0726 64.132 63.3357 64.396C63.5997 64.6591 63.7317 64.9854 63.7317 65.375C63.7317 65.7646 63.5997 66.0909 63.3357 66.354C63.0726 66.618 62.7463 66.75 62.3567 66.75ZM47.2317 72.25C46.4754 72.25 45.8278 71.981 45.2888 71.4429C44.7507 70.9039 44.4817 70.2563 44.4817 69.5V50.25C44.4817 49.4938 44.7507 48.8466 45.2888 48.3085C45.8278 47.7695 46.4754 47.5 47.2317 47.5H48.6067V44.75H51.3567V47.5H62.3567V44.75H65.1067V47.5H66.4817C67.2379 47.5 67.8856 47.7695 68.4246 48.3085C68.9626 48.8466 69.2317 49.4938 69.2317 50.25V69.5C69.2317 70.2563 68.9626 70.9039 68.4246 71.4429C67.8856 71.981 67.2379 72.25 66.4817 72.25H47.2317ZM47.2317 69.5H66.4817V55.75H47.2317V69.5ZM47.2317 53H66.4817V50.25H47.2317V53Z" fill="#5992A6"/>
                   </g>
-                  <circle cx="18.2758" cy="10.319" r="6.34097" fill="#FFBD14"/>
-                  <path d="M52.8126 21.4026C52.6855 21.0928 52.3863 20.8907 52.0544 20.8907H48.5792C47.5677 11.0918 40.3216 2.94011 30.7177 0.920631C30.3088 0.835308 29.9013 1.0726 29.771 1.47353L28.7387 4.6475C28.5859 5.11704 28.8874 5.63042 29.3673 5.72111C36.8711 7.14023 42.6184 13.3121 43.6217 20.8907H39.6758C38.9604 20.8907 38.5892 21.7944 39.0955 22.3061L45.2848 28.5589C45.601 28.8782 46.1292 28.8782 46.4453 28.5589L52.6347 22.3061C52.8693 22.0689 52.9396 21.7124 52.8126 21.4026Z" fill="#00AB71"/>
-                  <path d="M24.0892 39.9448C16.5854 38.5257 10.8381 32.3538 9.83482 24.7751H13.7808C14.4961 24.7751 14.8674 23.8714 14.361 23.3598L8.17174 17.107C7.85138 16.7833 7.33178 16.7833 7.01131 17.107L0.821816 23.3597C0.315591 23.8712 0.686707 24.775 1.40208 24.775H4.87724C5.88877 34.574 13.1348 42.7257 22.7387 44.7451C23.1427 44.8297 23.5568 44.5882 23.6856 44.1922L24.7178 41.0183C24.8706 40.5488 24.5691 40.0355 24.0892 39.9448Z" fill="#FE541F"/>
+                  <circle cx="26.5" cy="14.1064" r="9.5" fill="#FFBD14"/>
+                  <path d="M78.2427 30.7119C78.0523 30.2477 77.604 29.945 77.1068 29.945H71.9003C70.3848 15.2643 59.5288 3.05151 45.1403 0.0259351C44.5277 -0.101895 43.9171 0.253619 43.7219 0.854282L42.1753 5.60951C41.9465 6.31296 42.3981 7.08211 43.1171 7.21798C54.3593 9.3441 62.9698 18.5907 64.4729 29.945H58.5613C57.4895 29.945 56.9333 31.2989 57.6919 32.0654L66.9647 41.4334C67.4384 41.9118 68.2297 41.9118 68.7032 41.4334L77.9761 32.0654C78.3277 31.7101 78.433 31.176 78.2427 30.7119Z" fill="#00AB71"/>
+                  <path d="M35.2095 58.4912C23.9673 56.3652 15.3568 47.1185 13.8537 35.7641H19.7655C20.8373 35.7641 21.3934 34.4102 20.6348 33.6437L11.3621 24.2758C10.8821 23.7909 10.1036 23.7909 9.62353 24.2758L0.350466 33.6436C-0.407958 34.4099 0.148046 35.764 1.21982 35.764H6.42628C7.94175 50.4447 18.7978 62.6575 33.1862 65.6831C33.7915 65.8098 34.4119 65.448 34.6049 64.8547L36.1512 60.0995C36.3801 59.3962 35.9285 58.6271 35.2095 58.4912Z" fill="#FE541F"/>
                 </svg>
               </div>
             </div>
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
-                  <span class="uppercase text-sm font-medium">Exited Members</span>
-                  <span class="font-semibold text-lg">{{ memberStore.getMemberSummary?.DORMANT }}</span>
+                  <span class="uppercase text-sm font-medium">Total Amount Requested</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? $filters.currencyKES(loanRequestStore.getLoanRequestsSummary?.totalRequested) : 0 }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -173,27 +234,37 @@ const exportMembers = async () => {
               </div>
             </div>
           </div>
-          <MembersTable :members="memberStore.getMembers">
+          <LoanRequestsTable :loanRequests="loanRequestStore.getLoanRequests">
             <div class="sm:flex-auto">
-              <GlobalSearch :placeholder="'Search Members'" :ctx="$route.name" @update="searchMembers" />
+              <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLR" />
             </div>
-            <div class="mt-0 ml-16 flex flex-wrap space-x-4">
-              <button @click="exportMembers" type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+            <div class="mt-0 ml-auto flex flex-wrap space-x-4">
+              <div class="flex items-center">
+                <span class="mx-4 text-gray-500">From</span>
+                <div>
+                  <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
+                </div>
+                <span class="mx-4 text-gray-500">To</span>
+                <div>
+                    <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
+                </div>
+              </div>
+              <button @click="exportLoanRequests" type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                 </svg>
-                Export Members
+                Export Requests
               </button>
             </div>
-          </MembersTable>
+          </LoanRequestsTable>
           <Paginator
               :current-page="filters.page"
               :filter-form="filters"
               @refreshNext="refreshNext"
               @refreshPrev="refreshPrev"
               @refreshCurrent="refreshCurrent"
-              :total-pages="memberStore.getPaginationData ? memberStore.getPaginationData.totalPages : 0"
-              :total-elements="memberStore.getPaginationData ? memberStore.getPaginationData.totalElements : 0"
+              :total-pages="loanRequestStore.getPaginationData ? loanRequestStore.getPaginationData.totalPages : 0"
+              :total-elements="loanRequestStore.getPaginationData ? loanRequestStore.getPaginationData.totalElements : 0"
           />
         </div>
       </div>

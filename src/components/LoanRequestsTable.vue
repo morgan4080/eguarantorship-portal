@@ -16,11 +16,12 @@
             </th>
             <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Request No.</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
-            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member Name</th>
+            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Loan Type</th>
-            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Amount KSH</th>
-            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">No. Of Guarantors</th>
-            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
+            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Percentage</th>
+            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Application Status</th>
+            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Signing Status</th>
             <th scope="col" class="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-6">
               <span class="sr-only">Action</span>
             </th>
@@ -42,10 +43,10 @@
             <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.loanRequestNumber) ? 'text-eg-blue' : 'text-gray-900']" >
               <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestNumber }}</router-link>
             </td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+            <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-500">
               <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanDate }}</router-link>
             </td>
-            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
               <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.memberFirstName }} {{ item.memberLastName }}</router-link>
             </td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
@@ -55,10 +56,13 @@
               <router-link :to="`/loan-requests/${item.refId}/view`">{{ $filters.currencyKES(item.loanAmount) }}</router-link>
             </td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
-              <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.guarantorCount }}</router-link>
+              <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestProgress }}</router-link>
             </td>
             <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
-              <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.status }}</router-link>
+              <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.applicationStatus }}</router-link>
+            </td>
+            <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+              <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.applicationStatus === 'INPROGRESS' && item.signingStatus === 'ERROR' ? 'PENDING' : item.signingStatus }}</router-link>
             </td>
             <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
               <DropDown :items="[
