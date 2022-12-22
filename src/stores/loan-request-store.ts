@@ -154,6 +154,24 @@ export const useLoanRequest = defineStore('loan-request-store', {
                 return Promise.reject('Could not resubmit loan request for signing!');
             }
         },
+        async voidLoanRequest(loanRequestNumber: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/core-banking/loan-request/${loanRequestNumber}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                });
+
+                if (response.status === 200) {
+                    return Promise.resolve('Loan request voided successful!');
+                } else {
+                    return Promise.reject('Could not void loan request!');
+                }
+
+            } catch (e: any) {
+                console.error("voidLoanRequest",  e);
+                return Promise.reject('Could not void loan request!');
+            }
+        },
         async submitToCoBanking(loanRequestNumber: string) {
             try {
                 const myHeaders = new Headers();

@@ -1,3 +1,285 @@
+<script setup lang="ts">
+import * as d3 from 'd3'
+import stores from "../../stores";
+import {useRoute, useRouter} from "vue-router";
+import {onMounted, ref, watch} from "vue";
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import { ExclamationCircleIcon } from '@heroicons/vue/24/outline'
+import Breadcrumb from "../../components/Breadcrumb.vue";
+import { GuarantorData } from "../../stores/loan-request-store";
+const { loanRequestStore, authStore } = stores;
+const router = useRouter();
+const route = useRoute();
+
+onMounted(async () => {
+  await Promise.all([
+    loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
+  ])
+
+  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress) {
+    addArc();
+    addArc().remove();
+    addArc()
+        .transition()
+        .duration(750)
+        .call(arcTween, (2 * Math.PI) * loanRequestStore.getLoanRequest.loanRequestProgress / 100, arc());
+  }
+})
+
+const getSVG = () => {
+  return (
+      d3.select(`#test--svg--0`).select('g')
+  )
+};
+
+const arc: any = () => {
+  let {width, height, pathStyle} = {
+    height: 160,
+    width: 160,
+    pathStyle: {
+      width: 10,
+      fill: '#BA6A5D'
+    }
+  };
+  let radius = Math.min(width, height) / 2;
+  return (
+      d3.arc()
+          .innerRadius(radius - pathStyle.width)
+          .outerRadius(radius)
+          .startAngle(0)
+  )
+};
+
+const addArc = () => {
+  return (
+      getSVG().append("path")
+          .datum({endAngle: 0})
+          .style("fill", "#459aab")
+          .attr("d", arc())
+  )
+};
+
+const arcTween = (transition: { attrTween: (arg0: string, arg1: (d: any) => (t: any) => any) => void; }, newAngle: any, arc: (arg0: any) => any) => {
+  transition.attrTween('d', (d) => {
+    const interpolate = d3.interpolate(d.endAngle, newAngle);
+    const newArc = d;
+    return (t) => {
+      newArc.endAngle = interpolate(t);
+      return arc(newArc);
+    };
+  });
+};
+
+const documentDetails = ref<any[]>([])
+
+const downloadLoanRequestForm = async () => {
+  window.open(`${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/PDF`, '_blank')
+}
+
+const hrWidth = (guarantor: GuarantorData) => {
+  let step = 0;
+  if (guarantor.isAccepted) {
+    step += 1;
+  }
+  if (guarantor.isSigned) {
+    step += 1;
+  }
+  if (guarantor.isApproved) {
+    step += 1;
+  }
+  return (step * 100) / 3;
+};
+
+const hrWidth2 = () => {
+  let step = 0;
+  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessAccepted) step += 1;
+  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessSigned) step += 1;
+  return (step * 100) / 2;
+};
+
+const resubmitLR2Zoho = async () => {
+  const [resubmitted] = await Promise.allSettled([
+    loanRequestStore.resubmitForSigning(`${route.params.refId}`)
+  ])
+
+  if (resubmitted.status === 'fulfilled') {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Loan request resubmission successful!',
+      success: true
+    })
+  } else {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Could not resubmit loan request for signing!',
+      error: true
+    })
+  }
+};
+
+const closeLRequest = async () => {
+  const [closed] = await Promise.allSettled([
+    loanRequestStore.closeLoanRequest(`${loanRequestStore.getLoanRequest?.refId}`)
+  ]);
+
+  if (closed.status === 'fulfilled') {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: closed.value,
+      success: true
+    })
+    await loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
+  } else {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Could not close loan request!',
+      error: true
+    })
+  }
+}
+
+const post2CB = async () => {
+  const [submitted] = await Promise.allSettled([
+    loanRequestStore.submitToCoBanking(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
+  ])
+
+  if (submitted.status === 'fulfilled') {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Loan request submission to co-banking successful!',
+      success: true
+    })
+  } else {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Could not submit loan request to co-banking!',
+      error: true
+    })
+  }
+}
+
+const submitToCoBanking = async () => {
+  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress !== 100) {
+    if (confirm(`You are about to close an incomplete loan request ${loanRequestStore.getLoanRequest?.loanRequestNumber}, continue?`)) {
+      await Promise.allSettled([
+        closeLRequest(),
+        post2CB()
+      ]);
+    }
+  } else {
+    if (confirm(`Are you sure you want to close loan request number: ${loanRequestStore.getLoanRequest?.loanRequestNumber}?`)) {
+      await Promise.allSettled([
+        closeLRequest(),
+        post2CB()
+      ]);
+    }
+  }
+};
+
+const downloadAttachments = () => {
+  const element = document.createElement('a')
+  element.setAttribute('href', `${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/zip`)
+  element.setAttribute('download', "Loan Attachments")
+  element.style.display = 'none'
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
+};
+
+const downloadCertificate = async () => {
+  const [submitted] = await Promise.allSettled([
+    loanRequestStore.downloadCompletionCertificate({
+      zohoRequestId: `${loanRequestStore.getLoanRequest?.zohoRequestId}`
+    })
+  ])
+
+  if (submitted.status === 'fulfilled') {
+    documentDetails.value.push(submitted.value)
+    await downloadPdf('Completion Certificate', documentDetails.value.pop())
+  } else {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Could not download certificate!',
+      error: true
+    })
+  }
+};
+
+const downloadPdf = async (name: string, data: any) => {
+  if (data && data !== '') {
+    const element = document.createElement('a')
+    element.setAttribute('href', `data:application/pdf;base64, ${encodeURI(data)}`)
+    element.setAttribute('download', name)
+    element.style.display = 'none'
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+  } else {
+    authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: 'Could not download, no data available!',
+      error: true
+    })
+  }
+};
+
+const voidLoanRequest = async () => {
+  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED' && confirm("YOU ARE ABOUT TO VOID AN ALREADY APPRAISED LOAN")) {
+    const [voided] = await Promise.allSettled([
+      loanRequestStore.voidLoanRequest(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
+    ])
+
+    if (voided.status === 'fulfilled') {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: voided.value,
+        success: true
+      })
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Could not void loan request!',
+        error: true
+      })
+    }
+  }
+}
+
+const action = ref('')
+
+watch(() => action.value, async (actions) => {
+  if (actions !== '') {
+    switch (actions) {
+      case 'resubmitForSigning':
+        await resubmitLR2Zoho();
+        break;
+      case 'downloadAttachments':
+        downloadAttachments();
+        break;
+      case 'downloadPdf':
+        await  downloadLoanRequestForm();
+        break;
+      case 'downloadCertificate':
+        await downloadCertificate();
+        break;
+      case 'showZohoRequest':
+        console.log(actions)
+        // TODO: show zoho request details
+        break;
+      case 'submitToCoBanking':
+        await submitToCoBanking();
+        break;
+      case 'voidLoanRequest':
+        await voidLoanRequest();
+        break;
+    }
+  }
+  action.value = ''
+})
+
+const openErrorModal = ref(false)
+
+</script>
 <template>
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
@@ -14,6 +296,7 @@
                 <option value="downloadPdf">Download PDF</option>
                 <option value="downloadCertificate">Download Certificate</option>
                 <option value="showZohoRequest">Show zoho request</option>
+                <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="voidLoanRequest">Void loan request</option>
                 <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="submitToCoBanking">Submit to co-banking</option>
               </select>
             </div>
@@ -43,13 +326,45 @@
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-64 h-64 text-red-400">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                   </svg>
-                  <p>
-                    {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
-                  </p>
-                  <p>
-                    {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.readableErrorMessage) ? loanRequestStore.getLoanRequest.readableErrorMessage : "" }}
-                  </p>
-                  <p>Suggestion: Kindly Re-submit for signing.</p>
+                  <button @click="openErrorModal = true" type="button" class="absolute bottom-2 inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                    SHOW ERROR DETAILS
+                  </button>
+
+                  <TransitionRoot as="template" :show="openErrorModal">
+                    <Dialog as="div" class="relative z-10" @close="openErrorModal = false">
+                      <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                      </TransitionChild>
+
+                      <div class="fixed inset-0 z-10 overflow-y-auto">
+                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                              <div>
+                                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                                  <ExclamationCircleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
+                                </div>
+                                <div class="mt-3 text-center sm:mt-5">
+                                  <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Loan Request Error</DialogTitle>
+                                  <div class="mt-2">
+                                    <p class="text-sm text-gray-500">
+                                      {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                      {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.readableErrorMessage) ? loanRequestStore.getLoanRequest.readableErrorMessage : "" }}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </DialogPanel>
+                          </TransitionChild>
+                        </div>
+                      </div>
+                    </Dialog>
+                  </TransitionRoot>
                 </div>
               </aside>
 
@@ -220,262 +535,6 @@
     </main>
   </div>
 </template>
-
-<script setup lang="ts">
-  import * as d3 from 'd3'
-  import stores from "../../stores";
-  import {useRoute, useRouter} from "vue-router";
-  import {onMounted, ref, watch} from "vue";
-  import Breadcrumb from "../../components/Breadcrumb.vue";
-  import {GuarantorData} from "../../stores/loan-request-store";
-  const { loanRequestStore, authStore } = stores;
-  const router = useRouter();
-  const route = useRoute();
-
-  onMounted(async () => {
-    await Promise.all([
-      loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
-    ])
-
-    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress) {
-      addArc();
-      addArc().remove();
-      addArc()
-          .transition()
-          .duration(750)
-          .call(arcTween, (2 * Math.PI) * loanRequestStore.getLoanRequest.loanRequestProgress / 100, arc());
-    }
-  })
-
-  const getSVG = () => {
-    return (
-        d3.select(`#test--svg--0`).select('g')
-    )
-  };
-
-  const arc: any = () => {
-    let {width, height, pathStyle} = {
-      height: 160,
-      width: 160,
-      pathStyle: {
-        width: 10,
-        fill: '#BA6A5D'
-      }
-    };
-    let radius = Math.min(width, height) / 2;
-    return (
-        d3.arc()
-            .innerRadius(radius - pathStyle.width)
-            .outerRadius(radius)
-            .startAngle(0)
-    )
-  };
-
-  const addArc = () => {
-    return (
-        getSVG().append("path")
-            .datum({endAngle: 0})
-            .style("fill", "#459aab")
-            .attr("d", arc())
-    )
-  };
-
-  const arcTween = (transition: { attrTween: (arg0: string, arg1: (d: any) => (t: any) => any) => void; }, newAngle: any, arc: (arg0: any) => any) => {
-    transition.attrTween('d', (d) => {
-      const interpolate = d3.interpolate(d.endAngle, newAngle);
-      const newArc = d;
-      return (t) => {
-        newArc.endAngle = interpolate(t);
-        return arc(newArc);
-      };
-    });
-  };
-
-  const disabledPDF = ref<boolean>(false)
-
-  const documentDetails = ref<any[]>([])
-
-  const downloadLoanRequestForm = async () => {
-    window.open(`${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/PDF`, '_blank')
-  }
-
-  const hrWidth = (guarantor: GuarantorData) => {
-    let step = 0;
-    if (guarantor.isAccepted) {
-      step += 1;
-    }
-    if (guarantor.isSigned) {
-      step += 1;
-    }
-    if (guarantor.isApproved) {
-      step += 1;
-    }
-    return (step * 100) / 3;
-  };
-
-  const hrWidth2 = () => {
-    let step = 0;
-    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessAccepted) step += 1;
-    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessSigned) step += 1;
-    return (step * 100) / 2;
-  };
-
-  const resubmitLR2Zoho = async () => {
-      const [resubmitted] = await Promise.allSettled([
-        loanRequestStore.resubmitForSigning(`${route.params.refId}`)
-      ])
-
-      if (resubmitted.status === 'fulfilled') {
-        authStore.defineNotification({
-          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Loan request resubmission successful!',
-          success: true
-        })
-      } else {
-        authStore.defineNotification({
-          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Could not resubmit loan request for signing!',
-          error: true
-        })
-      }
-  };
-
-  const closeLRequest = async () => {
-    const [closed] = await Promise.allSettled([
-      loanRequestStore.closeLoanRequest(`${loanRequestStore.getLoanRequest?.refId}`)
-    ]);
-
-    if (closed.status === 'fulfilled') {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: closed.value,
-        success: true
-      })
-      await loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
-    } else {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Could not close loan request!',
-        error: true
-      })
-    }
-  }
-
-  const post2CB = async () => {
-    const [submitted] = await Promise.allSettled([
-      loanRequestStore.submitToCoBanking(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
-    ])
-
-    if (submitted.status === 'fulfilled') {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Loan request submission to co-banking successful!',
-        success: true
-      })
-    } else {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Could not submit loan request to co-banking!',
-        error: true
-      })
-    }
-  }
-
-  const submitToCoBanking = async () => {
-    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress !== 100) {
-      if (confirm(`You are about to close an incomplete loan request ${loanRequestStore.getLoanRequest?.loanRequestNumber}, continue?`)) {
-        await Promise.allSettled([
-          closeLRequest(),
-          post2CB()
-        ]);
-      }
-    } else {
-      if (confirm(`Are you sure you want to close loan request number: ${loanRequestStore.getLoanRequest?.loanRequestNumber}?`)) {
-        await Promise.allSettled([
-          closeLRequest(),
-          post2CB()
-        ]);
-      }
-    }
-  };
-
-  const downloadAttachments = () => {
-    const element = document.createElement('a')
-    element.setAttribute('href', `${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/zip`)
-    element.setAttribute('download', "Loan Attachments")
-    element.style.display = 'none'
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-  };
-
-  const downloadCertificate = async () => {
-    const [submitted] = await Promise.allSettled([
-      loanRequestStore.downloadCompletionCertificate({
-        zohoRequestId: `${loanRequestStore.getLoanRequest?.zohoRequestId}`
-      })
-    ])
-
-    if (submitted.status === 'fulfilled') {
-      documentDetails.value.push(submitted.value)
-      await downloadPdf('Completion Certificate', documentDetails.value.pop())
-    } else {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Could not download certificate!',
-        error: true
-      })
-    }
-  };
-
-  const downloadPdf = async (name: string, data: any) => {
-    if (data && data !== '') {
-      const element = document.createElement('a')
-      element.setAttribute('href', `data:application/pdf;base64, ${encodeURI(data)}`)
-      element.setAttribute('download', name)
-      element.style.display = 'none'
-      document.body.appendChild(element)
-      element.click()
-      document.body.removeChild(element)
-    } else {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Could not download, no data available!',
-        error: true
-      })
-    }
-  };
-
-  const action = ref('')
-
-  watch(() => action.value, async (actions) => {
-    if (actions !== '') {
-      switch (actions) {
-        case 'resubmitForSigning':
-          await resubmitLR2Zoho();
-          break;
-        case 'downloadAttachments':
-          downloadAttachments();
-          break;
-        case 'downloadPdf':
-          await  downloadLoanRequestForm();
-          break;
-        case 'downloadCertificate':
-          await downloadCertificate();
-          break;
-        case 'showZohoRequest':
-          console.log(actions)
-          // TODO: show zoho request details
-          break;
-        case 'submitToCoBanking':
-          await submitToCoBanking();
-          break;
-      }
-    }
-    action.value = ''
-  })
-
-</script>
 <style scoped>
 .tile {
   width: 500px;
