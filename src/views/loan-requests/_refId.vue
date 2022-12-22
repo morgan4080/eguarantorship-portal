@@ -1,283 +1,321 @@
 <script setup lang="ts">
-import * as d3 from 'd3'
-import stores from "../../stores";
-import {useRoute, useRouter} from "vue-router";
-import {onMounted, ref, watch} from "vue";
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ExclamationCircleIcon } from '@heroicons/vue/24/outline'
-import Breadcrumb from "../../components/Breadcrumb.vue";
-import { GuarantorData } from "../../stores/loan-request-store";
-const { loanRequestStore, authStore } = stores;
-const router = useRouter();
-const route = useRoute();
+  import * as d3 from 'd3'
+  import stores from "../../stores";
+  import {useRoute, useRouter} from "vue-router";
+  import {computed, onMounted, reactive, ref, watch} from "vue";
+  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, CheckIcon } from '@heroicons/vue/24/outline'
+  import Breadcrumb from "../../components/Breadcrumb.vue";
+  import { GuarantorData } from "../../stores/loan-request-store";
+  const { loanRequestStore, authStore } = stores;
+  const router = useRouter();
+  const route = useRoute();
 
-onMounted(async () => {
-  await Promise.all([
-    loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
-  ])
-
-  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress) {
-    addArc();
-    addArc().remove();
-    addArc()
-        .transition()
-        .duration(750)
-        .call(arcTween, (2 * Math.PI) * loanRequestStore.getLoanRequest.loanRequestProgress / 100, arc());
-  }
-})
-
-const getSVG = () => {
-  return (
-      d3.select(`#test--svg--0`).select('g')
-  )
-};
-
-const arc: any = () => {
-  let {width, height, pathStyle} = {
-    height: 160,
-    width: 160,
-    pathStyle: {
-      width: 10,
-      fill: '#BA6A5D'
-    }
-  };
-  let radius = Math.min(width, height) / 2;
-  return (
-      d3.arc()
-          .innerRadius(radius - pathStyle.width)
-          .outerRadius(radius)
-          .startAngle(0)
-  )
-};
-
-const addArc = () => {
-  return (
-      getSVG().append("path")
-          .datum({endAngle: 0})
-          .style("fill", "#459aab")
-          .attr("d", arc())
-  )
-};
-
-const arcTween = (transition: { attrTween: (arg0: string, arg1: (d: any) => (t: any) => any) => void; }, newAngle: any, arc: (arg0: any) => any) => {
-  transition.attrTween('d', (d) => {
-    const interpolate = d3.interpolate(d.endAngle, newAngle);
-    const newArc = d;
-    return (t) => {
-      newArc.endAngle = interpolate(t);
-      return arc(newArc);
-    };
-  });
-};
-
-const documentDetails = ref<any[]>([])
-
-const downloadLoanRequestForm = async () => {
-  window.open(`${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/PDF`, '_blank')
-}
-
-const hrWidth = (guarantor: GuarantorData) => {
-  let step = 0;
-  if (guarantor.isAccepted) {
-    step += 1;
-  }
-  if (guarantor.isSigned) {
-    step += 1;
-  }
-  if (guarantor.isApproved) {
-    step += 1;
-  }
-  return (step * 100) / 3;
-};
-
-const hrWidth2 = () => {
-  let step = 0;
-  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessAccepted) step += 1;
-  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessSigned) step += 1;
-  return (step * 100) / 2;
-};
-
-const resubmitLR2Zoho = async () => {
-  const [resubmitted] = await Promise.allSettled([
-    loanRequestStore.resubmitForSigning(`${route.params.refId}`)
-  ])
-
-  if (resubmitted.status === 'fulfilled') {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Loan request resubmission successful!',
-      success: true
-    })
-  } else {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Could not resubmit loan request for signing!',
-      error: true
-    })
-  }
-};
-
-const closeLRequest = async () => {
-  const [closed] = await Promise.allSettled([
-    loanRequestStore.closeLoanRequest(`${loanRequestStore.getLoanRequest?.refId}`)
-  ]);
-
-  if (closed.status === 'fulfilled') {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: closed.value,
-      success: true
-    })
-    await loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
-  } else {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Could not close loan request!',
-      error: true
-    })
-  }
-}
-
-const post2CB = async () => {
-  const [submitted] = await Promise.allSettled([
-    loanRequestStore.submitToCoBanking(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
-  ])
-
-  if (submitted.status === 'fulfilled') {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Loan request submission to co-banking successful!',
-      success: true
-    })
-  } else {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Could not submit loan request to co-banking!',
-      error: true
-    })
-  }
-}
-
-const submitToCoBanking = async () => {
-  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress !== 100) {
-    if (confirm(`You are about to close an incomplete loan request ${loanRequestStore.getLoanRequest?.loanRequestNumber}, continue?`)) {
-      await Promise.allSettled([
-        closeLRequest(),
-        post2CB()
-      ]);
-    }
-  } else {
-    if (confirm(`Are you sure you want to close loan request number: ${loanRequestStore.getLoanRequest?.loanRequestNumber}?`)) {
-      await Promise.allSettled([
-        closeLRequest(),
-        post2CB()
-      ]);
-    }
-  }
-};
-
-const downloadAttachments = () => {
-  const element = document.createElement('a')
-  element.setAttribute('href', `${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/zip`)
-  element.setAttribute('download', "Loan Attachments")
-  element.style.display = 'none'
-  document.body.appendChild(element)
-  element.click()
-  document.body.removeChild(element)
-};
-
-const downloadCertificate = async () => {
-  const [submitted] = await Promise.allSettled([
-    loanRequestStore.downloadCompletionCertificate({
-      zohoRequestId: `${loanRequestStore.getLoanRequest?.zohoRequestId}`
-    })
-  ])
-
-  if (submitted.status === 'fulfilled') {
-    documentDetails.value.push(submitted.value)
-    await downloadPdf('Completion Certificate', documentDetails.value.pop())
-  } else {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Could not download certificate!',
-      error: true
-    })
-  }
-};
-
-const downloadPdf = async (name: string, data: any) => {
-  if (data && data !== '') {
-    const element = document.createElement('a')
-    element.setAttribute('href', `data:application/pdf;base64, ${encodeURI(data)}`)
-    element.setAttribute('download', name)
-    element.style.display = 'none'
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-  } else {
-    authStore.defineNotification({
-      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-      message: 'Could not download, no data available!',
-      error: true
-    })
-  }
-};
-
-const voidLoanRequest = async () => {
-  if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED' && confirm("YOU ARE ABOUT TO VOID AN ALREADY APPRAISED LOAN")) {
-    const [voided] = await Promise.allSettled([
-      loanRequestStore.voidLoanRequest(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
+  onMounted(async () => {
+    await Promise.all([
+      loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
     ])
 
-    if (voided.status === 'fulfilled') {
+    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress) {
+      addArc();
+      addArc().remove();
+      addArc()
+          .transition()
+          .duration(750)
+          .call(arcTween, (2 * Math.PI) * loanRequestStore.getLoanRequest.loanRequestProgress / 100, arc());
+    }
+  })
+
+  const getSVG = () => {
+    return (
+        d3.select(`#test--svg--0`).select('g')
+    )
+  };
+
+  const arc: any = () => {
+    let {width, height, pathStyle} = {
+      height: 160,
+      width: 160,
+      pathStyle: {
+        width: 10,
+        fill: '#BA6A5D'
+      }
+    };
+    let radius = Math.min(width, height) / 2;
+    return (
+        d3.arc()
+            .innerRadius(radius - pathStyle.width)
+            .outerRadius(radius)
+            .startAngle(0)
+    )
+  };
+
+  const addArc = () => {
+    return (
+        getSVG().append("path")
+            .datum({endAngle: 0})
+            .style("fill", "#459aab")
+            .attr("d", arc())
+    )
+  };
+
+  const arcTween = (transition: { attrTween: (arg0: string, arg1: (d: any) => (t: any) => any) => void; }, newAngle: any, arc: (arg0: any) => any) => {
+    transition.attrTween('d', (d) => {
+      const interpolate = d3.interpolate(d.endAngle, newAngle);
+      const newArc = d;
+      return (t) => {
+        newArc.endAngle = interpolate(t);
+        return arc(newArc);
+      };
+    });
+  };
+
+  const documentDetails = ref<any[]>([])
+
+  const downloadLoanRequestForm = async () => {
+    window.open(`${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/PDF`, '_blank')
+  }
+
+  const hrWidth = (guarantor: GuarantorData) => {
+    let step = 0;
+    if (guarantor.isAccepted) {
+      step += 1;
+    }
+    if (guarantor.isSigned) {
+      step += 1;
+    }
+    if (guarantor.isApproved) {
+      step += 1;
+    }
+    return (step * 100) / 3;
+  };
+
+  const hrWidth2 = () => {
+    let step = 0;
+    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessAccepted) step += 1;
+    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessSigned) step += 1;
+    return (step * 100) / 2;
+  };
+
+  const resubmitLR2Zoho = async () => {
+    const [resubmitted] = await Promise.allSettled([
+      loanRequestStore.resubmitForSigning(`${route.params.refId}`)
+    ])
+
+    if (resubmitted.status === 'fulfilled') {
       authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: voided.value,
+        message: 'Loan request resubmission successful!',
         success: true
       })
     } else {
       authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Could not void loan request!',
+        message: 'Could not resubmit loan request for signing!',
+        error: true
+      })
+    }
+  };
+
+  const closeLRequest = async () => {
+    const [closed] = await Promise.allSettled([
+      loanRequestStore.closeLoanRequest(`${loanRequestStore.getLoanRequest?.refId}`)
+    ]);
+
+    if (closed.status === 'fulfilled') {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: closed.value,
+        success: true
+      })
+      await loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Could not close loan request!',
         error: true
       })
     }
   }
-}
 
-const action = ref('')
+  const post2CB = async () => {
+    const [submitted] = await Promise.allSettled([
+      loanRequestStore.submitToCoBanking(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
+    ])
 
-watch(() => action.value, async (actions) => {
-  if (actions !== '') {
-    switch (actions) {
-      case 'resubmitForSigning':
-        await resubmitLR2Zoho();
-        break;
-      case 'downloadAttachments':
-        downloadAttachments();
-        break;
-      case 'downloadPdf':
-        await  downloadLoanRequestForm();
-        break;
-      case 'downloadCertificate':
-        await downloadCertificate();
-        break;
-      case 'showZohoRequest':
-        console.log(actions)
-        // TODO: show zoho request details
-        break;
-      case 'submitToCoBanking':
-        await submitToCoBanking();
-        break;
-      case 'voidLoanRequest':
-        await voidLoanRequest();
-        break;
+    if (submitted.status === 'fulfilled') {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Loan request submission to co-banking successful!',
+        success: true
+      })
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Could not submit loan request to co-banking!',
+        error: true
+      })
     }
   }
-  action.value = ''
-})
 
-const openErrorModal = ref(false)
+  const submitToCoBanking = async () => {
+    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.loanRequestProgress !== 100) {
+      if (confirm(`You are about to close an incomplete loan request ${loanRequestStore.getLoanRequest?.loanRequestNumber}, continue?`)) {
+        await Promise.allSettled([
+          closeLRequest(),
+          post2CB()
+        ]);
+      }
+    } else {
+      if (confirm(`Are you sure you want to close loan request number: ${loanRequestStore.getLoanRequest?.loanRequestNumber}?`)) {
+        await Promise.allSettled([
+          closeLRequest(),
+          post2CB()
+        ]);
+      }
+    }
+  };
+
+  const downloadAttachments = () => {
+    const element = document.createElement('a')
+    element.setAttribute('href', `${import.meta.env.VITE_API_URL}/zoho/${loanRequestStore.getLoanRequest?.zohoRequestId}/zip`)
+    element.setAttribute('download', "Loan Attachments")
+    element.style.display = 'none'
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+  };
+
+  const downloadCertificate = async () => {
+    const [submitted] = await Promise.allSettled([
+      loanRequestStore.downloadCompletionCertificate({
+        zohoRequestId: `${loanRequestStore.getLoanRequest?.zohoRequestId}`
+      })
+    ])
+
+    if (submitted.status === 'fulfilled') {
+      documentDetails.value.push(submitted.value)
+      await downloadPdf('Completion Certificate', documentDetails.value.pop())
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Could not download certificate!',
+        error: true
+      })
+    }
+  };
+
+  const downloadPdf = async (name: string, data: any) => {
+    if (data && data !== '') {
+      const element = document.createElement('a')
+      element.setAttribute('href', `data:application/pdf;base64, ${encodeURI(data)}`)
+      element.setAttribute('download', name)
+      element.style.display = 'none'
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Could not download, no data available!',
+        error: true
+      })
+    }
+  };
+
+  const voidLoanRequest = async () => {
+    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED' && confirm("YOU ARE ABOUT TO VOID AN ALREADY APPRAISED LOAN")) {
+      const [voided] = await Promise.allSettled([
+        loanRequestStore.voidLoanRequest(`${loanRequestStore.getLoanRequest?.loanRequestNumber}`)
+      ])
+
+      if (voided.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: voided.value,
+          success: true
+        })
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Could not void loan request!',
+          error: true
+        })
+      }
+    }
+  }
+
+  const action = ref('')
+
+  watch(() => action.value, async (actions) => {
+    if (actions !== '') {
+      switch (actions) {
+        case 'resubmitForSigning':
+          await resubmitLR2Zoho();
+          break;
+        case 'downloadAttachments':
+          downloadAttachments();
+          break;
+        case 'downloadPdf':
+          await  downloadLoanRequestForm();
+          break;
+        case 'downloadCertificate':
+          await downloadCertificate();
+          break;
+        case 'showZohoRequest':
+          console.log(actions)
+          // TODO: show zoho request details
+          break;
+        case 'submitToCoBanking':
+          await submitToCoBanking();
+          break;
+        case 'voidLoanRequest':
+          await voidLoanRequest();
+          break;
+      }
+    }
+    action.value = ''
+  })
+
+  const openErrorModal = ref(false)
+
+  const guarantorApprovalOpen = ref(false)
+
+  const otherDetails = ref<boolean>(false)
+
+  const otherDetailsEdit = ref<boolean>(false)
+
+  const form = reactive({
+    details: {}
+  })
+  const saveLRDetails = () => {
+    otherDetailsEdit.value = false
+  }
+
+  const LRDetails = computed(() => {
+    if (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.details) {
+      form.details = loanRequestStore.getLoanRequest.details
+    }
+    return Object.keys(form.details)
+  })
+
+  const addingKey = ref(false)
+
+  const keyString = ref('')
+
+  const selectedGuarantor = ref<GuarantorData | null>(null)
+  const approveGuarantor = () => {
+    selectedGuarantor.value = null
+    guarantorApprovalOpen.value = false
+  }
+
+  const setGuarantorToApprove = (guarantor: GuarantorData) => {
+    if (confirm(`Are you sure you want to APPROVE ${guarantor.firstName + ' ' + guarantor.lastName} as a guarantor?`)) {
+      // approveGuarantor
+      guarantorApprovalOpen.value = true;
+      selectedGuarantor.value = guarantor;
+    }
+  }
 
 </script>
 <template>
@@ -303,7 +341,7 @@ const openErrorModal = ref(false)
           </div>
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="py-5 px-5">
-              <h3 class="text-lg font-medium leading-6 text-gray-900">Member Details</h3>
+              <h3 class="text-lg font-medium leading-6 text-gray-900">Loan Request Details.</h3>
               <p class="mt-1 max-w-2xl text-sm text-gray-500">Loan Request {{loanRequestStore.getLoanRequest?.loanRequestNumber}} current data.</p>
             </div>
             <div class="flex flex-1 items-stretch overflow-hidden">
@@ -419,7 +457,7 @@ const openErrorModal = ref(false)
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-gray-500">Guarantors</dt>
                       <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                        {{ loanRequestStore.getLoanRequest?.guarantorCount }}
+                        {{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.guarantorList ? loanRequestStore.getLoanRequest.guarantorList.length : 0 }}
                       </dd>
                     </div>
                   </dl>
@@ -452,9 +490,69 @@ const openErrorModal = ref(false)
                     </svg>
                   </div>
                 </div>
+
+                <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mt-14 items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 sm:text-sm">
+                  Other Details
+                  <ChevronDownIcon class="h-4 w-4 ml-2 text-gray-600"/>
+                </button>
               </aside>
             </div>
+            <Transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+              <div v-if="otherDetails" class="flex flex-1 items-stretch overflow-hidden mt-6">
+                <form @submit.prevent="saveLRDetails">
+                  <main class="flex-1 overflow-y-auto">
+                    <section aria-labelledby="primary-heading" class="flex h-full min-w-0 flex-1 flex-col lg:order-last">
+                      <div class="flex">
+                        <h6 class="py-2 sm:py-3 sm:px-6 font-medium text-base">Other details</h6>
+                        <div class="flex items-center justify-center bg-white hidden">
+                          <button type="button" v-if="!otherDetailsEdit" @click="otherDetailsEdit = !otherDetailsEdit" class="inline-flex cursor-pointer items-center rounded-full bg-black py-0.5 px-2 text-xs font-medium text-white">
+                            Edit
+                          </button>
+                          <button type="submit" v-if="otherDetailsEdit" class="inline-flex cursor-pointer items-center rounded-full bg-green-300 py-0.5 px-2 text-xs font-medium text-eg-bg">
+                            Save
+                          </button>
+                        </div>
+                      </div>
+                      <dl class="sm:divide-y sm:divide-gray-200">
+                        <TransitionGroup enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                          <div v-for="(key, i) in LRDetails" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">
+                              <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                              </div>
+                            </dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                              <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                <input :disabled="!otherDetailsEdit" required v-model="form.details[key].value" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                              </div>
+                            </dd>
+                            <dd v-if="otherDetailsEdit" class="mt-1 text-sm text-gray-900 sm:mt-0">
+                              <button type="button" @click="delete form.details[key]">
+                                <TrashIcon class="w-4 h-4" />
+                              </button>
+                            </dd>
+                          </div>
+                        </TransitionGroup>
+                      </dl>
+                      <div v-if="otherDetailsEdit" class="sm:divide-y sm:divide-gray-200 py-2 sm:py-3 sm:px-6">
+                        <div v-if="addingKey" class="flex rounded-md shadow-sm max-w-xs">
+                          <button :disabled="keyString === ''" @click="form.details[`${keyString}`] = { value: '', type: 'TEXT' };addingKey = !addingKey" type="button" class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-green-50 px-3 text-gray-500 sm:text-sm hover:bg-green-100 focus:bg-green-200">
+                            <CheckCircleIcon class="w-6 h-6" />
+                          </button>
+                          <input v-model="keyString" type="text" class="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 px-3 py-2 focus:border-eg-bg focus:ring-eg-bg sm:text-sm" placeholder="detail key" />
+                        </div>
+                        <button v-else type="button" @click="addingKey = !addingKey">
+                          <PlusCircleIcon class="w-6 h-6" />
+                        </button>
+                      </div>
+                    </section>
+                  </main>
+                </form>
+
+              </div>
+            </Transition>
           </div>
+
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="px-4 py-5 sm:px-6">
               <h3 class="text-lg font-medium leading-6 text-gray-900">Witnesses</h3>
@@ -469,7 +567,14 @@ const openErrorModal = ref(false)
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
               <tr>
-                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessMemberNo ? loanRequestStore.getLoanRequest.witnessMemberNo : '' }}</td>
+                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                  <router-link v-if="loanRequestStore.getLoanRequest?.witnessRefId" :to="`/members/${loanRequestStore.getLoanRequest?.witnessRefId}/view`" class="underline flex items-center text-eg-bg">
+                    {{ loanRequestStore.getLoanRequest?.witnessMemberNo }}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                    </svg>
+                  </router-link>
+                </td>
                 <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessName ? loanRequestStore.getLoanRequest.witnessName : '' }}</td>
                 <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
                   <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessMemberNo" class="flex items-center relative">
@@ -487,6 +592,7 @@ const openErrorModal = ref(false)
               </tbody>
             </table>
           </div>
+
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="px-4 py-5 sm:px-6">
               <h3 class="text-lg font-medium leading-6 text-gray-900">Guarantors</h3>
@@ -503,32 +609,120 @@ const openErrorModal = ref(false)
               </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="guarantor in loanRequestStore.getLoanRequest?.guarantorList" :key="guarantor.refId">
-                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ guarantor.memberNumber }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ guarantor.firstName }} {{ guarantor.lastName }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ guarantor.committedAmount }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ guarantor.availableAmount }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ guarantor.status }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
-                  <div class="flex items-center relative">
-                    <div class="w-full border border-eg-lightblue h-2 rounded-full flex">
-                      <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-lightblue"></div>
-                    </div>
+                <tr v-for="guarantor in loanRequestStore.getLoanRequest?.guarantorList" :key="guarantor.refId">
+                  <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                    <router-link v-if="guarantor.memberRefId" :to="`/members/${guarantor.memberRefId}/view`" class="underline flex items-center text-eg-bg">
+                      {{ guarantor.memberNumber }}
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                      </svg>
+                    </router-link>
+                  </td>
+                  <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                    <button @click="setGuarantorToApprove(guarantor)" type="button">
+                      {{ guarantor.firstName }} {{ guarantor.lastName }}
+                    </button>
+                  </td>
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+                    <button @click="setGuarantorToApprove(guarantor)" type="button">
+                      {{ guarantor.committedAmount ? $filters.currencyKES(guarantor.committedAmount) : guarantor.committedAmount }}
+                    </button>
+                  </td>
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                    <button @click="setGuarantorToApprove(guarantor)" type="button">
+                      {{ guarantor.availableAmount ? $filters.currencyKES(guarantor.availableAmount) : guarantor.availableAmount }}
+                    </button>
+                  </td>
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                    <button @click="setGuarantorToApprove(guarantor)" type="button">
+                      {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
+                    </button>
+                  </td>
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                    <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
+                      <div class="w-full border border-eg-lightblue h-2 rounded-full flex">
+                        <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-lightblue"></div>
+                      </div>
 
-                    <div class="w-4 bg-eg-lightblue h-4 left-0 rounded-full absolute"></div>
-                    <span class="left-0 rounded-full mt-10 -ml-5 text-xxs text-eg-lightblue absolute">Accepted</span>
-                    <div class="w-4 bg-eg-lightblue h-4 left-1/2 rounded-full absolute"></div>
-                    <span class="left-1/2 rounded-full mt-10 -ml-2 text-xxs text-eg-lightblue absolute">Signed</span>
-                    <div class="w-4 bg-eg-lightblue h-4 right-0 rounded-full absolute"></div>
-                    <span class="right-0 rounded-full mt-10 -mr-5 text-xxs text-eg-lightblue absolute">Approved</span>
-                  </div>
-                </td>
-              </tr>
+                      <div class="w-4 bg-eg-lightblue h-4 left-0 rounded-full absolute"></div>
+                      <span class="left-0 rounded-full mt-10 -ml-5 text-xxs text-eg-lightblue absolute">Accepted</span>
+                      <div class="w-4 bg-eg-lightblue h-4 left-1/2 rounded-full absolute"></div>
+                      <span class="left-1/2 rounded-full mt-10 -ml-2 text-xxs text-eg-lightblue absolute">Signed</span>
+                      <div class="w-4 bg-eg-lightblue h-4 right-0 rounded-full absolute"></div>
+                      <span class="right-0 rounded-full mt-10 -mr-5 text-xxs text-eg-lightblue absolute">Approved</span>
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
-            <button v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" @click="submitToCoBanking" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-sm font-medium text-eg-bg hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-14">
+            <button v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" @click="submitToCoBanking" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-sm font-medium text-eg-bg hover:bg-eg-lightblue focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 mt-14">
               Submit Loan Form
             </button>
+
+            <TransitionRoot as="template" :show="guarantorApprovalOpen">
+              <Dialog as="div" class="relative z-10" @close="guarantorApprovalOpen = false">
+                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+                </TransitionChild>
+
+                <div class="fixed inset-0 z-10 overflow-y-auto">
+                  <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                      <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                        <div>
+                          <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
+
+                          <dl class="sm:divide-y sm:divide-gray-100">
+                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">Name</dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                {{ selectedGuarantor?.firstName }}
+                                <br>
+                                {{ selectedGuarantor?.lastName }}
+                              </dd>
+                            </div>
+                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">Member No.</dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                {{ selectedGuarantor?.memberNumber }}
+                              </dd>
+                            </div>
+                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">Deposits</dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                {{ $filters.currencyKES(selectedGuarantor?.totalDeposits) }}
+                              </dd>
+                            </div>
+                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">Committed</dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                {{ $filters.currencyKES(selectedGuarantor?.committedAmount) }}
+                              </dd>
+                            </div>
+                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">Available</dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                {{ $filters.currencyKES(selectedGuarantor?.availableAmount) }}
+                              </dd>
+                            </div>
+                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">Required</dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                                {{ selectedGuarantor ? $filters.currencyKES(selectedGuarantor?.availableAmount - selectedGuarantor?.committedAmount) : 0 }}
+                              </dd>
+                            </div>
+                          </dl>
+                        </div>
+                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                          <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" @click="approveGuarantor">Approve</button>
+                          <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" @click="guarantorApprovalOpen = false" ref="cancelButtonRef">Cancel</button>
+                        </div>
+                      </DialogPanel>
+                    </TransitionChild>
+                  </div>
+                </div>
+              </Dialog>
+            </TransitionRoot>
           </div>
         </div>
       </div>

@@ -49,6 +49,7 @@ export interface LoanRequestData {
     witnessMemberNo?: string,
     witnessAccepted?: boolean,
     witnessSigned?: boolean,
+    details: Record<string, Record<string, string>>
 }
 
 export interface PaginationData {
@@ -170,6 +171,25 @@ export const useLoanRequest = defineStore('loan-request-store', {
             } catch (e: any) {
                 console.error("voidLoanRequest",  e);
                 return Promise.reject('Could not void loan request!');
+            }
+        },
+        async approveGuarantor(guarantorRefId: string) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/guarantorship-request/${guarantorRefId}/guarantor/true`, {
+                    method: 'POST',
+                    headers: myHeaders,
+                    credentials: 'include',
+                });
+                if (response.status === 200) {
+                    return Promise.resolve('Guarantor approved!');
+                } else {
+                    return Promise.reject('Could not approve guarantor!');
+                }
+            } catch (e: any) {
+                console.error("approveGuarantor",  e);
+                return Promise.reject('Could not approve guarantor!');
             }
         },
         async submitToCoBanking(loanRequestNumber: string) {

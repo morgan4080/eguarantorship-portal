@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Breadcrumb from "../../components/Breadcrumb.vue";
 import {useRoute, useRouter} from "vue-router";
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline"
 import stores from "../../stores";
 const { memberStore, authStore } = stores;
@@ -16,7 +16,9 @@ const form = reactive({
   details: {}
 })
 const otherDetails = ref<boolean>(false)
+
 const otherDetailsEdit = ref<boolean>(false)
+
 const memberDetails = computed(() => {
   if (memberStore.getMemberDetails && memberStore.getMemberDetails.details) {
     form.details = memberStore.getMemberDetails.details
@@ -65,6 +67,7 @@ const witnessedLoans = computed(() => {
 })
 
 const keyString = ref('')
+
 const addingKey = ref(false)
 
 const saveMemberDetails = () => {
