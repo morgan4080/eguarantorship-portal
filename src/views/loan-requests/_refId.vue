@@ -386,22 +386,19 @@
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
       <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
+        <div class="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
-            <div class="flex items-center space-x-4">
-              <span>Action</span>
-              <select v-model="action" class="block h-8 mr-5 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue text-xs font-normal rounded-md">
-                <option value="">Select Option</option>
-                <option value="resubmitForSigning">Resubmit for signing</option>
-                <option value="downloadAttachments">Download Attachments</option>
-                <option value="downloadPdf">Download PDF</option>
-                <option value="downloadCertificate">Download Certificate</option>
-                <option value="showZohoRequest">Show zoho request</option>
-                <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="voidLoanRequest">Void loan request</option>
-                <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="submitToCoBanking">Submit to co-banking</option>
-              </select>
-            </div>
+            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-text text-sm bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue font-normal rounded-md">
+              <option value="">Select Option</option>
+              <option value="resubmitForSigning">Resubmit for signing</option>
+              <option value="downloadAttachments">Download Attachments</option>
+              <option value="downloadPdf">Download PDF</option>
+              <option value="downloadCertificate">Download Certificate</option>
+              <option value="showZohoRequest">Show zoho request</option>
+              <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="voidLoanRequest">Void loan request</option>
+              <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="submitToCoBanking">Submit to co-banking</option>
+            </select>
           </div>
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="py-5 px-5">
@@ -799,8 +796,16 @@
 
               <div class="fixed inset-0 z-10 overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                  <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                    <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <TransitionChild
+                      as="template"
+                      enter="ease-out duration-300"
+                      enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                      enter-to="opacity-100 translate-y-0 sm:scale-100"
+                      leave="ease-in duration-200"
+                      leave-from="opacity-100 translate-y-0 sm:scale-100"
+                      leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  >
+                    <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-5xl sm:p-6">
                       <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
                         <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="zohoRequestOpen = false">
                           <span class="sr-only">Close</span>
@@ -808,12 +813,98 @@
                         </button>
                       </div>
                       <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left overflow-hidden">
                           <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Zoho Request Detail</DialogTitle>
-                          <div class="mt-2">
-                            <p class="text-sm text-gray-500">
-
-                            </p>
+                          <div class="mt-2 space-y-4">
+                            <div class="text-sm text-gray-500">
+                              <span class="font-semibold">Actions:</span>
+                              <div class="overflow-x-scroll">
+                                <table class="mt-6">
+                                  <thead class="bg-gray-50">
+                                  <tr>
+                                    <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ROLE</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION ID</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION TYPE</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT NAME</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT PHONE NO.</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT EMAIL</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">PRIVATE NOTES</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFY RECIPIENT</th>
+                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFICATION TYPE</th>
+                                  </tr>
+                                  </thead>
+                                  <tbody class="divide-y divide-gray-200 bg-white">
+                                  <!--                                {action_id: string, action_type: string, is_embedded: boolean, private_notes: string, recipient_email: string, recipient_name: string, recipient_phonenumber: string, role: string, verification_type: string, verify_recipient: boolean}-->
+                                  <tr v-for="action in zohoRequest.templates.actions" :key="action.action_id">
+                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ action.role }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ action.action_id }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ action.action_type }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_name }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_phonenumber }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_email }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.private_notes }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verify_recipient }}</td>
+                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verification_type }}</td>
+                                  </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                            <div class="space-y-2">
+                              <div class="text-sm text-gray-500">
+                                <span class="font-semibold">Field Text Data:</span>
+                                <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_text_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
+                                  <dt class="text-sm font-medium text-gray-500">
+                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                                    </div>
+                                  </dt>
+                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                      <input disabled :value="zohoRequest.templates.field_data.field_text_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                                    </div>
+                                  </dd>
+                                </div>
+                              </div>
+                              <div class="text-sm text-gray-500">
+                                <span class="font-semibold">Field Date Data:</span>
+                                <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_date_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
+                                  <dt class="text-sm font-medium text-gray-500">
+                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                                    </div>
+                                  </dt>
+                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                      <input disabled :value="zohoRequest.templates.field_data.field_date_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                                    </div>
+                                  </dd>
+                                </div>
+                              </div>
+                              <div class="text-sm text-gray-500">
+                                <span class="font-semibold">Field Boolean Data:</span>
+                                <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_boolean_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
+                                  <dt class="text-sm font-medium text-gray-500">
+                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                                    </div>
+                                  </dt>
+                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                      <input disabled :value="zohoRequest.templates.field_data.field_boolean_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                                    </div>
+                                  </dd>
+                                </div>
+                              </div>
+                              <div class="text-sm text-gray-500">
+                                <span class="font-semibold">Request name:</span>
+                                <p class="text-sm text-gray-500">{{ zohoRequest.templates.request_name }}</p>
+                              </div>
+                              <div class="text-sm text-gray-500">
+                                <span class="font-semibold">Notes:</span>
+                                <p class="text-sm text-gray-500">{{ zohoRequest.templates.notes }}</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
