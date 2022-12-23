@@ -4,7 +4,7 @@
   import {useRoute, useRouter} from "vue-router";
   import {computed, ComputedRef, onMounted, reactive, ref, watch} from "vue";
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
   import Breadcrumb from "../../components/Breadcrumb.vue";
   import {GuarantorData} from "../../stores/loan-request-store";
   const { loanRequestStore, authStore } = stores;
@@ -262,6 +262,8 @@
 
   const action = ref('')
 
+  const zohoRequestOpen = ref(false)
+
   watch(() => action.value, async (actions) => {
     if (actions !== '') {
       switch (actions) {
@@ -280,6 +282,7 @@
         case 'showZohoRequest':
           console.log(actions)
           // TODO: show zoho request details
+          zohoRequestOpen.value = true
           break;
         case 'submitToCoBanking':
           await submitToCoBanking();
@@ -613,7 +616,6 @@
               </div>
             </Transition>
           </div>
-
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="px-4 py-5 sm:px-6">
               <h3 class="text-lg font-medium leading-6 text-gray-900">Witnesses</h3>
@@ -653,7 +655,6 @@
               </tbody>
             </table>
           </div>
-
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="px-4 py-5 sm:px-6">
               <h3 class="text-lg font-medium leading-6 text-gray-900">Guarantors</h3>
@@ -730,11 +731,14 @@
                   <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                       <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                        <div class="relative">
-                          <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
-                          <button @click="guarantorApprovalOpen = false" class="absolute right-0 top-0" type="button">
-                            <XCircleIcon class="w-5 h-5"/>
+                        <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+                          <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="guarantorApprovalOpen = false">
+                            <span class="sr-only">Close</span>
+                            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
                           </button>
+                        </div>
+                        <div>
+                          <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
                           <dl class="sm:divide-y sm:divide-gray-100">
                             <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
                               <dt class="text-sm font-medium text-gray-500">Name</dt>
@@ -787,6 +791,41 @@
               </Dialog>
             </TransitionRoot>
           </div>
+          <TransitionRoot as="template" :show="zohoRequestOpen">
+            <Dialog as="div" class="relative z-10" @close="zohoRequestOpen = false">
+              <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+              </TransitionChild>
+
+              <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                    <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                      <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+                        <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="zohoRequestOpen = false">
+                          <span class="sr-only">Close</span>
+                          <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                        </button>
+                      </div>
+                      <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                          <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Zoho Request Detail</DialogTitle>
+                          <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                        <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm" @click="zohoRequestOpen = false">Cancel</button>
+                      </div>
+                    </DialogPanel>
+                  </TransitionChild>
+                </div>
+              </div>
+            </Dialog>
+          </TransitionRoot>
         </div>
       </div>
     </main>
