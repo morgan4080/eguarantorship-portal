@@ -50,6 +50,7 @@ export interface LoanRequestData {
     witnessAccepted?: boolean,
     witnessSigned?: boolean,
     details: Record<string, Record<string, string>>
+    zohoRequest?: string
 }
 
 export interface PaginationData {
@@ -80,6 +81,10 @@ export const useLoanRequest = defineStore('loan-request-store', {
     }),
     getters: {
         getLoanRequest(state) {
+            if (state.loanRequest?.zohoRequest) {
+                console.log(JSON.parse(state.loanRequest?.zohoRequest))
+            }
+
             return state.loanRequest
         },
         getLoanRequests(state) {
@@ -173,23 +178,23 @@ export const useLoanRequest = defineStore('loan-request-store', {
                 return Promise.reject('Could not void loan request!');
             }
         },
-        async approveGuarantor(guarantorRefId: string) {
+        async approveGuarantor(guarantorshipRequestRefId: string, approve: boolean) {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/guarantorship-request/${guarantorRefId}/guarantor/true`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/guarantorship-request/${guarantorshipRequestRefId}/guarantor/${approve}`, {
                     method: 'POST',
                     headers: myHeaders,
                     credentials: 'include',
                 });
                 if (response.status === 200) {
-                    return Promise.resolve('Guarantor approved!');
+                    return Promise.resolve(`Guarantor ${approve ? 'approved' : 'declined'}!`);
                 } else {
-                    return Promise.reject('Could not approve guarantor!');
+                    return Promise.reject(`Could not ${approve ? 'approve' : 'decline'} guarantor!`);
                 }
             } catch (e: any) {
                 console.error("approveGuarantor",  e);
-                return Promise.reject('Could not approve guarantor!');
+                return Promise.reject(`Could not ${approve ? 'approve' : 'decline'} guarantor!`);
             }
         },
         async submitToCoBanking(loanRequestNumber: string) {

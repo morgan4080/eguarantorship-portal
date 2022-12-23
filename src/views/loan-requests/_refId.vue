@@ -2,14 +2,29 @@
   import * as d3 from 'd3'
   import stores from "../../stores";
   import {useRoute, useRouter} from "vue-router";
-  import {computed, onMounted, reactive, ref, watch} from "vue";
+  import {computed, ComputedRef, onMounted, reactive, ref, watch} from "vue";
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, CheckIcon } from '@heroicons/vue/24/outline'
+  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline'
   import Breadcrumb from "../../components/Breadcrumb.vue";
-  import { GuarantorData } from "../../stores/loan-request-store";
+  import {GuarantorData} from "../../stores/loan-request-store";
   const { loanRequestStore, authStore } = stores;
   const router = useRouter();
   const route = useRoute();
+
+  type guarantorList = {
+    refId: string,
+    memberNumber: string,
+    memberRefId: string,
+    firstName: string,
+    lastName: string,
+    dateAccepted: string,
+    isAccepted: boolean,
+    isSigned: boolean,
+    isActive: boolean,
+    committedAmount: number,
+    availableAmount: number,
+    totalDeposits: number
+  }
 
   onMounted(async () => {
     await Promise.all([
@@ -303,19 +318,65 @@
 
   const keyString = ref('')
 
-  const selectedGuarantor = ref<GuarantorData | null>(null)
-  const approveGuarantor = () => {
-    selectedGuarantor.value = null
-    guarantorApprovalOpen.value = false
-  }
+  const selectedGuarantor = ref<guarantorList | null>(null)
+  const approveGuarantor = async (approve: boolean) => {
+    if (selectedGuarantor.value && confirm(`Are you sure you want to ${approve ? 'APPROVE' : 'DECLINE'} ${selectedGuarantor.value.firstName + ' ' + selectedGuarantor.value.lastName} as a guarantor?`)) {
+      const [approved] = await Promise.allSettled([
+        loanRequestStore.approveGuarantor(`${selectedGuarantor.value.refId}`, approve)
+      ])
+      if (approved.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: approved.value,
+          success: true
+        })
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: `Could not ${approve ? 'approve' : 'decline'} guarantor!`,
+          error: true
+        })
+      }
 
-  const setGuarantorToApprove = (guarantor: GuarantorData) => {
-    if (confirm(`Are you sure you want to APPROVE ${guarantor.firstName + ' ' + guarantor.lastName} as a guarantor?`)) {
-      // approveGuarantor
-      guarantorApprovalOpen.value = true;
-      selectedGuarantor.value = guarantor;
+      selectedGuarantor.value = null
+      guarantorApprovalOpen.value = false
     }
   }
+  const setGuarantorToApprove = (guarantor: guarantorList) => {
+    guarantorApprovalOpen.value = true;
+    selectedGuarantor.value = guarantor;
+  }
+  // Record<any, any>
+  type zohoRequestType = {
+    templates: {
+      actions: {
+        action_id: string,
+        action_type: string,
+        is_embedded: boolean,
+        private_notes: string,
+        recipient_email: string,
+        recipient_name: string,
+        recipient_phonenumber: string,
+        role: string,
+        verification_type: string,
+        verify_recipient: boolean
+      }[],
+      field_data: {
+        field_boolean_data: {},
+        field_date_data: {},
+        field_text_data: {}
+      },
+      notes: string,
+      request_name: string
+    }
+  }
+  const zohoRequest: ComputedRef<zohoRequestType> = computed(() => {
+    if (loanRequestStore.getLoanRequest?.zohoRequest) {
+      return JSON.parse(loanRequestStore.getLoanRequest?.zohoRequest)
+    } else {
+      return null
+    }
+  })
 
 </script>
 <template>
@@ -669,9 +730,11 @@
                   <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                       <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                        <div>
+                        <div class="relative">
                           <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
-
+                          <button @click="guarantorApprovalOpen = false" class="absolute right-0 top-0" type="button">
+                            <XCircleIcon class="w-5 h-5"/>
+                          </button>
                           <dl class="sm:divide-y sm:divide-gray-100">
                             <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
                               <dt class="text-sm font-medium text-gray-500">Name</dt>
@@ -714,8 +777,8 @@
                           </dl>
                         </div>
                         <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                          <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" @click="approveGuarantor">Approve</button>
-                          <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" @click="guarantorApprovalOpen = false" ref="cancelButtonRef">Cancel</button>
+                          <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" @click="approveGuarantor(true)">Approve</button>
+                          <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-transparent bg-red-400 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" @click="approveGuarantor(false)" ref="cancelButtonRef">Decline</button>
                         </div>
                       </DialogPanel>
                     </TransitionChild>
