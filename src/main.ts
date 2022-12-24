@@ -17,12 +17,16 @@ app.use(router);
 app.use(pinia);
 
 app.config.globalProperties.$filters = {
-    currencyKES: (money: number): string => {
-        return `${parseFloat(`${money}`)
-            .toFixed(0)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${
-            parseFloat(`${money}`).toFixed(2).split(".")[1]
-        }`;
+    currencyKES: (money: number| undefined): string => {
+        if (money) {
+            return `${parseFloat(`${money}`)
+                .toFixed(0)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${
+                parseFloat(`${money}`).toFixed(2).split(".")[1]
+            }`;
+        } else {
+            return `0.00`
+        }
     },
 };
 

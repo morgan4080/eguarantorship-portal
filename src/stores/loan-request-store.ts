@@ -68,7 +68,13 @@ interface LoanRequestSummary {
 interface LoanRequestState {
     loanRequest: LoanRequestData | null,
     loanRequests: LoanRequestData[],
-    paginationData: PaginationData | null
+    memberLoanRequests: LoanRequestData[],
+    guaranteedLoanRequests: LoanRequestData[],
+    witnessedLoanRequests: LoanRequestData[],
+    paginationData: PaginationData | null,
+    memberLoanRequestsPaginationData: PaginationData | null,
+    guaranteedLoanRequestsPaginationData: PaginationData | null,
+    witnessedLoanRequestsPaginationData: PaginationData | null,
     loanRequestSummary: LoanRequestSummary | null
 }
 
@@ -76,7 +82,13 @@ export const useLoanRequest = defineStore('loan-request-store', {
     state: (): LoanRequestState => ({
         loanRequest: null,
         loanRequests: [],
+        memberLoanRequests: [],
+        guaranteedLoanRequests: [],
+        witnessedLoanRequests: [],
         paginationData: null,
+        memberLoanRequestsPaginationData: null,
+        guaranteedLoanRequestsPaginationData: null,
+        witnessedLoanRequestsPaginationData: null,
         loanRequestSummary: null
     }),
     getters: {
@@ -90,8 +102,26 @@ export const useLoanRequest = defineStore('loan-request-store', {
         getLoanRequests(state) {
             return state.loanRequests
         },
+        getMemberLoanRequests(state) {
+            return state.memberLoanRequests
+        },
+        getGuaranteedLoanRequests(state) {
+            return state.guaranteedLoanRequests
+        },
+        getWitnessedLoanRequests(state) {
+            return state.witnessedLoanRequests
+        },
         getPaginationData(state) {
             return state.paginationData
+        },
+        getMemberLoanRequestsPaginationData(state) {
+            return state.memberLoanRequestsPaginationData
+        },
+        getGuaranteedLoanRequestsPaginationData(state) {
+            return state.guaranteedLoanRequestsPaginationData
+        },
+        getWitnessedLoanRequestsPaginationData(state) {
+            return state.witnessedLoanRequestsPaginationData
         },
         getLoanRequestsSummary(state) {
             return state.loanRequestSummary
@@ -244,6 +274,72 @@ export const useLoanRequest = defineStore('loan-request-store', {
                     const {content, totalPages, totalElements} = await response.json();
                     this.loanRequests = content;
                     this.paginationData = {
+                        totalPages: totalPages,
+                        totalElements: totalElements,
+                    };
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan requests.`);
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject(e.message);
+            }
+        },
+        async fetchMemberLoanRequests(params?: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/query${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const {content, totalPages, totalElements} = await response.json();
+                    this.memberLoanRequests = content;
+                    this.memberLoanRequestsPaginationData = {
+                        totalPages: totalPages,
+                        totalElements: totalElements,
+                    };
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan requests.`);
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject(e.message);
+            }
+        },
+        async fetchMemberGuaranteedLoanRequests(params?: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/query${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const {content, totalPages, totalElements} = await response.json();
+                    this.guaranteedLoanRequests = content;
+                    this.guaranteedLoanRequestsPaginationData = {
+                        totalPages: totalPages,
+                        totalElements: totalElements,
+                    };
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to fetch loan requests.`);
+                }
+            } catch (e: any) {
+                console.error("fetchLoanRequest",  e);
+                return Promise.reject(e.message);
+            }
+        },
+        async fetchMemberWitnessedLoanRequests(params?: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/query${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const {content, totalPages, totalElements} = await response.json();
+                    this.witnessedLoanRequests = content;
+                    this.witnessedLoanRequestsPaginationData = {
                         totalPages: totalPages,
                         totalElements: totalElements,
                     };

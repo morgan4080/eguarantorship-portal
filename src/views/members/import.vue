@@ -52,11 +52,12 @@
 </template>
 
 <script setup lang="ts">
-import Breadcrumb from "../../components/Breadcrumb.vue"
-import {computed, onMounted, reactive, watch} from "vue"
-import { useRouter } from "vue-router"
+import Breadcrumb from "../../components/Breadcrumb.vue";
+import {computed, onMounted, reactive, watch} from "vue";
+import { useRouter } from "vue-router";
+import stores from "../../stores";
+
 const router = useRouter()
-import stores from "../../stores"
 
 const {memberStore} = stores
 
@@ -94,7 +95,7 @@ const csvJSON = () => {
   }
 }
 
-const dropHandler = (ev: { preventDefault: () => void; dataTransfer: { items: string | any[]; files: string | any[]; }; }) => {
+const dropHandler = (ev: any) => {
   ev.preventDefault();
   if (ev.dataTransfer.items) {
     for (let i = 0; i < ev.dataTransfer.items.length; i++) {

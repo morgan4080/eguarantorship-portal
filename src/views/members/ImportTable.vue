@@ -26,7 +26,7 @@
                   <span>{{ header.label }}</span>
                   <select
                       class="block h-8 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue text-xs font-normal rounded-md"
-                      @change="exchangeValues($event.target.value, header.label)"
+                      @change="exchangeValues($event, header.label)"
                   >
                     <option hidden>Select For</option>
                     <option
@@ -117,10 +117,12 @@ const columnChecked = (label: any) => {
   }
 }
 
-const exchangeValues = (val: any, item: any) => {
+const exchangeValues = (event: any, item: any) => {
+  const target = event.target as HTMLInputElement;
+
   let index = form.columns.findIndex((res: any)=>res.label==item);
   if(index >= 0){
-    form.columns[index].selectFor=val;
+    form.columns[index].selectFor=target.value;
   }
 }
 

@@ -1,86 +1,109 @@
 <script setup lang="ts">
-import Breadcrumb from "../../components/Breadcrumb.vue";
-import {useRoute, useRouter} from "vue-router";
-import {computed, onMounted, reactive, ref} from "vue";
-import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline"
-import stores from "../../stores";
-const { memberStore, authStore } = stores;
-const router = useRouter();
-const route = useRoute();
-onMounted(async () => {
-  await Promise.all([
-    memberStore.fetchMember(`${route.params.refId}`)
-  ])
-})
-const form = reactive({
-  details: {}
-})
-const otherDetails = ref<boolean>(false)
+  import Breadcrumb from "../../components/Breadcrumb.vue";
+  import {useRoute, useRouter} from "vue-router";
+  import {computed, onMounted, reactive, ref} from "vue";
+  import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline";
+  import stores from "../../stores";
+  import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
+  import Paginator from "../../components/Paginator.vue";
+  const { memberStore, authStore, loanRequestStore } = stores;
+  const router = useRouter();
+  const route = useRoute();
 
-const otherDetailsEdit = ref<boolean>(false)
+  const filtersMemberLoanRequests = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    order: 'ASC',
+    page: 1
+  });
 
-const memberDetails = computed(() => {
-  if (memberStore.getMemberDetails && memberStore.getMemberDetails.details) {
-    form.details = memberStore.getMemberDetails.details
+  const filtersGuaranteedLoanRequests = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    order: 'ASC',
+    page: 1
+  });
+
+  const filtersWitnessedLoanRequests = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    order: 'ASC',
+    page: 1
+  });
+
+  onMounted(async () => {
+    await Promise.allSettled([
+      memberStore.fetchMember(`${route.params.refId}`),
+      loanRequestStore.fetchMemberLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`),
+      loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`),
+      loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`),
+    ])
+  });
+
+  const refreshMemberNext = (cP: number) => {
+    filtersMemberLoanRequests.page = cP + 1;
+    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`);
   }
-  return Object.keys(form.details)
-})
+  const refreshMemberPrev = (cP: number) => {
+    filtersMemberLoanRequests.page = cP - 1;
+    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshMemberCurrent = () => {
+    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshGuaranteedNext = (cP: number) => {
+    filtersGuaranteedLoanRequests.page = cP + 1;
+    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshGuaranteedPrev = (cP: number) => {
+    filtersGuaranteedLoanRequests.page = cP - 1;
+    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshGuaranteedCurrent = () => {
+    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshWitnessedNext = (cP: number) => {
+    filtersWitnessedLoanRequests.page = cP + 1;
+    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshWitnessedPrev = (cP: number) => {
+    filtersWitnessedLoanRequests.page = cP - 1;
+    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`);
+  }
+  const refreshWitnessedCurrent = () => {
+    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`);
+  }
 
-const currentLoans = computed(() => {
-  return [
-    /*{
-      id: '1413',
-      loanNo: '1413',
-      member: '1413',
-      date: new Date().toLocaleDateString(),
-      committed: '1413',
-      status: '1413'
-    }*/
-  ]
-})
+  const form = reactive<any>({
+    details: {}
+  });
 
-const guaranteedLoans = computed(() => {
-  return [
-    /*{
-      id: '1413',
-      loanNo: '1413',
-      loanDate: new Date().toLocaleDateString(),
-      loanType: '1413',
-      amount: '1413',
-      committed: '1413',
-      paymentStatus: '1413',
-      status: '1413'
-    }*/
-  ]
-})
+  const otherDetails = ref<boolean>(false)
 
-const witnessedLoans = computed(() => {
-  return [
-    /*{
-      id: '1413',
-      loanNo: '1413',
-      member: '1413',
-      date: new Date().toLocaleDateString(),
-      status: '1413'
-    }*/
-  ]
-})
+  const otherDetailsEdit = ref<boolean>(false)
 
-const keyString = ref('')
+  const memberDetails = computed(() => {
+    if (memberStore.getMemberDetails && memberStore.getMemberDetails.details) {
+      form.details = memberStore.getMemberDetails.details
+    }
+    return Object.keys(form.details)
+  })
 
-const addingKey = ref(false)
+  const keyString = ref('')
 
-const saveMemberDetails = () => {
-  otherDetailsEdit.value = false
-  memberStore.editMemberDetails({
-    refId: `${route.params.refId}`,
-    details: form.details
-  }, `${route.params.refId}`).then(() => memberStore.fetchMember(`${route.params.refId}`)).then(() => authStore.defineNotification({
-    id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-    message: `Member Details Updated`,
-    success: true
-  }))
-}
+  const addingKey = ref(false)
+
+  const saveMemberDetails = () => {
+    otherDetailsEdit.value = false
+    memberStore.editMemberDetails({
+      refId: `${route.params.refId}`,
+      details: form.details
+    }, `${route.params.refId}`).then(() => memberStore.fetchMember(`${route.params.refId}`)).then(() => authStore.defineNotification({
+      id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+      message: `Member Details Updated`,
+      success: true
+    }))
+  }
 </script>
 <template>
   <div class="flex flex-1 flex-col md:pl-24">
@@ -91,7 +114,7 @@ const saveMemberDetails = () => {
           <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  :current="`Member ${memberStore.getMemberDetails?.memberNumber}`"/>
         </div>
         <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-          <div class="px-4 py-5 sm:px-6">
+          <div class="px-4 py-5">
             <h3 class="text-lg font-medium leading-6 text-gray-900">Member Details</h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Member {{memberStore.getMemberDetails?.memberNumber}} current data.</p>
           </div>
@@ -218,111 +241,54 @@ const saveMemberDetails = () => {
         </div>
 
         <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-          <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg font-medium leading-6 text-gray-900">Current Loans</h3>
+          <div class="px-4 py-5">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Current</h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Members' current loan requests.</p>
+            <LoanRequestsTable :loanRequests="loanRequestStore.getMemberLoanRequests" />
+            <Paginator
+                :current-page="filtersMemberLoanRequests.page"
+                :filter-form="filtersMemberLoanRequests"
+                @refreshNext="refreshMemberNext"
+                @refreshPrev="refreshMemberPrev"
+                @refreshCurrent="refreshMemberCurrent"
+                :total-pages="loanRequestStore.getMemberLoanRequestsPaginationData ? loanRequestStore.getMemberLoanRequestsPaginationData.totalPages : 0"
+                :total-elements="loanRequestStore.getMemberLoanRequestsPaginationData ? loanRequestStore.getMemberLoanRequestsPaginationData.totalElements : 0"
+            />
           </div>
-          <table class="min-w-full divide-y divide-gray-300">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Loan No.</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-              <th scope="col" class="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-6">
-                <span class="sr-only">Action</span>
-              </th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-            <tr v-for="loan in currentLoans" :key="loan.id">
-              <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ loan.loanNo }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ loan.member }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ loan.date }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.committed }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.status }}</td>
-              <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-eg-lightblue hover:text-eg-bg">
-                  View<span class="sr-only">, {{ loan.id }}</span>
-                </a>
-              </td>
-            </tr>
-            </tbody>
-          </table>
         </div>
 
         <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-          <div class="px-4 py-5 sm:px-6">
+          <div class="px-4 py-5">
             <h3 class="text-lg font-medium leading-6 text-gray-900">Witnessed Loans</h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Loans requests witnessed by member.</p>
+            <LoanRequestsTable :loanRequests="loanRequestStore.getWitnessedLoanRequests" />
+            <Paginator
+                :current-page="filtersWitnessedLoanRequests.page"
+                :filter-form="filtersWitnessedLoanRequests"
+                @refreshNext="refreshWitnessedNext"
+                @refreshPrev="refreshWitnessedPrev"
+                @refreshCurrent="refreshWitnessedCurrent"
+                :total-pages="loanRequestStore.getWitnessedLoanRequestsPaginationData ? loanRequestStore.getWitnessedLoanRequestsPaginationData.totalPages : 0"
+                :total-elements="loanRequestStore.getWitnessedLoanRequestsPaginationData ? loanRequestStore.getWitnessedLoanRequestsPaginationData.totalElements : 0"
+            />
           </div>
-          <table class="min-w-full divide-y divide-gray-300">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Loan No.</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                <th scope="col" class="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-6">
-                  <span class="sr-only">Action</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="loan in witnessedLoans" :key="loan.id">
-                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ loan.loanNo }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ loan.member }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ loan.date }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.status }}</td>
-                <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                  <a href="#" class="text-eg-lightblue hover:text-eg-bg">
-                    View
-                    <span class="sr-only">, {{ loan.id }}</span>
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
 
         <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-          <div class="px-4 py-5 sm:px-6">
+          <div class="px-4 py-5">
             <h3 class="text-lg font-medium leading-6 text-gray-900">Guaranteed Loans</h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Loans requests guaranteed by member.</p>
+            <LoanRequestsTable :loanRequests="loanRequestStore.getGuaranteedLoanRequests" />
+            <Paginator
+                :current-page="filtersGuaranteedLoanRequests.page"
+                :filter-form="filtersGuaranteedLoanRequests"
+                @refreshNext="refreshGuaranteedNext"
+                @refreshPrev="refreshGuaranteedPrev"
+                @refreshCurrent="refreshGuaranteedCurrent"
+                :total-pages="loanRequestStore.getGuaranteedLoanRequestsPaginationData ? loanRequestStore.getGuaranteedLoanRequestsPaginationData.totalPages : 0"
+                :total-elements="loanRequestStore.getGuaranteedLoanRequestsPaginationData ? loanRequestStore.getGuaranteedLoanRequestsPaginationData.totalElements : 0"
+            />
           </div>
-          <table class="min-w-full divide-y divide-gray-300">
-            <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Loan No.</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Loan Date</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Loan Type</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Payment Status</th>
-              <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-              <th scope="col" class="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-6">
-                <span class="sr-only">View</span>
-              </th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-            <tr v-for="loan in guaranteedLoans" :key="loan.id">
-              <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ loan.loanNo }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ loan.loanDate }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ loan.loanType }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.amount }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.committed }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.paymentStatus }}</td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ loan.status }}</td>
-              <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                <a href="#" class="text-eg-lightblue hover:text-eg-bg"
-                >View<span class="sr-only">, {{ loan.id }}</span></a
-                >
-              </td>
-            </tr>
-            </tbody>
-          </table>
         </div>
         </div>
       </div>

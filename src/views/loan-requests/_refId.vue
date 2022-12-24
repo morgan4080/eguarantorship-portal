@@ -303,7 +303,7 @@
 
   const otherDetailsEdit = ref<boolean>(false)
 
-  const form = reactive({
+  const form = reactive<any>({
     details: {}
   })
   const saveLRDetails = () => {
@@ -345,7 +345,7 @@
       guarantorApprovalOpen.value = false
     }
   }
-  const setGuarantorToApprove = (guarantor: guarantorList) => {
+  const setGuarantorToApprove = (guarantor: any) => {
     guarantorApprovalOpen.value = true;
     selectedGuarantor.value = guarantor;
   }
@@ -373,7 +373,7 @@
       request_name: string
     }
   }
-  const zohoRequest: ComputedRef<zohoRequestType> = computed(() => {
+  const zohoRequest: ComputedRef<any> = computed(() => {
     if (loanRequestStore.getLoanRequest?.zohoRequest) {
       return JSON.parse(loanRequestStore.getLoanRequest?.zohoRequest)
     } else {
