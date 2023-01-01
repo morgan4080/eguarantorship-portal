@@ -10,24 +10,23 @@ import {
 import GlobalSearch from "../../components/GlobalSearch.vue";
 import DropDown from "../../components/DropDown.vue";
 import stores from "../../stores";
-import {MenuButton} from "@headlessui/vue";
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Paginator from "../../components/Paginator.vue";
 const { memberStore } = stores;
 
 const filters = reactive({
   recordsPerPage: 10,
   searchTerm: '',
-  order: 'ASC',
   page: 1
 })
 
 const queryMembers: ComputedRef<string> = computed(() => {
-  return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+  return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
 })
 
 const searchMembers = (customFilters?: {searchTerm?: string}) => {
   if (customFilters) {
-    const {searchTerm} = customFilters
+    const { searchTerm } = customFilters
     if (searchTerm) {
       memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
     } else {
@@ -67,17 +66,28 @@ const actions = [
 onMounted(async () => {
   await Promise.all([
     memberStore.fetchMembersSummary(),
-    memberStore.fetchMembers(),
+    memberStore.fetchMembers(queryMembers.value),
   ])
 })
 
-const exportMembers = async () => {
-  const url = await memberStore.exportMembers(queryMembers.value)
-  const link = document.createElement('a');
-  link.href = url;
-  link.setAttribute('download', new Date() + 'loan-requests.csv');
-  document.body.appendChild(link);
-  link.click();
+const exportMembers = async (all?: string) => {
+  if (all === 'all') {
+    if (confirm("You are about to export all member data. Proceed?")) {
+      const url = await memberStore.exportMembers()
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', new Date() + 'all-members.csv');
+      document.body.appendChild(link);
+      link.click();
+    }
+  } else {
+    const url = await memberStore.exportMembers(queryMembers.value)
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', new Date() + 'filtered-members.csv');
+    document.body.appendChild(link);
+    link.click();
+  }
 }
 </script>
 <template>
@@ -178,12 +188,34 @@ const exportMembers = async () => {
               <GlobalSearch :placeholder="'Search Members'" :ctx="$route.name" @update="searchMembers" />
             </div>
             <div class="mt-0 ml-16 flex flex-wrap space-x-4">
-              <button @click="exportMembers" type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                </svg>
-                Export Members
-              </button>
+              <Menu as="div" class="relative inline-block text-left">
+                <div>
+                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+                    <span class="sr-only">export requests options</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                    Export Members
+                  </MenuButton>
+                </div>
+
+                <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                  <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div class="py-1">
+                      <form @submit.prevent="exportMembers('all')">
+                        <MenuItem v-slot="{ active }">
+                          <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full px-4 py-2 text-left text-sm']">Export All</button>
+                        </MenuItem>
+                      </form>
+                      <form @submit.prevent="exportMembers">
+                        <MenuItem v-slot="{ active }">
+                          <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full px-4 py-2 text-left text-sm']">Export Filtered</button>
+                        </MenuItem>
+                      </form>
+                    </div>
+                  </MenuItems>
+                </transition>
+              </Menu>
             </div>
           </MembersTable>
           <Paginator
