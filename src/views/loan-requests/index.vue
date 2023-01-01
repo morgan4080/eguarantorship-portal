@@ -114,7 +114,7 @@
     searchLR(customFilters)
   })
 
-  const exportLoanRequests = async (all?: string) => {
+  const exportLoanRequests = async (all?: any) => {
     if (all === 'all') {
       if (confirm("You are about to export all loan requests. Proceed?")) {
         const url = await loanRequestStore.exportLoanRequests()

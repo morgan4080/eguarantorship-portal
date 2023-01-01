@@ -70,7 +70,7 @@ onMounted(async () => {
   ])
 })
 
-const exportMembers = async (all?: string) => {
+const exportMembers = async (all?: any) => {
   if (all === 'all') {
     if (confirm("You are about to export all member data. Proceed?")) {
       const url = await memberStore.exportMembers()
