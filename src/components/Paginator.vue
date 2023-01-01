@@ -8,7 +8,7 @@ const props = defineProps<{
   filterForm: {
     recordsPerPage: number;
     searchTerm: string;
-    order: string;
+    order?: string;
     page: number;
   };
   currentPage: number;
