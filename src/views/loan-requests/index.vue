@@ -35,7 +35,7 @@
   const filters = reactive({
     recordsPerPage: 10,
     searchTerm: '',
-    order: 'ASC',
+    // order: 'ASC',
     page: 1
   })
 
@@ -55,14 +55,15 @@
   })
 
   const queryLoanRequests: ComputedRef<string> = computed(() => {
-    return (`?order=${filters.order}&pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+    // order=${filters.order}&
+    return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
   })
 
   onMounted(async () => {
     await Promise.allSettled([
       loanProductStore.fetchLoanProducts(),
       loanRequestStore.fetchLoanRequests(queryLoanRequests.value),
-      loanRequestStore.fetchLoanRequestSummary(),
+      loanRequestStore.fetchLoanRequestSummary(queryLoanRequests.value),
     ])
   })
 
@@ -89,8 +90,10 @@
       console.log(urlString)
 
       loanRequestStore.fetchLoanRequests(urlString)
+      loanRequestStore.fetchLoanRequestSummary(urlString)
     } else {
       loanRequestStore.fetchLoanRequests(queryLoanRequests.value)
+      loanRequestStore.fetchLoanRequestSummary(queryLoanRequests.value)
     }
   }
 
