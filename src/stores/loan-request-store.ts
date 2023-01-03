@@ -354,7 +354,7 @@ export const useLoanRequest = defineStore('loan-request-store', {
         },
         async fetchLoanRequestSummary(params?:string) {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/summary${params ? params : ''}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/loans/summary${params ? params : ''}`, {
                     method: 'GET',
                     credentials: 'include'
                 });

@@ -117,7 +117,8 @@
   const exportLoanRequests = async (all?: any) => {
     if (all === 'all') {
       if (confirm("You are about to export all loan requests. Proceed?")) {
-        const url = await loanRequestStore.exportLoanRequests()
+        const maxValue = 2147483647;
+        const url = await loanRequestStore.exportLoanRequests(`?pageSize=${maxValue}`);
 
         const link = document.createElement('a');
         link.href = url;
@@ -128,9 +129,9 @@
     } else {
       const payload = {
         ...customFilters,
-      }
+      };
 
-      let urlString = queryLoanRequests.value
+      let urlString = queryLoanRequests.value;
 
       for (const [key, value] of Object.entries(payload)) {
         if (value) {
@@ -163,12 +164,31 @@
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
-            <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
-              <option :value="null">Select Request Status</option>
-              <option value="CLOSED">CLOSED</option>
-              <option value="OPEN">OPEN</option>
-              <option value="READ">READ</option>
-            </select>
+            <div class="flex space-x-2">
+              <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+                <option :value="null">Request Status</option>
+                <option value="CLOSED">CLOSED</option>
+                <option value="OPEN">OPEN</option>
+                <option value="READ">READ</option>
+              </select>
+              <select v-model="customFilters.signingStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+                <option :value="null">Signing Status</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="INPROGRESS">INPROGRESS</option>
+                <option value="ERROR">PENDING</option>
+              </select>
+              <select v-model="customFilters.acceptanceStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+                <option :value="null">Acceptance Status</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="INPROGRESS">INPROGRESS</option>
+                <option value="ANY">ANY</option>
+              </select>
+              <select v-model="customFilters.applicationStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+                <option :value="null">Application Status</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="INPROGRESS">INPROGRESS</option>
+              </select>
+            </div>
           </div>
           <div class="sm:grid sm:grid-cols-4 sm:gap-2">
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">

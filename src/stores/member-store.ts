@@ -124,7 +124,7 @@ export const useMember = defineStore('member-store', {
         },
         async fetchMembersSummary(params?: string) {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/members/summary${params ? params : ''}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/members/summary${params ? params : ''}`, {
                     method: 'GET',
                     credentials: 'include'
                 });

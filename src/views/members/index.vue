@@ -73,7 +73,8 @@ onMounted(async () => {
 const exportMembers = async (all?: any) => {
   if (all === 'all') {
     if (confirm("You are about to export all member data. Proceed?")) {
-      const url = await memberStore.exportMembers()
+      const maxValue = 2147483647;
+      const url = await memberStore.exportMembers(`?pageSize=${maxValue}`);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', new Date() + 'all-members.csv');
