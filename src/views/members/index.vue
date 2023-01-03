@@ -168,7 +168,7 @@ const exportMembers = async (all?: any) => {
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Exited Members</span>
-                  <span class="font-semibold text-lg">{{ memberStore.getMemberSummary?.DORMANT }}</span>
+                  <span class="font-semibold text-lg">{{ memberStore.getMemberSummary?.EXITED }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
