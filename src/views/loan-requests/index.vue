@@ -40,7 +40,7 @@
     recordsPerPage: JSON.stringify(route.query) !== '{}' && route.query.pageSize ? route.query.pageSize : 10,
     searchTerm: JSON.stringify(route.query) !== '{}' && route.query.searchTerm ? route.query.searchTerm : '',
     // order: 'ASC',
-    page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? route.query.pageIndex : 1
+    page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? Number(route.query.pageIndex) + 1 :  1
   })
 
   const customFilters =  reactive<Record<any, any>>({
@@ -58,39 +58,43 @@
     includeInActive: JSON.stringify(route.query) !== '{}' && route.query.includeInActive ? route.query.includeInActive : null,
   })
 
-  const queryLoanRequests: ComputedRef<string> = computed(() => {
-    // order=${filters.order}&
-    return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+  let queryParams = reactive<Record<any, any>>({
+    pageSize: filters.recordsPerPage,
+    pageIndex: filters.page - 1
   })
 
-  const withValues = ref<Record<string, string | number>>({})
-
   const searchLR = (customFilter?: customFiltersType) => {
-    if (customFilter) {
-      const payload = {
-        ...customFilters,
-        ...customFilter,
-      }
 
-      for (const [key, value] of Object.entries(payload)) {
-        if (value) {
-          if (key === 'page') {
-            // pageIndex
-            withValues.value['pageIndex'] = Number(value) - 1
-          } else if (key === 'recordsPerPage') {
-            // pageSize
-            withValues.value['pageSize'] = value
-          } else if (key == 'startDate' || key == 'endDate') {
-            withValues.value[key] = new Date(value).toLocaleDateString('en-US')
-          } else {
-            withValues.value[key] = value
-          }
+    let withValues: Record<string, string | number> = {}
+
+    const payload = {
+      ...filters,
+      ...customFilters,
+      ...customFilter
+    }
+
+    for (const [key, value] of Object.entries(payload)) {
+      if (value) {
+        if (key === 'page') {
+          // pageIndex
+          withValues['pageIndex'] = Number(value) - 1
+        } else if (key === 'recordsPerPage') {
+          // pageSize
+          withValues['pageSize'] = value
+        } else if (key == 'startDate' || key == 'endDate') {
+          withValues[key] = new Date(value).toLocaleDateString('en-US')
+        } else {
+          withValues[key] = value
         }
       }
+    }
 
-      router.push({ path: route.path, query: withValues.value})
+    router.push({ path: route.path, query: withValues})
 
-      /*let urlString = queryLoanRequests.value
+    /*if (customFilter) {
+
+
+      /!*let urlString = queryLoanRequests.value
 
       for (const [key, value] of Object.entries(payload)) {
         if (value) {
@@ -106,7 +110,7 @@
       console.log(urlString)
 
       loanRequestStore.fetchLoanRequests(urlString)
-      loanRequestStore.fetchLoanRequestSummary(urlString)*/
+      loanRequestStore.fetchLoanRequestSummary(urlString)*!/
     } else {
       const payload = {
         ...customFilters,
@@ -117,23 +121,23 @@
         if (value) {
           if (key === 'page') {
             // pageIndex
-            withValues.value['pageIndex'] = Number(value) - 1
+            withValues['pageIndex'] = Number(value) - 1
           } else if (key === 'recordsPerPage') {
             // pageSize
-            withValues.value['pageSize'] = value
+            withValues['pageSize'] = value
           } else if (key === 'startDate') {
-            withValues.value[key] = new Date(value).toLocaleDateString('en-US')
+            withValues[key] = new Date(value).toLocaleDateString('en-US')
           } else if (key === 'endDate') {
-            withValues.value[key] = new Date(value).toLocaleDateString('en-US')
+            withValues[key] = new Date(value).toLocaleDateString('en-US')
           } else {
-            withValues.value[key] = value
+            withValues[key] = value
           }
         }
       }
 
-      router.push({ path: route.path, query: withValues.value})
+      router.push({ path: route.path, query: withValues})
 
-      /*let urlString = queryLoanRequests.value
+      /!*let urlString = queryLoanRequests.value
 
       for (const [key, value] of Object.entries(payload)) {
         if (value) {
@@ -149,8 +153,8 @@
       console.log(urlString)
 
       loanRequestStore.fetchLoanRequests(urlString)
-      loanRequestStore.fetchLoanRequestSummary(urlString)*/
-    }
+      loanRequestStore.fetchLoanRequestSummary(urlString)*!/
+    }*/
   }
 
   const refreshNext = (cP: number) => {
@@ -168,7 +172,6 @@
   watch(customFilters, (customFilters) => {
     searchLR(customFilters)
   })
-
   const exportLoanRequests = async (all?: any) => {
     if (all === 'all') {
       if (confirm("You are about to export all loan requests. Proceed?")) {
@@ -207,38 +210,42 @@
     }
   }
 
- watch(() => route.query, async (query) => {
-   if (JSON.stringify(query) === '{}') {
+   watch(() => route.query, async (query) => {
+     let urlString: string
 
-     await Promise.allSettled([
-       loanProductStore.fetchLoanProducts(),
-       loanRequestStore.fetchLoanRequests(queryLoanRequests.value),
-       loanRequestStore.fetchLoanRequestSummary(queryLoanRequests.value),
-     ])
+     if (JSON.stringify(query) === '{}') {
+       urlString = ''
+       queryParams = {}
+     } else {
+       urlString = '?'
+       queryParams = query
+     }
 
-   } else {
-     let urlString = '?'
-
-     for (const [key, value] of Object.entries(query)) {
+     for (const [key, value] of Object.entries(queryParams)) {
        if (value) {
-         if (key == 'startDate' || key == 'endDate') {
+         if (key === 'startDate' || key === 'endDate') {
            let theDate = encodeURIComponent(`${new Date(`${value}`).toLocaleDateString('en-US')}`)
-           urlString += `&${key}=${theDate}`
+           if (urlString === '?') {
+             urlString += `${key}=${theDate}`
+           } else {
+             urlString += `&${key}=${theDate}`
+           }
          } else {
-           urlString += `&${key}=${value}`
+           if (urlString === '?') {
+             urlString += `${key}=${value}`
+           } else {
+             urlString += `&${key}=${value}`
+           }
          }
        }
      }
 
-     console.log(urlString)
-
      await Promise.allSettled([
        loanProductStore.fetchLoanProducts(),
        loanRequestStore.fetchLoanRequests(urlString),
-       loanRequestStore.fetchLoanRequestSummary(urlString)
+       loanRequestStore.fetchLoanRequestSummary(urlString),
      ])
-   }
- }, {immediate: true})
+   }, {immediate: true})
 
 </script>
 <template>
