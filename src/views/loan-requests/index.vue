@@ -10,6 +10,7 @@
   const { loanRequestStore, loanProductStore } = stores
   const router = useRouter()
   const route = useRoute()
+
   type LoanReqStatuses = "CLOSED" | "OPEN" | "READ" | null
 
   type SigningStatus = "COMPLETED" | "INPROGRESS" | "ERROR" | null
@@ -181,16 +182,12 @@
         link.click();
       }
     } else {
-      const payload = {
-        ...customFilters,
-      };
+      let urlString = '?';
 
-      let urlString = queryLoanRequests.value;
-
-      for (const [key, value] of Object.entries(payload)) {
+      for (const [key, value] of Object.entries(route.query)) {
         if (value) {
           if (key == 'startDate' || key == 'endDate') {
-            let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
+            let theDate = encodeURIComponent(`${new Date(`${value}`).toLocaleDateString('en-US')}`)
             urlString += `&${key}=${theDate}`
           } else {
             urlString += `&${key}=${value}`
