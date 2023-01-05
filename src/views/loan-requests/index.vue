@@ -1,13 +1,15 @@
 <script setup lang="ts">
-  import Breadcrumb from "../../components/Breadcrumb.vue";
-  import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
-  import GlobalSearch from "../../components/GlobalSearch.vue";
-  import {computed, ComputedRef, onMounted, reactive, watch} from "vue";
-  import Paginator from "../../components/Paginator.vue";
-  import stores from "../../stores";
+  import {useRoute, useRouter} from "vue-router"
+  import Breadcrumb from "../../components/Breadcrumb.vue"
+  import LoanRequestsTable from "../../components/LoanRequestsTable.vue"
+  import GlobalSearch from "../../components/GlobalSearch.vue"
+  import {computed, ComputedRef, onMounted, reactive, ref, watch} from "vue"
+  import Paginator from "../../components/Paginator.vue"
+  import stores from "../../stores"
   import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-  const { loanRequestStore, loanProductStore } = stores;
-
+  const { loanRequestStore, loanProductStore } = stores
+  const router = useRouter()
+  const route = useRoute()
   type LoanReqStatuses = "CLOSED" | "OPEN" | "READ" | null
 
   type SigningStatus = "COMPLETED" | "INPROGRESS" | "ERROR" | null
@@ -33,26 +35,26 @@
     includeInActive?: IncludeInactive,
   }
 
-  const filters = reactive({
-    recordsPerPage: 10,
-    searchTerm: '',
+  const filters = reactive<Record<any, any>>({
+    recordsPerPage: JSON.stringify(route.query) !== '{}' && route.query.pageSize ? route.query.pageSize : 10,
+    searchTerm: JSON.stringify(route.query) !== '{}' && route.query.searchTerm ? route.query.searchTerm : '',
     // order: 'ASC',
-    page: 1
+    page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? route.query.pageIndex : 1
   })
 
-  const customFilters =  reactive<customFiltersType>({
-    productRefId: '',
-    memberRefId: '',
-    guarantorRefId: '',
-    loanReqStatus: null,
-    signingStatus: null,
-    acceptanceStatus: null,
-    applicationStatus: null,
-    witnessRefId: '',
-    loanNumber: '',
-    startDate: '',
-    endDate: '',
-    includeInActive: null,
+  const customFilters =  reactive<Record<any, any>>({
+    productRefId: JSON.stringify(route.query) !== '{}' && route.query.productRefId ? route.query.productRefId : '',
+    memberRefId: JSON.stringify(route.query) !== '{}' && route.query.memberRefId ? route.query.memberRefId : '',
+    guarantorRefId: JSON.stringify(route.query) !== '{}' && route.query.guarantorRefId ? route.query.guarantorRefId : '',
+    loanReqStatus: JSON.stringify(route.query) !== '{}' && route.query.loanReqStatus ? route.query.loanReqStatus : null,
+    signingStatus: JSON.stringify(route.query) !== '{}' && route.query.signingStatus ? route.query.signingStatus : null,
+    acceptanceStatus: JSON.stringify(route.query) !== '{}' && route.query.acceptanceStatus ? route.query.acceptanceStatus : null,
+    applicationStatus: JSON.stringify(route.query) !== '{}' && route.query.applicationStatus ? route.query.applicationStatus : null,
+    witnessRefId: JSON.stringify(route.query) !== '{}' && route.query.witnessRefId ? route.query.witnessRefId : '',
+    loanNumber: JSON.stringify(route.query) !== '{}' && route.query.loanNumber ? route.query.loanNumber : '',
+    startDate: JSON.stringify(route.query) !== '{}' && route.query.startDate ? new Date(`${route.query.startDate}`).toLocaleDateString('en-CA') : '',
+    endDate: JSON.stringify(route.query) !== '{}' && route.query.endDate ? new Date(`${route.query.endDate}`).toLocaleDateString('en-CA') : '',
+    includeInActive: JSON.stringify(route.query) !== '{}' && route.query.includeInActive ? route.query.includeInActive : null,
   })
 
   const queryLoanRequests: ComputedRef<string> = computed(() => {
@@ -60,13 +62,7 @@
     return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
   })
 
-  onMounted(async () => {
-    await Promise.allSettled([
-      loanProductStore.fetchLoanProducts(),
-      loanRequestStore.fetchLoanRequests(queryLoanRequests.value),
-      loanRequestStore.fetchLoanRequestSummary(queryLoanRequests.value),
-    ])
-  })
+  const withValues = ref<Record<string, string | number>>({})
 
   const searchLR = (customFilter?: customFiltersType) => {
     if (customFilter) {
@@ -75,7 +71,25 @@
         ...customFilter,
       }
 
-      let urlString = queryLoanRequests.value
+      for (const [key, value] of Object.entries(payload)) {
+        if (value) {
+          if (key === 'page') {
+            // pageIndex
+            withValues.value['pageIndex'] = Number(value) - 1
+          } else if (key === 'recordsPerPage') {
+            // pageSize
+            withValues.value['pageSize'] = value
+          } else if (key == 'startDate' || key == 'endDate') {
+            withValues.value[key] = new Date(value).toLocaleDateString('en-US')
+          } else {
+            withValues.value[key] = value
+          }
+        }
+      }
+
+      router.push({ path: route.path, query: withValues.value})
+
+      /*let urlString = queryLoanRequests.value
 
       for (const [key, value] of Object.entries(payload)) {
         if (value) {
@@ -91,10 +105,50 @@
       console.log(urlString)
 
       loanRequestStore.fetchLoanRequests(urlString)
-      loanRequestStore.fetchLoanRequestSummary(urlString)
+      loanRequestStore.fetchLoanRequestSummary(urlString)*/
     } else {
-      loanRequestStore.fetchLoanRequests(queryLoanRequests.value)
-      loanRequestStore.fetchLoanRequestSummary(queryLoanRequests.value)
+      const payload = {
+        ...customFilters,
+        ...filters
+      }
+
+      for (const [key, value] of Object.entries(payload)) {
+        if (value) {
+          if (key === 'page') {
+            // pageIndex
+            withValues.value['pageIndex'] = Number(value) - 1
+          } else if (key === 'recordsPerPage') {
+            // pageSize
+            withValues.value['pageSize'] = value
+          } else if (key === 'startDate') {
+            withValues.value[key] = new Date(value).toLocaleDateString('en-US')
+          } else if (key === 'endDate') {
+            withValues.value[key] = new Date(value).toLocaleDateString('en-US')
+          } else {
+            withValues.value[key] = value
+          }
+        }
+      }
+
+      router.push({ path: route.path, query: withValues.value})
+
+      /*let urlString = queryLoanRequests.value
+
+      for (const [key, value] of Object.entries(payload)) {
+        if (value) {
+          if (key == 'startDate' || key == 'endDate') {
+            let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
+            urlString += `&${key}=${theDate}`
+          } else {
+            urlString += `&${key}=${value}`
+          }
+        }
+      }
+
+      console.log(urlString)
+
+      loanRequestStore.fetchLoanRequests(urlString)
+      loanRequestStore.fetchLoanRequestSummary(urlString)*/
     }
   }
 
@@ -155,6 +209,39 @@
       link.click();
     }
   }
+
+ watch(() => route.query, async (query) => {
+   if (JSON.stringify(query) === '{}') {
+
+     await Promise.allSettled([
+       loanProductStore.fetchLoanProducts(),
+       loanRequestStore.fetchLoanRequests(queryLoanRequests.value),
+       loanRequestStore.fetchLoanRequestSummary(queryLoanRequests.value),
+     ])
+
+   } else {
+     let urlString = '?'
+
+     for (const [key, value] of Object.entries(query)) {
+       if (value) {
+         if (key == 'startDate' || key == 'endDate') {
+           let theDate = encodeURIComponent(`${new Date(`${value}`).toLocaleDateString('en-US')}`)
+           urlString += `&${key}=${theDate}`
+         } else {
+           urlString += `&${key}=${value}`
+         }
+       }
+     }
+
+     console.log(urlString)
+
+     await Promise.allSettled([
+       loanProductStore.fetchLoanProducts(),
+       loanRequestStore.fetchLoanRequests(urlString),
+       loanRequestStore.fetchLoanRequestSummary(urlString)
+     ])
+   }
+ }, {immediate: true})
 
 </script>
 <template>
@@ -271,7 +358,7 @@
           </div>
           <LoanRequestsTable :loanRequests="loanRequestStore.getLoanRequests">
             <div class="sm:flex-auto">
-              <GlobalSearch :placeholder="'Search Loan Requests'" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLR" />
+              <GlobalSearch :placeholder="'Search Loan Requests'" :filters="filters" :customFilters="customFilters" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLR" />
             </div>
             <div class="mt-0 ml-auto flex flex-wrap space-x-4">
               <div class="flex items-center">

@@ -5,7 +5,7 @@ const totalRecords = ref(<number>0);
 const pageCountOpen = ref(<boolean>false);
 const props = defineProps<{
   totalPages: number;
-  filterForm: {
+  filterForm: Record<any, any> | {
     recordsPerPage: number;
     searchTerm: string;
     order?: string;

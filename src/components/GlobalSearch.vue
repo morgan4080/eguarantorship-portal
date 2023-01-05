@@ -7,9 +7,11 @@
     placeholder: string,
     hasFilter?: boolean,
     filterEntities?: any,
+    filters?: any,
+    customFilters?: any,
   }>()
 
-  const { ctx, placeholder, hasFilter } = toRefs(props);
+  const { ctx, placeholder, hasFilter, filters, customFilters } = toRefs(props);
 
   const changed = ref<boolean>(false)
   const hasContent = ref<boolean>(false)
@@ -46,8 +48,8 @@
   })
 
   const searchFilter = reactive({
-    productRefId: '',
-    searchTerm: ''
+    productRefId: customFilters && customFilters.value ? customFilters.value.productRefId : '',
+    searchTerm: filters && filters.value ? filters.value.searchTerm : ''
   })
 
   const makeSelection = (val: number) => {
