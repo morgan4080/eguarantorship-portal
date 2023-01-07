@@ -8,15 +8,16 @@ const authStore = stores.authStore;
 const user = computed(() => authStore.getLoggedInUser ? authStore.getLoggedInUser : null)
 async function doLogout() {
   try {
-    const requestOptions: any = {
+    await fetch(`${import.meta.env.VITE_APP_AUTH}/logout`, {
       method: 'POST',
-      redirect: 'follow'
-    };
-    await fetch(`${import.meta.env.VITE_KEYCLOAK_URL}admin/realms/${authStore.getLoggedInUser?.tenantId}/logout-all`, requestOptions);
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+    })
   } catch (e: any) {
-    console.log(e.message);
+    console.log(e.message)
   } finally {
-    window.location.reload();
+    window.location.reload()
   }
 }
 
