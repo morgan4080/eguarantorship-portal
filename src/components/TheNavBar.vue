@@ -10,6 +10,7 @@ async function doLogout() {
   try {
     await fetch(`${import.meta.env.VITE_APP_AUTH}/logout`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'multipart/form-data'
       },
