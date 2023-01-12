@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
 import stores from "../stores";
-import GlobalSearch from "./GlobalSearch.vue";
 const accountMenu = ref(false);
 const authStore = stores.authStore;
 

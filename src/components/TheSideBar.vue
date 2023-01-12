@@ -121,7 +121,7 @@ const navigateTo = (item: any) => {
 </script>
 
 <template>
-  <div class="fixed inset-y-0 flex flex-col transform ease-in-out transition-all z-50 bg-eg-bg">
+  <div class="fixed inset-y-0 flex flex-col transform ease-in-out transition-all z-50 bg-eg-bg transition duration-500 ease-in-out">
     <div class="flex min-h-0 flex-1 flex-col bg-eg-bg">
       <div class="relative">
         <a :href="theUrl" :class="{'flex-col' : !setWidth}" class="navbar py-5 px-4 flex items-center">
