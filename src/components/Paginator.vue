@@ -22,7 +22,7 @@ const changePage = (act: string): void => {
   } else if (act === "subtract") {
     emit("refreshPrev", currentPage.value);
   }
-};
+}
 const popcorn = ref(<any>null);
 const tooltip = ref(<any>null);
 const lots = ref(<number[]>[10, 50, 100]);
@@ -74,8 +74,8 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
 </script>
 
 <template>
-  <section>
-    <div class="py-6 px-4 sm:p-6">
+  <div class="!-mt-6">
+    <div class="mt-4 py-6">
       <div class="flex items-center justify-between">
         <div
             class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
@@ -250,5 +250,5 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>

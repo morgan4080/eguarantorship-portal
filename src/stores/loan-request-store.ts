@@ -51,6 +51,8 @@ export interface LoanRequestData {
     witnessSigned?: boolean,
     details: Record<string, Record<string, string>>
     zohoRequest?: string
+
+    isActive?: boolean
 }
 
 export interface PaginationData {

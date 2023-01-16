@@ -185,35 +185,35 @@
 
 </script>
 <template>
-  <div class="flex flex-1 flex-col md:pl-24">
+  <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
+      <div class="pt-2 pb-16">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
-            <div class="flex space-x-2">
-              <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
-                <option :value="null">Request Status</option>
-                <option value="CLOSED">CLOSED</option>
-                <option value="OPEN">OPEN</option>
-                <option value="READ">READ</option>
+            <div class="flex space-x-4">
+              <select v-model="customFilters.loanReqStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                <option :value="null" class="text-xs">Request Status</option>
+                <option value="CLOSED" class="text-xs">CLOSED</option>
+                <option value="OPEN" class="text-xs">OPEN</option>
+                <option value="READ" class="text-xs">READ</option>
               </select>
-              <select v-model="customFilters.signingStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
-                <option :value="null">Signing Status</option>
-                <option value="COMPLETED">COMPLETED</option>
-                <option value="INPROGRESS">INPROGRESS</option>
-                <option value="ERROR">PENDING</option>
+              <select v-model="customFilters.signingStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                <option :value="null" class="text-xs">Signing Status</option>
+                <option value="COMPLETED" class="text-xs">COMPLETED</option>
+                <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
+                <option value="ERROR" class="text-xs">PENDING</option>
               </select>
-              <select v-model="customFilters.acceptanceStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
-                <option :value="null">Acceptance Status</option>
-                <option value="COMPLETED">COMPLETED</option>
-                <option value="INPROGRESS">INPROGRESS</option>
-                <option value="ANY">ANY</option>
+              <select v-model="customFilters.acceptanceStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                <option :value="null" class="text-xs">Acceptance Status</option>
+                <option value="COMPLETED" class="text-xs">COMPLETED</option>
+                <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
+                <option value="ANY" class="text-xs">ANY</option>
               </select>
-              <select v-model="customFilters.applicationStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
-                <option :value="null">Application Status</option>
-                <option value="COMPLETED">COMPLETED</option>
-                <option value="INPROGRESS">INPROGRESS</option>
+              <select v-model="customFilters.applicationStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                <option :value="null" class="text-xs">Application Status</option>
+                <option value="COMPLETED" class="text-xs">COMPLETED</option>
+                <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
               </select>
             </div>
           </div>
@@ -313,7 +313,7 @@
               </div>
               <Menu as="div" class="relative inline-block text-left">
                 <div>
-                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
                     <span class="sr-only">export requests options</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />

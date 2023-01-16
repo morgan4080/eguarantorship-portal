@@ -82,6 +82,23 @@ export const useMember = defineStore('member-store', {
         }
     },
     actions: {
+        async getCo_bankingMemberDetails(params?:string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/core-banking/member-details${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const content = await response.json();
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to get member.`);
+                }
+            } catch (e: any) {
+                console.error("ge",  e);
+                return Promise.reject(e.message);
+            }
+        },
         async exportMembers(params?:string) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/members${params ? params : ''}`, {

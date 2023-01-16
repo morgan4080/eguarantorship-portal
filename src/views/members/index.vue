@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import Breadcrumb from "../../components/Breadcrumb.vue";
 import MembersTable from "../../components/MembersTable.vue";
-import {computed, ComputedRef, onMounted, reactive} from "vue";
+import {computed, ComputedRef, onMounted, reactive, ref} from "vue";
 import {
   UserPlusIcon,
   ArrowUpTrayIcon,
   ChevronDownIcon,
 } from '@heroicons/vue/20/solid'
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import GlobalSearch from "../../components/GlobalSearch.vue";
 import DropDown from "../../components/DropDown.vue";
 import stores from "../../stores";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Paginator from "../../components/Paginator.vue";
-const { memberStore } = stores;
+import {required} from "@vuelidate/validators";
+import useVuelidate from "@vuelidate/core";
+const { memberStore, authStore } = stores;
 
 const filters = reactive({
   recordsPerPage: 10,
@@ -90,20 +93,99 @@ const exportMembers = async (all?: any) => {
     link.click();
   }
 }
+
+const openPullMemberModal = ref(false)
+
+// /core-banking/member-details?memberIdentifier=ss&identifierType=EMAIL&force=false
+
+const pullForm = reactive({
+  memberIdentifier: null,
+  identifierType: null,
+  force: false
+})
+
+const pullFormRules = {
+  memberIdentifier: {
+    required,
+  },
+  identifierType: {
+    required,
+  },
+  force: {
+    required,
+  },
+}
+
+const v$ = useVuelidate(pullFormRules, pullForm, { $lazy: true, $autoDirty: true})
+
+const identifierTypes = ref([
+  {
+    id: 1,
+    name: 'Email',
+    value: 'EMAIL'
+  },
+  {
+    id: 2,
+    name: 'ID Number',
+    value: 'ID_NUMBER'
+  },
+  {
+    id: 3,
+    name: 'Phone Number',
+    value: 'PHONE_NUMBER'
+  },
+  {
+    id: 4,
+    name: 'Member Number',
+    value: 'MEMBER_NUMBER'
+  }
+])
+
+const pullMember = async () => {
+  const result = await v$.value.$validate()
+
+  if (result) {
+    const [submitted] = await Promise.allSettled([
+      memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
+    ])
+
+    if (submitted.status === 'fulfilled') {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Member pulled successfully!',
+        success: true
+      })
+    } else {
+      authStore.defineNotification({
+        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+        message: 'Member pull error!',
+        error: true
+      })
+    }
+
+    openPullMemberModal.value = false
+  }
+}
+
 </script>
 <template>
-  <div class="flex flex-1 flex-col md:pl-24">
+  <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
+      <div class="pt-2 pb-16">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
-            <DropDown :items="actions">
-              <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Actions
-                <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-              </MenuButton>
-            </DropDown>
+            <div class="flex space-x-2">
+              <button @click="openPullMemberModal = true" type="button" class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                Pull Member
+              </button>
+              <DropDown :items="actions">
+                <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                  Actions
+                  <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+                </MenuButton>
+              </DropDown>
+            </div>
           </div>
           <div class="sm:grid sm:grid-cols-4 sm:gap-2">
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
@@ -191,7 +273,7 @@ const exportMembers = async (all?: any) => {
             <div class="mt-0 ml-16 flex flex-wrap space-x-4">
               <Menu as="div" class="relative inline-block text-left">
                 <div>
-                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
                     <span class="sr-only">export requests options</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
@@ -231,5 +313,58 @@ const exportMembers = async (all?: any) => {
         </div>
       </div>
     </main>
+    <TransitionRoot as="template" :show="openPullMemberModal">
+      <Dialog as="div" class="relative z-10" @close="openPullMemberModal = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Pull Member</DialogTitle>
+                <div class="mt-4">
+                  <form @submit.prevent="pullMember" class="space-y-6">
+                    <div>
+                      <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6">
+                          <label for="template-name" class="block text-sm font-medium text-gray-700">Template Name</label>
+                          <select v-model="pullForm.identifierType" id="template-name" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                            <option :value="null">-Select Identifier Type-</option>
+                            <option v-for="(option, i) in identifierTypes" :key="`${option.id}${i}`" :value="option.value">{{ option.name }}</option>
+                          </select>
+                          <div class="input-errors" v-for="(error, index) of v$.identifierType.$errors" :key="index">
+                            <div class="text-xs text-red-400">{{ error.$message }}</div>
+                          </div>
+                        </div>
+                        <div class="col-span-6">
+                          <label for="name" class="block text-sm font-medium text-gray-700">Member Identifier</label>
+                          <input v-model="pullForm.memberIdentifier" id="name" type="text" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                          <div class="input-errors" v-for="(error, index) of v$.memberIdentifier.$errors" :key="index">
+                            <div class="text-xs text-red-400">{{ error.$message }}</div>
+                          </div>
+                        </div>
+                        <div class="col-span-6">
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                              <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                              <label for="pull-cb" class="ml-2 block text-sm text-gray-900">Pull from co-banking</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">Sumbit</button>
+                    </div>
+                  </form>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </div>
 </template>

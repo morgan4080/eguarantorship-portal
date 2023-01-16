@@ -383,9 +383,9 @@
 
 </script>
 <template>
-  <div class="flex flex-1 flex-col md:pl-24">
+  <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
+      <div class="pt-2 pb-16">
         <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests?pageSize=10&pageIndex=0&isActive=true"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>

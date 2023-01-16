@@ -200,9 +200,9 @@
 
 </script>
 <template>
-  <div v-if="route.params.type === 'zoho-integration'" class="flex flex-1 flex-col md:pl-24">
+  <div v-if="route.params.type === 'zoho-integration'" class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
+      <div class="pt-2 pb-16">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="Settings Information" linkUrl="/settings"  current="Zoho Integration"/>
@@ -259,9 +259,9 @@
       </div>
     </main>
   </div>
-  <div v-if="route.params.type === 'loan-products'" class="flex flex-1 flex-col md:pl-24">
+  <div v-if="route.params.type === 'loan-products'" class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
+      <div class="pt-2 pb-16">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="Settings Information" linkUrl="/settings"  current="Loan Products"/>
@@ -332,9 +332,9 @@
       </div>
     </main>
   </div>
-  <div v-if="route.params.type === 'client-settings'" class="flex flex-1 flex-col md:pl-24">
+  <div v-if="route.params.type === 'client-settings'" class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
+      <div class="pt-2 pb-16">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="Settings Information" linkUrl="/settings"  current="Organisation Details"/>

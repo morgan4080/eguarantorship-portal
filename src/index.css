@@ -13,7 +13,7 @@ body {
     min-height: 100vh;
     line-height: 16px;
     word-spacing: 1px;
-    font-size: 12px;
+    font-size: 14px;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
     -moz-osx-font-smoothing: grayscale;
@@ -22,7 +22,8 @@ body {
 }
 
 .router-link-active.router-link-exact-active {
-    @apply bg-eg-lightblue;
+    @apply bg-eg-bg;
+    @apply text-white;
 }
 
 .input-errors {
