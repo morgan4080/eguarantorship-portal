@@ -252,7 +252,7 @@
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
       <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
+        <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
             <div class="flex space-x-2">
@@ -368,11 +368,11 @@
               <div class="flex items-center">
                 <span class="mx-4 text-gray-500">From</span>
                 <div>
-                  <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
+                  <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
                 </div>
                 <span class="mx-4 text-gray-500">To</span>
                 <div>
-                  <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
+                  <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
                 </div>
               </div>
               <Menu as="div" class="relative inline-block text-left">

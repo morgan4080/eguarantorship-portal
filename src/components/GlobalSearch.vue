@@ -75,7 +75,7 @@
         <option v-for="loanProd in filterEntities.getLoanProducts" :key="loanProd.refId" :value="loanProd.refId">{{ loanProd.name }}</option>
       </select>
     </div>
-    <input @mousedown="onMouseDown($event)" v-model="searchFilter.searchTerm" id="combobox" type="text" :placeholder="placeholder" :class="{'pl-48' : hasFilter, 'pl-6' : !hasFilter}" class="w-full rounded-full border border-gray-300 bg-white py-2 pr-12 shadow-sm ring-0 focus:ring-eg-bg focus:border-eg-bg focus:outline-none sm:text-sm" role="combobox" aria-controls="options" :aria-expanded="changed">
+    <input @mousedown="onMouseDown($event)" v-model="searchFilter.searchTerm" id="combobox" type="search" :placeholder="placeholder" :class="{'pl-48' : hasFilter, 'pl-6' : !hasFilter}" class="w-full rounded-full border border-gray-300 bg-white py-2 pr-12 shadow-sm ring-0 focus:ring-eg-bg focus:border-eg-bg focus:outline-none sm:text-sm" role="combobox" aria-controls="options" :aria-expanded="changed">
 
     <button @click="showList" type="button" class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-4 focus:outline-none">
       <svg class="h-5 w-5 text-eg-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

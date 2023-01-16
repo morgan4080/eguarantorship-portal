@@ -386,7 +386,7 @@
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
       <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-5">
+        <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
             <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-text text-sm bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue font-normal rounded-md">

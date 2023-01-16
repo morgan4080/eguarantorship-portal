@@ -83,7 +83,7 @@ watch(() => zohoStore.getZohoTemplateDetails, (details) => {
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
       <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
+        <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="Loan Products" linkUrl="/settings/loan-products"  current="Create Loan Product"/>
           </div>

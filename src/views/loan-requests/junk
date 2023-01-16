@@ -145,7 +145,7 @@
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
       <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
+        <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
             <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
