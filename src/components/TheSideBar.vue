@@ -27,7 +27,7 @@ const menus = reactive([
   },*/
   {
     title: 'REQUESTS',
-    url: '/loan-requests?pageSize=10&pageIndex=0',
+    url: '/loan-requests?pageSize=10&pageIndex=0&isActive=true',
     icon: 'requests',
     expanded: false,
     subMenus: []

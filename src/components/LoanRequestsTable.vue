@@ -116,7 +116,7 @@
       await Promise.allSettled([...new Set(selectedRequests.value)].map(async (loanRequestNumber: string) => {
         await loanRequestStore.deleteLoanRequest(loanRequestNumber)
       }));
-      await loanRequestStore.fetchLoanRequests(`?order=ASC&pageSize=10&pageIndex=0`);
+      await loanRequestStore.fetchLoanRequests(`?pageSize=10&pageIndex=0&isActive=true`);
       authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
         message: 'Deleted Loan requests successfully',
@@ -143,7 +143,7 @@
       link.setAttribute('download', new Date().toLocaleTimeString('en-GB') + 'loan-requests.csv');
       document.body.appendChild(link);
       link.click();
-      await loanRequestStore.fetchLoanRequests(`?order=ASC&pageSize=10&pageIndex=0`);
+      await loanRequestStore.fetchLoanRequests(`?pageSize=10&pageIndex=0&isActive=true`);
       authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
         message: 'Exported Loan requests successfully',

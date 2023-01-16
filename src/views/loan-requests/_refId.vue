@@ -388,7 +388,7 @@
       <div class="py-16">
         <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
-            <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
+            <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests?pageSize=10&pageIndex=0&isActive=true"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
             <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-text text-sm bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue font-normal rounded-md">
               <option value="">Select Option</option>
               <option value="resubmitForSigning">Resubmit for signing</option>
@@ -478,6 +478,10 @@
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-gray-500">Application Date</dt>
                       <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanDate }}</dd>
+                    </div>
+                    <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
+                      <dt class="text-sm font-medium text-gray-500">Applicant Signed</dt>
+                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.applicantSigned }}</dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-gray-500">Member No.</dt>

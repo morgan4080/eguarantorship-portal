@@ -40,7 +40,8 @@
     recordsPerPage: JSON.stringify(route.query) !== '{}' && route.query.pageSize ? route.query.pageSize : 10,
     searchTerm: JSON.stringify(route.query) !== '{}' && route.query.searchTerm ? route.query.searchTerm : '',
     // order: 'ASC',
-    page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? Number(route.query.pageIndex) + 1 :  1
+    page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? Number(route.query.pageIndex) + 1 :  1,
+    isActive: 'true'
   })
 
   const customFilters =  reactive<Record<any, any>>({
@@ -55,12 +56,12 @@
     loanNumber: JSON.stringify(route.query) !== '{}' && route.query.loanNumber ? route.query.loanNumber : '',
     startDate: JSON.stringify(route.query) !== '{}' && route.query.startDate ? new Date(`${route.query.startDate}`).toLocaleDateString('en-CA') : '',
     endDate: JSON.stringify(route.query) !== '{}' && route.query.endDate ? new Date(`${route.query.endDate}`).toLocaleDateString('en-CA') : '',
-    includeInActive: JSON.stringify(route.query) !== '{}' && route.query.includeInActive ? route.query.includeInActive : null,
   })
 
   let queryParams = reactive<Record<any, any>>({
     pageSize: filters.recordsPerPage,
-    pageIndex: filters.page - 1
+    pageIndex: filters.page - 1,
+    isActive: filters.isActive,
   })
 
   const searchLR = (customFilter?: customFiltersType) => {
@@ -90,71 +91,6 @@
     }
 
     router.push({ path: route.path, query: withValues})
-
-    /*if (customFilter) {
-
-
-      /!*let urlString = queryLoanRequests.value
-
-      for (const [key, value] of Object.entries(payload)) {
-        if (value) {
-          if (key == 'startDate' || key == 'endDate') {
-            let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
-            urlString += `&${key}=${theDate}`
-          } else {
-            urlString += `&${key}=${value}`
-          }
-        }
-      }
-
-      console.log(urlString)
-
-      loanRequestStore.fetchLoanRequests(urlString)
-      loanRequestStore.fetchLoanRequestSummary(urlString)*!/
-    } else {
-      const payload = {
-        ...customFilters,
-        ...filters
-      }
-
-      for (const [key, value] of Object.entries(payload)) {
-        if (value) {
-          if (key === 'page') {
-            // pageIndex
-            withValues['pageIndex'] = Number(value) - 1
-          } else if (key === 'recordsPerPage') {
-            // pageSize
-            withValues['pageSize'] = value
-          } else if (key === 'startDate') {
-            withValues[key] = new Date(value).toLocaleDateString('en-US')
-          } else if (key === 'endDate') {
-            withValues[key] = new Date(value).toLocaleDateString('en-US')
-          } else {
-            withValues[key] = value
-          }
-        }
-      }
-
-      router.push({ path: route.path, query: withValues})
-
-      /!*let urlString = queryLoanRequests.value
-
-      for (const [key, value] of Object.entries(payload)) {
-        if (value) {
-          if (key == 'startDate' || key == 'endDate') {
-            let theDate = encodeURIComponent(`${new Date(value).toLocaleDateString('en-US')}`)
-            urlString += `&${key}=${theDate}`
-          } else {
-            urlString += `&${key}=${value}`
-          }
-        }
-      }
-
-      console.log(urlString)
-
-      loanRequestStore.fetchLoanRequests(urlString)
-      loanRequestStore.fetchLoanRequestSummary(urlString)*!/
-    }*/
   }
 
   const refreshNext = (cP: number) => {
