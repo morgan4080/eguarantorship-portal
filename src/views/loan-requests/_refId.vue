@@ -389,7 +389,7 @@
         <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests?pageSize=10&pageIndex=0&isActive=true"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
-            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-text text-sm bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue font-normal rounded-md">
+            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-bg text-sm bg-gray-200 focus:outline-none focus:ring-eg-bg focus:border-eg-bg font-normal rounded-md">
               <option value="">Select Option</option>
               <option value="resubmitForSigning">Resubmit for signing</option>
               <option value="downloadAttachments">Download Attachments</option>

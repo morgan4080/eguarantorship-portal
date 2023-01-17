@@ -2,7 +2,7 @@
   import Breadcrumb from "../../components/Breadcrumb.vue";
   import {useRoute, useRouter} from "vue-router";
   import {computed, onMounted, reactive, ref} from "vue";
-  import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline";
+  import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, PencilIcon} from "@heroicons/vue/24/outline";
   import stores from "../../stores";
   import LoanRequestsTable from "../../components/LoanRequestsTable.vue";
   import Paginator from "../../components/Paginator.vue";
@@ -112,6 +112,10 @@
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
         <div class="flex justify-between items-center">
           <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  :current="`Member ${memberStore.getMemberDetails?.memberNumber}`"/>
+          <router-link :to="{ name: 'MemberEdit', params: { refId: route.params.refId }}" class="inline-flex justify-center items-center space-x-2 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+            <span>Edit Member</span>
+            <PencilIcon class="w-3 h-3" />
+          </router-link>
         </div>
         <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
           <div class="px-4 py-5">

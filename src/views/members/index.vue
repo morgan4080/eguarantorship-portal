@@ -15,7 +15,9 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Paginator from "../../components/Paginator.vue";
 import {required} from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
+import {useRouter} from "vue-router";
 const { memberStore, authStore } = stores;
+const router = useRouter();
 
 const filters = reactive({
   recordsPerPage: 10,
@@ -155,15 +157,21 @@ const pullMember = async () => {
         message: 'Member pulled successfully!',
         success: true
       })
+
+      openPullMemberModal.value = false
+
+      if (submitted.value) {
+        await router.push({name: 'MemberView', params: { refId: submitted.value.refId }})
+      }
     } else {
       authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
         message: 'Member pull error!',
         error: true
       })
-    }
 
-    openPullMemberModal.value = false
+      openPullMemberModal.value = false
+    }
   }
 }
 
@@ -177,7 +185,7 @@ const pullMember = async () => {
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
             <div class="flex space-x-2">
               <button @click="openPullMemberModal = true" type="button" class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Pull Member
+                Pull Member By <Identifier></Identifier>
               </button>
               <DropDown :items="actions">
                 <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
