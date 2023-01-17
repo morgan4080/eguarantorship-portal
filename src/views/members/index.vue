@@ -13,9 +13,10 @@ import DropDown from "../../components/DropDown.vue";
 import stores from "../../stores";
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import Paginator from "../../components/Paginator.vue";
-import {required} from "@vuelidate/validators";
+import {helpers, required} from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import {useRouter} from "vue-router";
+import parsePhoneNumber, {isValidNumberForRegion} from "libphonenumber-js";
 const { memberStore, authStore } = stores;
 const router = useRouter();
 
@@ -106,9 +107,14 @@ const pullForm = reactive({
   force: false
 })
 
+const validPhone = (value: number) => (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? isValidNumberForRegion(`${value}`, 'KE') : true;
+
 const pullFormRules = {
   memberIdentifier: {
     required,
+    validPhone: helpers.withMessage('Please provide a phone number',
+        validPhone
+    )
   },
   identifierType: {
     required,
@@ -147,8 +153,10 @@ const pullMember = async () => {
   const result = await v$.value.$validate()
 
   if (result) {
+    const phoneNumber = (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? parsePhoneNumber(`${pullForm.memberIdentifier}`, 'KE') : null
+
     const [submitted] = await Promise.allSettled([
-      memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
+      memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${ phoneNumber ? `${phoneNumber?.countryCallingCode}${phoneNumber?.nationalNumber}` : pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
     ])
 
     if (submitted.status === 'fulfilled') {
@@ -185,7 +193,7 @@ const pullMember = async () => {
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
             <div class="flex space-x-2">
               <button @click="openPullMemberModal = true" type="button" class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Pull Member By <Identifier></Identifier>
+                Pull Member By Identifier
               </button>
               <DropDown :items="actions">
                 <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">

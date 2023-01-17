@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-
+import ResponseError from "../utils/responseError"
 export interface GuarantorData {
     refId: string,
     memberNumber: string,
@@ -130,6 +130,40 @@ export const useLoanRequest = defineStore('loan-request-store', {
         }
     },
     actions: {
+        async replaceGuarantor(loanRequestRefId: string, guarantorRefId: string, memberRefId: string) {
+            try {
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", `application/json`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${loanRequestRefId}/guarantor/${guarantorRefId}`, {
+                    method: 'POST',
+                    headers: myHeaders,
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        memberRefId
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new ResponseError('Bad fetch response', res)
+                }
+
+                const data = await res.json();
+
+                return Promise.resolve(data);
+
+            } catch (err: any) {
+                switch (err.response.status) {
+                    case 400:
+                        return Promise.reject(`${err.response.status}:`);
+                    case 401:
+                        return Promise.reject(`${err.response.status}:`);
+                    case 404:
+                        return Promise.reject(`${err.response.status}:`);
+                    case 500:
+                        return Promise.reject(`${err.response.status}:`);
+                }
+            }
+        },
         async closeLoanRequest(refId: string) {
             try {
                 const myHeaders = new Headers();
