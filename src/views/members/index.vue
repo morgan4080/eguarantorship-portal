@@ -1,187 +1,241 @@
 <script setup lang="ts">
-import Breadcrumb from "../../components/Breadcrumb.vue";
-import MembersTable from "../../components/MembersTable.vue";
-import {computed, ComputedRef, onMounted, reactive, ref} from "vue";
-import {
-  UserPlusIcon,
-  ArrowUpTrayIcon,
-  ChevronDownIcon,
-} from '@heroicons/vue/20/solid'
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import GlobalSearch from "../../components/GlobalSearch.vue";
-import DropDown from "../../components/DropDown.vue";
-import stores from "../../stores";
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import Paginator from "../../components/Paginator.vue";
-import {helpers, required} from "@vuelidate/validators";
-import useVuelidate from "@vuelidate/core";
-import {useRouter} from "vue-router";
-import parsePhoneNumber, {isValidNumberForRegion} from "libphonenumber-js";
-const { memberStore, authStore } = stores;
-const router = useRouter();
+  import Breadcrumb from "../../components/Breadcrumb.vue";
+  import MembersTable from "../../components/MembersTable.vue";
+  import {computed, ComputedRef, onMounted, reactive, ref} from "vue";
+  import {
+    UserPlusIcon,
+    ArrowUpTrayIcon,
+    ChevronDownIcon,
+  } from '@heroicons/vue/20/solid'
+  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+  import GlobalSearch from "../../components/GlobalSearch.vue";
+  import DropDown from "../../components/DropDown.vue";
+  import stores from "../../stores";
+  import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+  import Paginator from "../../components/Paginator.vue";
+  import {helpers, required} from "@vuelidate/validators";
+  import useVuelidate from "@vuelidate/core";
+  import {useRouter} from "vue-router";
+  import parsePhoneNumber, {isValidNumberForRegion} from "libphonenumber-js";
+  const { memberStore, authStore } = stores;
+  const router = useRouter();
 
-const filters = reactive({
-  recordsPerPage: 10,
-  searchTerm: '',
-  page: 1
-})
+  const filters = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    page: 1
+  })
 
-const queryMembers: ComputedRef<string> = computed(() => {
-  return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
-})
+  const queryMembers: ComputedRef<string> = computed(() => {
+    return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+  })
 
-const searchMembers = (customFilters?: {searchTerm?: string}) => {
-  if (customFilters) {
-    const { searchTerm } = customFilters
-    if (searchTerm) {
-      memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
+  const searchMembers = (customFilters?: {searchTerm?: string}) => {
+    if (customFilters) {
+      const { searchTerm } = customFilters
+      if (searchTerm) {
+        memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
+      } else {
+        memberStore.fetchMembers(queryMembers.value)
+      }
     } else {
       memberStore.fetchMembers(queryMembers.value)
     }
-  } else {
-    memberStore.fetchMembers(queryMembers.value)
   }
-}
 
-const refreshNext = (cP: number) => {
-  filters.page = cP + 1;
-  searchMembers();
-}
-const refreshPrev = (cP: number) => {
-  filters.page = cP - 1;
-  searchMembers();
-}
-const refreshCurrent = () => {
-  searchMembers();
-}
-const actions = [
-  {
-    id: 1,
-    name: 'Create Member',
-    icon: UserPlusIcon,
-    href: '/members/create'
-  },
-  {
-    id: 2,
-    name: 'Import Members',
-    icon: ArrowUpTrayIcon,
-    href: '/members/import'
+  const refreshNext = (cP: number) => {
+    filters.page = cP + 1;
+    searchMembers();
   }
-]
+  const refreshPrev = (cP: number) => {
+    filters.page = cP - 1;
+    searchMembers();
+  }
+  const refreshCurrent = () => {
+    searchMembers();
+  }
+  const actions = [
+    {
+      id: 1,
+      name: 'Create Member',
+      icon: UserPlusIcon,
+      href: '/members/create'
+    },
+    {
+      id: 2,
+      name: 'Import Members',
+      icon: ArrowUpTrayIcon,
+      href: '/members/import'
+    }
+  ]
 
-onMounted(async () => {
-  await Promise.all([
-    memberStore.fetchMembersSummary(),
-    memberStore.fetchMembers(queryMembers.value),
-  ])
-})
+  onMounted(async () => {
+    await Promise.all([
+      memberStore.fetchMembersSummary(),
+      memberStore.fetchMembers(queryMembers.value),
+    ])
+  })
 
-const exportMembers = async (all?: any) => {
-  if (all === 'all') {
-    if (confirm("You are about to export all member data. Proceed?")) {
-      const maxValue = 2147483647;
-      const url = await memberStore.exportMembers(`?pageSize=${maxValue}`);
+  const exportMembers = async (all?: any) => {
+    if (all === 'all') {
+      if (confirm("You are about to export all member data. Proceed?")) {
+        const maxValue = 2147483647;
+        const url = await memberStore.exportMembers(`?pageSize=${maxValue}`);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', new Date() + 'all-members.csv');
+        document.body.appendChild(link);
+        link.click();
+      }
+    } else {
+      const url = await memberStore.exportMembers(queryMembers.value)
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', new Date() + 'all-members.csv');
+      link.setAttribute('download', new Date() + 'filtered-members.csv');
       document.body.appendChild(link);
       link.click();
     }
-  } else {
-    const url = await memberStore.exportMembers(queryMembers.value)
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', new Date() + 'filtered-members.csv');
-    document.body.appendChild(link);
-    link.click();
   }
-}
 
-const openPullMemberModal = ref(false)
+  const openPullMemberModal = ref(false)
 
-// /core-banking/member-details?memberIdentifier=ss&identifierType=EMAIL&force=false
+  // /core-banking/member-details?memberIdentifier=ss&identifierType=EMAIL&force=false
 
-const pullForm = reactive({
-  memberIdentifier: null,
-  identifierType: null,
-  force: false
-})
+  const pullForm = reactive({
+    memberIdentifier: null,
+    identifierType: null,
+    force: false
+  })
 
-const validPhone = (value: number) => (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? isValidNumberForRegion(`${value}`, 'KE') : true;
+  const validPhone = (value: number) => (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? isValidNumberForRegion(`${value}`, 'KE') : true;
 
-const pullFormRules = {
-  memberIdentifier: {
-    required,
-    validPhone: helpers.withMessage('Please provide a phone number',
-        validPhone
-    )
-  },
-  identifierType: {
-    required,
-  },
-  force: {
-    required,
-  },
-}
-
-const v$ = useVuelidate(pullFormRules, pullForm, { $lazy: true, $autoDirty: true})
-
-const identifierTypes = ref([
-  {
-    id: 1,
-    name: 'Email',
-    value: 'EMAIL'
-  },
-  {
-    id: 2,
-    name: 'ID Number',
-    value: 'ID_NUMBER'
-  },
-  {
-    id: 3,
-    name: 'Phone Number',
-    value: 'PHONE_NUMBER'
-  },
-  {
-    id: 4,
-    name: 'Member Number',
-    value: 'MEMBER_NUMBER'
+  const pullFormRules = {
+    memberIdentifier: {
+      required,
+      validPhone: helpers.withMessage('Please provide a phone number',
+          validPhone
+      )
+    },
+    identifierType: {
+      required,
+    },
+    force: {
+      required,
+    },
   }
-])
 
-const pullMember = async () => {
-  const result = await v$.value.$validate()
+  const v$ = useVuelidate(pullFormRules, pullForm, { $lazy: true, $autoDirty: true})
 
-  if (result) {
-    const phoneNumber = (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? parsePhoneNumber(`${pullForm.memberIdentifier}`, 'KE') : null
+  const identifierTypes = ref([
+    {
+      id: 1,
+      name: 'Email',
+      value: 'EMAIL'
+    },
+    {
+      id: 2,
+      name: 'ID Number',
+      value: 'ID_NUMBER'
+    },
+    {
+      id: 3,
+      name: 'Phone Number',
+      value: 'PHONE_NUMBER'
+    },
+    {
+      id: 4,
+      name: 'Member Number',
+      value: 'MEMBER_NUMBER'
+    }
+  ])
 
-    const [submitted] = await Promise.allSettled([
-      memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${ phoneNumber ? `${phoneNumber?.countryCallingCode}${phoneNumber?.nationalNumber}` : pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
-    ])
+  const pullMember = async () => {
+    const result = await v$.value.$validate()
 
-    if (submitted.status === 'fulfilled') {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Member pulled successfully!',
-        success: true
-      })
+    if (result) {
+      const phoneNumber = (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? parsePhoneNumber(`${pullForm.memberIdentifier}`, 'KE') : null
 
-      openPullMemberModal.value = false
+      const [submitted] = await Promise.allSettled([
+        memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${ phoneNumber ? `${phoneNumber?.countryCallingCode}${phoneNumber?.nationalNumber}` : pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
+      ])
 
-      if (submitted.value) {
-        await router.push({name: 'MemberView', params: { refId: submitted.value.refId }})
+      if (submitted.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member pulled successfully!',
+          success: true
+        })
+
+        openPullMemberModal.value = false
+
+        if (submitted.value) {
+          await router.push({name: 'MemberView', params: { refId: submitted.value.refId }})
+        }
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member pull error!',
+          error: true
+        })
+
+        openPullMemberModal.value = false
       }
-    } else {
-      authStore.defineNotification({
-        id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-        message: 'Member pull error!',
-        error: true
-      })
-
-      openPullMemberModal.value = false
     }
   }
-}
+
+  const openMemberTransferModal = ref<boolean>(false)
+
+  const memberTransferForm = reactive({
+    joinDate: null,
+    endDate: null
+  })
+
+  const memberTransferFormRules = {
+    joinDate: {
+      required,
+    },
+    endDate: {
+      required,
+    },
+  }
+
+  const v1$ = useVuelidate(memberTransferFormRules, memberTransferForm, { $lazy: true, $autoDirty: true})
+
+  const initMemberTransfer = async () => {
+    const result = await v1$.value.$validate()
+
+    if (result && confirm("You ae about to initiate member transfers. Proceed?") && memberTransferForm.joinDate && memberTransferForm.endDate) {
+      const urlParams = new URLSearchParams();
+      urlParams.set("joinDate", memberTransferForm.joinDate);
+      urlParams.set("endDate", memberTransferForm.endDate);
+
+      const [submitted] = await Promise.allSettled([
+        memberStore.initMemberTransfers(urlParams.toString())
+      ])
+
+      if (submitted.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member transfers initiated successfully!',
+          success: true
+        })
+
+        openMemberTransferModal.value = false
+
+        console.log(submitted.value)
+
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member transfers failed to initiated!',
+          error: true
+        })
+
+        openMemberTransferModal.value = false
+      }
+
+    }
+  }
 
 </script>
 <template>
@@ -192,8 +246,11 @@ const pullMember = async () => {
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
             <div class="flex space-x-2">
-              <button @click="openPullMemberModal = true" type="button" class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Pull Member By Identifier
+              <button @click="openMemberTransferModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                Init Transfers
+              </button>
+              <button @click="openPullMemberModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                Pull Member
               </button>
               <DropDown :items="actions">
                 <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
@@ -329,6 +386,7 @@ const pullMember = async () => {
         </div>
       </div>
     </main>
+
     <TransitionRoot as="template" :show="openPullMemberModal">
       <Dialog as="div" class="relative z-10" @close="openPullMemberModal = false">
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
@@ -372,8 +430,53 @@ const pullMember = async () => {
                       </div>
                     </div>
                     <div>
-                      <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">Sumbit</button>
+                      <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">Submit</button>
                     </div>
+                  </form>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+
+    <TransitionRoot as="template" :show="openMemberTransferModal">
+      <Dialog as="div" class="relative z-10" @close="openMemberTransferModal = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Initialize Member Transfers</DialogTitle>
+                <div class="mt-4">
+                  <form @submit.prevent="initMemberTransfer" class="space-y-6">
+
+                    <div class="grid grid-cols-6 gap-6">
+
+                      <div class="col-span-6">
+                        <label for="joinDate" class="block text-sm font-medium text-gray-700">Join Date</label>
+                        <input v-model="memberTransferForm.joinDate" id="joinDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                        <div class="input-errors" v-for="(error, index) of v1$.joinDate.$errors" :key="index">
+                          <div class="text-xs text-red-400">{{ error.$message }}</div>
+                        </div>
+                      </div>
+
+                      <div class="col-span-6">
+                        <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input v-model="memberTransferForm.endDate" id="endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                        <div class="input-errors" v-for="(error, index) of v1$.endDate.$errors" :key="index">
+                          <div class="text-xs text-red-400">{{ error.$message }}</div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">Submit</button>
+
                   </form>
                 </div>
               </DialogPanel>

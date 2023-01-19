@@ -211,7 +211,7 @@ export const useLoanRequest = defineStore('loan-request-store', {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}/retry?sendNotification=${sendNotification}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${refId}/sign?sendNotification=${sendNotification}`, {
                     method: 'POST',
                     headers: myHeaders,
                     credentials: 'include',
