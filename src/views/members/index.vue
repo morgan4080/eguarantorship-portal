@@ -174,8 +174,8 @@
       } else {
         authStore.defineNotification({
           id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Member pull error!',
-          error: true
+          message: 'Member Not Found!',
+          warning: true
         })
 
         openPullMemberModal.value = false
@@ -210,7 +210,7 @@
       urlParams.set("endDate", memberTransferForm.endDate);
 
       const [submitted] = await Promise.allSettled([
-        memberStore.initMemberTransfers(urlParams.toString())
+        memberStore.initMemberTransfers(`?${urlParams.toString()}`)
       ])
 
       if (submitted.status === 'fulfilled') {
