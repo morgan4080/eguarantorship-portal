@@ -94,7 +94,7 @@ export const useMember = defineStore('member-store', {
                     throw new ResponseError('Bad fetch response', response)
                 }
 
-                const data = await response.json();
+                const data = await response.text();
 
                 return Promise.resolve(data);
             } catch (err: any) {

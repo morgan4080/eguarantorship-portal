@@ -216,18 +216,16 @@
       if (submitted.status === 'fulfilled') {
         authStore.defineNotification({
           id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Member transfers initiated successfully!',
+          message: `Member transfers ${submitted.value}!`,
           success: true
         })
 
         openMemberTransferModal.value = false
 
-        console.log(submitted.value)
-
       } else {
         authStore.defineNotification({
           id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Member transfers failed to initiated!',
+          message: 'Member transfers failed to initiate!',
           error: true
         })
 
