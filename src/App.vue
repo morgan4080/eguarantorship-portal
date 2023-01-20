@@ -8,7 +8,7 @@ const authStore = stores.authStore
 </script>
 
 <template>
-  <TheNavBar class="fixed w-screen" />
+  <TheNavBar />
   <div class="flex min-h-screen" >
     <TheSideBar v-if="$route.name !== 'Landing' && $route.name !== 'Password-Reset'" />
     <router-view></router-view>

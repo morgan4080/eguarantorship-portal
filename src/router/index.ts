@@ -5,8 +5,8 @@ const isClient = typeof window !== 'undefined'
 // https://router.vuejs.org/guide/advanced/meta.html
 
 const routes = [
-    { path:'/', name: 'Home', redirect: '/loan-requests' /*component: () => import("@/views/HomePage.vue"), meta: { requiresAuth: true }*/ },
-    { path:'/dashboard', redirect: '/loan-requests' /*name: 'Dashboard', component: () => import("@/views/HomePage.vue"), meta: { requiresAuth: true }*/ },
+    { path:'/', name: 'Home', redirect: '/loan-requests?pageSize=10&pageIndex=0&isActive=true' /*component: () => import("@/views/HomePage.vue"), meta: { requiresAuth: true }*/ },
+    { path:'/dashboard', redirect: '/loan-requests?pageSize=10&pageIndex=0&isActive=true' /*name: 'Dashboard', component: () => import("@/views/HomePage.vue"), meta: { requiresAuth: true }*/ },
     { path:'/loan-requests', name: 'LoanRequests', component: () => import("@/views/loan-requests/index.vue"), meta: { requiresAuth: true } },
     { path:'/loan-requests/:refId/view', name: 'LoanRequestsView', component: () => import("@/views/loan-requests/_refId.vue"), meta: { requiresAuth: true } },
     { path:'/members', name: 'Members', component: () => import("@/views/members/index.vue"), meta: { requiresAuth: true } },

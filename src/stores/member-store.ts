@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import {PaginationData} from "./loan-request-store";
+import ResponseError from "../utils/responseError";
 export interface Member {
     isTermsAccepted: boolean
     refId: string
@@ -82,6 +83,50 @@ export const useMember = defineStore('member-store', {
         }
     },
     actions: {
+        async initMemberTransfers(params: string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/core-banking/init-member-transfers${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new ResponseError('Bad fetch response', response)
+                }
+
+                const data = await response.text();
+
+                return Promise.resolve(data);
+            } catch (err: any) {
+                switch (err.response.status) {
+                    case 400:
+                        return Promise.reject(`${err.response.status}: ${err.response.message}`);
+                    case 401:
+                        return Promise.reject(`${err.response.status}: ${err.response.message}`);
+                    case 404:
+                        return Promise.reject(`${err.response.status}: ${err.response.message}`);
+                    case 500:
+                        return Promise.reject(`${err.response.status}: ${err.response.message}`);
+                }
+            }
+        },
+        async getCo_bankingMemberDetails(params?:string) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/core-banking/member-details${params ? params : ''}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const content = await response.json();
+                    return Promise.resolve(content);
+                } else {
+                    return Promise.reject(`${response.status}: Failed to get member.`);
+                }
+            } catch (e: any) {
+                console.error("ge",  e);
+                return Promise.reject(e.message);
+            }
+        },
         async exportMembers(params?:string) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/members${params ? params : ''}`, {

@@ -1,109 +1,262 @@
 <script setup lang="ts">
-import Breadcrumb from "../../components/Breadcrumb.vue";
-import MembersTable from "../../components/MembersTable.vue";
-import {computed, ComputedRef, onMounted, reactive} from "vue";
-import {
-  UserPlusIcon,
-  ArrowUpTrayIcon,
-  ChevronDownIcon,
-} from '@heroicons/vue/20/solid'
-import GlobalSearch from "../../components/GlobalSearch.vue";
-import DropDown from "../../components/DropDown.vue";
-import stores from "../../stores";
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import Paginator from "../../components/Paginator.vue";
-const { memberStore } = stores;
+  import Breadcrumb from "../../components/Breadcrumb.vue";
+  import MembersTable from "../../components/MembersTable.vue";
+  import {computed, ComputedRef, onMounted, reactive, ref} from "vue";
+  import {
+    UserPlusIcon,
+    ArrowUpTrayIcon,
+    ChevronDownIcon,
+  } from '@heroicons/vue/20/solid'
+  import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+  import GlobalSearch from "../../components/GlobalSearch.vue";
+  import DropDown from "../../components/DropDown.vue";
+  import stores from "../../stores";
+  import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+  import Paginator from "../../components/Paginator.vue";
+  import {helpers, required} from "@vuelidate/validators";
+  import useVuelidate from "@vuelidate/core";
+  import {useRouter} from "vue-router";
+  import parsePhoneNumber, {isValidNumberForRegion} from "libphonenumber-js";
+  const { memberStore, authStore } = stores;
+  const router = useRouter();
 
-const filters = reactive({
-  recordsPerPage: 10,
-  searchTerm: '',
-  page: 1
-})
+  const filters = reactive({
+    recordsPerPage: 10,
+    searchTerm: '',
+    page: 1
+  })
 
-const queryMembers: ComputedRef<string> = computed(() => {
-  return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
-})
+  const queryMembers: ComputedRef<string> = computed(() => {
+    return (`?pageSize=${filters.recordsPerPage}&pageIndex=${filters.page - 1}`)
+  })
 
-const searchMembers = (customFilters?: {searchTerm?: string}) => {
-  if (customFilters) {
-    const { searchTerm } = customFilters
-    if (searchTerm) {
-      memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
+  const searchMembers = (customFilters?: {searchTerm?: string}) => {
+    if (customFilters) {
+      const { searchTerm } = customFilters
+      if (searchTerm) {
+        memberStore.fetchMembers(`${queryMembers.value}&searchTerm=${searchTerm}`)
+      } else {
+        memberStore.fetchMembers(queryMembers.value)
+      }
     } else {
       memberStore.fetchMembers(queryMembers.value)
     }
-  } else {
-    memberStore.fetchMembers(queryMembers.value)
   }
-}
 
-const refreshNext = (cP: number) => {
-  filters.page = cP + 1;
-  searchMembers();
-}
-const refreshPrev = (cP: number) => {
-  filters.page = cP - 1;
-  searchMembers();
-}
-const refreshCurrent = () => {
-  searchMembers();
-}
-const actions = [
-  {
-    id: 1,
-    name: 'Create Member',
-    icon: UserPlusIcon,
-    href: '/members/create'
-  },
-  {
-    id: 2,
-    name: 'Import Members',
-    icon: ArrowUpTrayIcon,
-    href: '/members/import'
+  const refreshNext = (cP: number) => {
+    filters.page = cP + 1;
+    searchMembers();
   }
-]
+  const refreshPrev = (cP: number) => {
+    filters.page = cP - 1;
+    searchMembers();
+  }
+  const refreshCurrent = () => {
+    searchMembers();
+  }
+  const actions = [
+    {
+      id: 1,
+      name: 'Create Member',
+      icon: UserPlusIcon,
+      href: '/members/create'
+    },
+    {
+      id: 2,
+      name: 'Import Members',
+      icon: ArrowUpTrayIcon,
+      href: '/members/import'
+    }
+  ]
 
-onMounted(async () => {
-  await Promise.all([
-    memberStore.fetchMembersSummary(),
-    memberStore.fetchMembers(queryMembers.value),
-  ])
-})
+  onMounted(async () => {
+    await Promise.all([
+      memberStore.fetchMembersSummary(),
+      memberStore.fetchMembers(queryMembers.value),
+    ])
+  })
 
-const exportMembers = async (all?: any) => {
-  if (all === 'all') {
-    if (confirm("You are about to export all member data. Proceed?")) {
-      const maxValue = 2147483647;
-      const url = await memberStore.exportMembers(`?pageSize=${maxValue}`);
+  const exportMembers = async (all?: any) => {
+    if (all === 'all') {
+      if (confirm("You are about to export all member data. Proceed?")) {
+        const maxValue = 2147483647;
+        const url = await memberStore.exportMembers(`?pageSize=${maxValue}`);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', new Date() + 'all-members.csv');
+        document.body.appendChild(link);
+        link.click();
+      }
+    } else {
+      const url = await memberStore.exportMembers(queryMembers.value)
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', new Date() + 'all-members.csv');
+      link.setAttribute('download', new Date() + 'filtered-members.csv');
       document.body.appendChild(link);
       link.click();
     }
-  } else {
-    const url = await memberStore.exportMembers(queryMembers.value)
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', new Date() + 'filtered-members.csv');
-    document.body.appendChild(link);
-    link.click();
   }
-}
+
+  const openPullMemberModal = ref(false)
+
+  // /core-banking/member-details?memberIdentifier=ss&identifierType=EMAIL&force=false
+
+  const pullForm = reactive({
+    memberIdentifier: null,
+    identifierType: null,
+    force: false
+  })
+
+  const validPhone = (value: number) => (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? isValidNumberForRegion(`${value}`, 'KE') : true;
+
+  const pullFormRules = {
+    memberIdentifier: {
+      required,
+      validPhone: helpers.withMessage('Please provide a phone number',
+          validPhone
+      )
+    },
+    identifierType: {
+      required,
+    },
+    force: {
+      required,
+    },
+  }
+
+  const v$ = useVuelidate(pullFormRules, pullForm, { $lazy: true, $autoDirty: true})
+
+  const identifierTypes = ref([
+    {
+      id: 1,
+      name: 'Email',
+      value: 'EMAIL'
+    },
+    {
+      id: 2,
+      name: 'ID Number',
+      value: 'ID_NUMBER'
+    },
+    {
+      id: 3,
+      name: 'Phone Number',
+      value: 'PHONE_NUMBER'
+    },
+    {
+      id: 4,
+      name: 'Member Number',
+      value: 'MEMBER_NUMBER'
+    }
+  ])
+
+  const pullMember = async () => {
+    const result = await v$.value.$validate()
+
+    if (result) {
+      const phoneNumber = (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? parsePhoneNumber(`${pullForm.memberIdentifier}`, 'KE') : null
+
+      const [submitted] = await Promise.allSettled([
+        memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${ phoneNumber ? `${phoneNumber?.countryCallingCode}${phoneNumber?.nationalNumber}` : pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
+      ])
+
+      if (submitted.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member pulled successfully!',
+          success: true
+        })
+
+        openPullMemberModal.value = false
+
+        if (submitted.value) {
+          await router.push({name: 'MemberView', params: { refId: submitted.value.refId }})
+        }
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member Not Found!',
+          warning: true
+        })
+
+        openPullMemberModal.value = false
+      }
+    }
+  }
+
+  const openMemberTransferModal = ref<boolean>(false)
+
+  const memberTransferForm = reactive({
+    joinDate: null,
+    endDate: null
+  })
+
+  const memberTransferFormRules = {
+    joinDate: {
+      required,
+    },
+    endDate: {
+      required,
+    },
+  }
+
+  const v1$ = useVuelidate(memberTransferFormRules, memberTransferForm, { $lazy: true, $autoDirty: true})
+
+  const initMemberTransfer = async () => {
+    const result = await v1$.value.$validate()
+
+    if (result && confirm("You ae about to initiate member transfers. Proceed?") && memberTransferForm.joinDate && memberTransferForm.endDate) {
+      const urlParams = new URLSearchParams();
+      urlParams.set("joinDate", memberTransferForm.joinDate);
+      urlParams.set("endDate", memberTransferForm.endDate);
+
+      const [submitted] = await Promise.allSettled([
+        memberStore.initMemberTransfers(`?${urlParams.toString()}`)
+      ])
+
+      if (submitted.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: `Member transfers ${submitted.value}!`,
+          success: true
+        })
+
+        openMemberTransferModal.value = false
+
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member transfers failed to initiate!',
+          error: true
+        })
+
+        openMemberTransferModal.value = false
+      }
+
+    }
+  }
+
 </script>
 <template>
-  <div class="flex flex-1 flex-col md:pl-24">
+  <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-5">
+      <div class="pt-2 pb-16">
+        <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
-            <DropDown :items="actions">
-              <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Actions
-                <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-              </MenuButton>
-            </DropDown>
+            <div class="flex space-x-2">
+              <button @click="openMemberTransferModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                Init Transfers
+              </button>
+              <button @click="openPullMemberModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                Pull Member
+              </button>
+              <DropDown :items="actions">
+                <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
+                  Actions
+                  <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+                </MenuButton>
+              </DropDown>
+            </div>
           </div>
           <div class="sm:grid sm:grid-cols-4 sm:gap-2">
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
@@ -191,7 +344,7 @@ const exportMembers = async (all?: any) => {
             <div class="mt-0 ml-16 flex flex-wrap space-x-4">
               <Menu as="div" class="relative inline-block text-left">
                 <div>
-                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
                     <span class="sr-only">export requests options</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
@@ -231,5 +384,104 @@ const exportMembers = async (all?: any) => {
         </div>
       </div>
     </main>
+
+    <TransitionRoot as="template" :show="openPullMemberModal">
+      <Dialog as="div" class="relative z-10" @close="openPullMemberModal = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Pull Member</DialogTitle>
+                <div class="mt-4">
+                  <form @submit.prevent="pullMember" class="space-y-6">
+                    <div>
+                      <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6">
+                          <label for="template-name" class="block text-sm font-medium text-gray-700">Template Name</label>
+                          <select v-model="pullForm.identifierType" id="template-name" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                            <option :value="null">-Select Identifier Type-</option>
+                            <option v-for="(option, i) in identifierTypes" :key="`${option.id}${i}`" :value="option.value">{{ option.name }}</option>
+                          </select>
+                          <div class="input-errors" v-for="(error, index) of v$.identifierType.$errors" :key="index">
+                            <div class="text-xs text-red-400">{{ error.$message }}</div>
+                          </div>
+                        </div>
+                        <div class="col-span-6">
+                          <label for="name" class="block text-sm font-medium text-gray-700">Member Identifier</label>
+                          <input v-model="pullForm.memberIdentifier" id="name" type="text" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                          <div class="input-errors" v-for="(error, index) of v$.memberIdentifier.$errors" :key="index">
+                            <div class="text-xs text-red-400">{{ error.$message }}</div>
+                          </div>
+                        </div>
+                        <div class="col-span-6">
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                              <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                              <label for="pull-cb" class="ml-2 block text-sm text-gray-900">Pull from co-banking</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">Submit</button>
+                    </div>
+                  </form>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+
+    <TransitionRoot as="template" :show="openMemberTransferModal">
+      <Dialog as="div" class="relative z-10" @close="openMemberTransferModal = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Initialize Member Transfers</DialogTitle>
+                <div class="mt-4">
+                  <form @submit.prevent="initMemberTransfer" class="space-y-6">
+
+                    <div class="grid grid-cols-6 gap-6">
+
+                      <div class="col-span-6">
+                        <label for="joinDate" class="block text-sm font-medium text-gray-700">Join Date</label>
+                        <input v-model="memberTransferForm.joinDate" id="joinDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                        <div class="input-errors" v-for="(error, index) of v1$.joinDate.$errors" :key="index">
+                          <div class="text-xs text-red-400">{{ error.$message }}</div>
+                        </div>
+                      </div>
+
+                      <div class="col-span-6">
+                        <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input v-model="memberTransferForm.endDate" id="endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                        <div class="input-errors" v-for="(error, index) of v1$.endDate.$errors" :key="index">
+                          <div class="text-xs text-red-400">{{ error.$message }}</div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <button type="submit" class="flex w-full justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">Submit</button>
+
+                  </form>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </div>
 </template>

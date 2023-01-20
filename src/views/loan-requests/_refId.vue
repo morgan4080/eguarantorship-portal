@@ -4,10 +4,13 @@
   import {useRoute, useRouter} from "vue-router";
   import {computed, ComputedRef, onMounted, reactive, ref, watch} from "vue";
   import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+  import { ExclamationCircleIcon, ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, XMarkIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
   import Breadcrumb from "../../components/Breadcrumb.vue";
   import {GuarantorData} from "../../stores/loan-request-store";
-  const { loanRequestStore, authStore } = stores;
+  import {alphaNum, email, helpers, numeric, required, requiredIf} from "@vuelidate/validators";
+  import useVuelidate from "@vuelidate/core";
+  import parsePhoneNumber, {isValidNumberForRegion} from "libphonenumber-js";
+  const { loanRequestStore, authStore, memberStore } = stores;
   const router = useRouter();
   const route = useRoute();
 
@@ -26,7 +29,7 @@
     totalDeposits: number
   }
 
-  onMounted(async () => {
+  const reloadLR = async () => {
     await Promise.all([
       loanRequestStore.fetchLoanRequest(`${route.params.refId}`)
     ])
@@ -39,6 +42,10 @@
           .duration(750)
           .call(arcTween, (2 * Math.PI) * loanRequestStore.getLoanRequest.loanRequestProgress / 100, arc());
     }
+  }
+
+  onMounted(async () => {
+    await reloadLR()
   })
 
   const getSVG = () => {
@@ -69,7 +76,7 @@
     return (
         getSVG().append("path")
             .datum({endAngle: 0})
-            .style("fill", "#459aab")
+            .style("fill", "#2A3F54")
             .attr("d", arc())
     )
   };
@@ -381,15 +388,138 @@
     }
   })
 
+  const showReplaceModal = ref(false)
+
+  const guarantor2Replace = ref<GuarantorData | null>(null)
+
+  const newGuarantor = ref<GuarantorData | null>(null)
+
+  const selectGuarantorToReplace = (guarantor: GuarantorData) => {
+    guarantor2Replace.value = guarantor;
+    showReplaceModal.value = true;
+  }
+
+  const pullForm = reactive({
+    memberIdentifier: null,
+    identifierType: null,
+    force: false
+  })
+
+  const validPhone = (value: number) => (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? isValidNumberForRegion(`${value}`, 'KE') : true;
+
+  const pullFormRules = {
+    memberIdentifier: {
+      required,
+      validPhone: helpers.withMessage('Please provide a phone number',
+          validPhone
+      )
+    },
+    identifierType: {
+      required,
+    },
+    force: {
+      required,
+    },
+  }
+
+  const v$ = useVuelidate(pullFormRules, pullForm, { $lazy: true, $autoDirty: true})
+
+  const identifierTypes = ref([
+    {
+      id: 1,
+      name: 'Email',
+      value: 'EMAIL'
+    },
+    {
+      id: 2,
+      name: 'ID Number',
+      value: 'ID_NUMBER'
+    },
+    {
+      id: 3,
+      name: 'Phone Number',
+      value: 'PHONE_NUMBER'
+    },
+    {
+      id: 4,
+      name: 'Member Number',
+      value: 'MEMBER_NUMBER'
+    }
+  ])
+
+  const pullMember = async () => {
+    const result = await v$.value.$validate()
+
+    if (result) {
+      const phoneNumber = (pullForm.identifierType && pullForm.identifierType === 'PHONE_NUMBER') ? parsePhoneNumber(`${pullForm.memberIdentifier}`, 'KE') : null
+
+      const [submitted] = await Promise.allSettled([
+        memberStore.getCo_bankingMemberDetails(`?memberIdentifier=${ phoneNumber ? `${phoneNumber?.countryCallingCode}${phoneNumber?.nationalNumber}` : pullForm.memberIdentifier}&identifierType=${pullForm.identifierType}&force=${pullForm.force}`)
+      ])
+
+      if (submitted.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Member pulled successfully!',
+          success: true
+        })
+
+        newGuarantor.value = submitted.value
+
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: `Member with identifier '${pullForm.memberIdentifier}' was not found!`,
+          warning: true
+        })
+      }
+    }
+  }
+
+  const resetPullForm = () => {
+    newGuarantor.value = null
+    pullForm.memberIdentifier = null
+    pullForm.identifierType = null
+    pullForm.force = false
+  }
+
+  const replaceGuarantor = async () => {
+    if (guarantor2Replace.value && newGuarantor.value && confirm(`Are you sure you want to replace ${guarantor2Replace.value.memberNumber} with ${newGuarantor.value.memberNumber} as guarantor?`)) {
+      const loanRequestRefId = route.params.refId
+      const guarantorRefId = guarantor2Replace.value?.refId
+      const memberRefId = newGuarantor.value?.refId
+
+      const [replaced] = await Promise.allSettled([
+        loanRequestStore.replaceGuarantor(`${loanRequestRefId}`, `${guarantorRefId}`, `${memberRefId}`)
+      ])
+
+      if (replaced.status === 'fulfilled') {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Guarantor replaced successfully!',
+          success: true
+        })
+        showReplaceModal.value = false
+        await reloadLR()
+      } else {
+        authStore.defineNotification({
+          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+          message: 'Could not replace guarantor!',
+          error: true
+        })
+      }
+    }
+  }
+
 </script>
 <template>
-  <div class="flex flex-1 flex-col md:pl-24">
+  <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="py-16">
-        <div class="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-5">
+      <div class="pt-2 pb-16">
+        <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
-            <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
-            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-text text-sm bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue font-normal rounded-md">
+            <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests?pageSize=10&pageIndex=0&isActive=true"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
+            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-bg text-sm bg-gray-200 focus:outline-none focus:ring-eg-bg focus:border-eg-bg font-normal rounded-md">
               <option value="">Select Option</option>
               <option value="resubmitForSigning">Resubmit for signing</option>
               <option value="downloadAttachments">Download Attachments</option>
@@ -414,7 +544,7 @@
                       alt="Loan Application Form"
                       class="w-64"
                   >
-                  <button @click="downloadLoanRequestForm" type="button" class="absolute bottom-2 inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
+                  <button @click="downloadLoanRequestForm" type="button" class="absolute bottom-2 inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                     </svg>
@@ -425,45 +555,12 @@
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-64 h-64 text-red-400">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                   </svg>
-                  <button @click="openErrorModal = true" type="button" class="absolute bottom-2 inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
+                  <button @click="openErrorModal = true" type="button" class="absolute bottom-2 inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                     </svg>
                     SHOW ERROR DETAILS
                   </button>
-
-                  <TransitionRoot as="template" :show="openErrorModal">
-                    <Dialog as="div" class="relative z-10" @close="openErrorModal = false">
-                      <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-                      </TransitionChild>
-
-                      <div class="fixed inset-0 z-10 overflow-y-auto">
-                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                            <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                              <div>
-                                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                                  <ExclamationCircleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
-                                </div>
-                                <div class="mt-3 text-center sm:mt-5">
-                                  <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Loan Request Error</DialogTitle>
-                                  <div class="mt-2">
-                                    <p class="text-sm text-gray-500">
-                                      {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
-                                    </p>
-                                    <p class="text-sm text-gray-500">
-                                      {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.readableErrorMessage) ? loanRequestStore.getLoanRequest.readableErrorMessage : "" }}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </DialogPanel>
-                          </TransitionChild>
-                        </div>
-                      </div>
-                    </Dialog>
-                  </TransitionRoot>
                 </div>
               </aside>
 
@@ -478,6 +575,10 @@
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-gray-500">Application Date</dt>
                       <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanDate }}</dd>
+                    </div>
+                    <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
+                      <dt class="text-sm font-medium text-gray-500">Applicant Signed</dt>
+                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.applicantSigned }}</dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-gray-500">Member No.</dt>
@@ -552,7 +653,7 @@
                   </div>
                 </div>
 
-                <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mt-14 items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 sm:text-sm">
+                <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mt-14 items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:text-sm">
                   Other Details
                   <ChevronDownIcon class="h-4 w-4 ml-2 text-gray-600"/>
                 </button>
@@ -579,12 +680,12 @@
                           <div v-for="(key, i) in LRDetails" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3 sm:px-6">
                             <dt class="text-sm font-medium text-gray-500">
                               <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                                <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                               </div>
                             </dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                               <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                <input :disabled="!otherDetailsEdit" required v-model="form.details[key].value" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                                <input :disabled="!otherDetailsEdit" required v-model="form.details[key].value" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
                               </div>
                             </dd>
                             <dd v-if="otherDetailsEdit" class="mt-1 text-sm text-gray-900 sm:mt-0">
@@ -638,14 +739,14 @@
                 <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessName ? loanRequestStore.getLoanRequest.witnessName : '' }}</td>
                 <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
                   <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessMemberNo" class="flex items-center relative">
-                    <div class="w-full border border-eg-lightblue h-2 rounded-full flex">
-                      <div :style="{ width: hrWidth2() + '%' }" class="bg-eg-lightblue"></div>
+                    <div class="w-full border border-eg-bg h-2 rounded-full flex">
+                      <div :style="{ width: hrWidth2() + '%' }" class="bg-eg-bg"></div>
                     </div>
 
-                    <div class="w-4 bg-eg-lightblue h-4 left-0 rounded-full absolute"></div>
-                    <span class="left-0 rounded-full mt-10 -ml-5 text-xxs text-eg-lightblue absolute">Accepted</span>
-                    <div class="w-4 bg-eg-lightblue h-4 right-0 rounded-full absolute"></div>
-                    <span class="right-0 rounded-full mt-10 -ml-2 text-xxs text-eg-lightblue absolute">Signed</span>
+                    <div class="w-4 bg-eg-bg h-4 left-0 rounded-full absolute"></div>
+                    <span class="left-0 rounded-full mt-10 -ml-5 text-xxs text-eg-bg absolute">Accepted</span>
+                    <div class="w-4 bg-eg-bg h-4 right-0 rounded-full absolute"></div>
+                    <span class="right-0 rounded-full mt-10 -ml-2 text-xxs text-eg-bg absolute">Signed</span>
                   </div>
                 </td>
               </tr>
@@ -664,6 +765,7 @@
                 <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
                 <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
                 <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Required</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Edit</th>
                 <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
               </tr>
               </thead>
@@ -697,228 +799,494 @@
                       {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
                     </button>
                   </td>
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                    <button type="button" @click="selectGuarantorToReplace(guarantor)">
+                      <PencilSquareIcon class="text-amber-900 w-5 h-5" />
+                    </button>
+                  </td>
                   <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
                     <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
-                      <div class="w-full border border-eg-lightblue h-2 rounded-full flex">
-                        <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-lightblue"></div>
+                      <div class="w-full border border-eg-bg h-2 rounded-full flex">
+                        <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
                       </div>
 
-                      <div class="w-4 bg-eg-lightblue h-4 left-0 rounded-full absolute"></div>
-                      <span class="left-0 rounded-full mt-10 -ml-5 text-xxs text-eg-lightblue absolute">Accepted</span>
-                      <div class="w-4 bg-eg-lightblue h-4 left-1/2 rounded-full absolute"></div>
-                      <span class="left-1/2 rounded-full mt-10 -ml-2 text-xxs text-eg-lightblue absolute">Signed</span>
-                      <div class="w-4 bg-eg-lightblue h-4 right-0 rounded-full absolute"></div>
-                      <span class="right-0 rounded-full mt-10 -mr-5 text-xxs text-eg-lightblue absolute">Approved</span>
+                      <div class="w-4 bg-eg-bg h-4 left-0 rounded-full absolute"></div>
+                      <span class="left-0 rounded-full mt-10 -ml-5 text-xxs text-eg-bg absolute">Accepted</span>
+                      <div class="w-4 bg-eg-bg h-4 left-1/2 rounded-full absolute"></div>
+                      <span class="left-1/2 rounded-full mt-10 -ml-2 text-xxs text-eg-bg absolute">Signed</span>
+                      <div class="w-4 bg-eg-bg h-4 right-0 rounded-full absolute"></div>
+                      <span class="right-0 rounded-full mt-10 -mr-5 text-xxs text-eg-bg absolute">Approved</span>
                     </div>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <button v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" @click="submitToCoBanking" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-sm font-medium text-eg-bg hover:bg-eg-lightblue focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 mt-14">
+            <button v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" @click="submitToCoBanking" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-sm font-medium text-eg-bg hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 mt-14">
               Submit Loan Form
             </button>
-
-            <TransitionRoot as="template" :show="guarantorApprovalOpen">
-              <Dialog as="div" class="relative z-10" @close="guarantorApprovalOpen = false">
-                <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-                </TransitionChild>
-
-                <div class="fixed inset-0 z-10 overflow-y-auto">
-                  <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                    <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                      <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                        <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
-                          <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="guarantorApprovalOpen = false">
-                            <span class="sr-only">Close</span>
-                            <XMarkIcon class="h-6 w-6" aria-hidden="true" />
-                          </button>
-                        </div>
-                        <div>
-                          <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
-                          <dl class="sm:divide-y sm:divide-gray-100">
-                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">Name</dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-                                {{ selectedGuarantor?.firstName }}
-                                <br>
-                                {{ selectedGuarantor?.lastName }}
-                              </dd>
-                            </div>
-                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">Member No.</dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-                                {{ selectedGuarantor?.memberNumber }}
-                              </dd>
-                            </div>
-                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">Deposits</dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-                                {{ $filters.currencyKES(selectedGuarantor?.totalDeposits) }}
-                              </dd>
-                            </div>
-                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">Committed</dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-                                {{ $filters.currencyKES(selectedGuarantor?.committedAmount) }}
-                              </dd>
-                            </div>
-                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">Available</dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-                                {{ $filters.currencyKES(selectedGuarantor?.availableAmount) }}
-                              </dd>
-                            </div>
-                            <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">Required</dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
-                                {{ selectedGuarantor ? $filters.currencyKES(selectedGuarantor?.availableAmount - selectedGuarantor?.committedAmount) : 0 }}
-                              </dd>
-                            </div>
-                          </dl>
-                        </div>
-                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                          <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" @click="approveGuarantor(true)">Approve</button>
-                          <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-transparent bg-red-400 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" @click="approveGuarantor(false)" ref="cancelButtonRef">Decline</button>
-                        </div>
-                      </DialogPanel>
-                    </TransitionChild>
-                  </div>
-                </div>
-              </Dialog>
-            </TransitionRoot>
           </div>
-          <TransitionRoot as="template" :show="zohoRequestOpen">
-            <Dialog as="div" class="relative z-10" @close="zohoRequestOpen = false">
-              <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-              </TransitionChild>
+        </div>
+      </div>
+      <TransitionRoot as="template" :show="openErrorModal">
+        <Dialog as="div" class="relative z-10" @close="openErrorModal = false">
+          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </TransitionChild>
 
-              <div class="fixed inset-0 z-10 overflow-y-auto">
-                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                  <TransitionChild
-                      as="template"
-                      enter="ease-out duration-300"
-                      enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                      enter-to="opacity-100 translate-y-0 sm:scale-100"
-                      leave="ease-in duration-200"
-                      leave-from="opacity-100 translate-y-0 sm:scale-100"
-                      leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                  >
-                    <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-5xl sm:p-6">
-                      <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
-                        <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="zohoRequestOpen = false">
-                          <span class="sr-only">Close</span>
-                          <XMarkIcon class="h-6 w-6" aria-hidden="true" />
-                        </button>
+          <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                      <ExclamationCircleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
+                    </div>
+                    <div class="mt-3 text-center sm:mt-5">
+                      <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Loan Request Error</DialogTitle>
+                      <div class="mt-2">
+                        <p class="text-sm text-gray-500">
+                          {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                          {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.readableErrorMessage) ? loanRequestStore.getLoanRequest.readableErrorMessage : "" }}
+                        </p>
                       </div>
-                      <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left overflow-hidden">
-                          <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Zoho Request Detail</DialogTitle>
-                          <div class="mt-2 space-y-4">
-                            <div class="text-sm text-gray-500">
-                              <span class="font-semibold">Actions:</span>
-                              <div class="overflow-x-scroll">
-                                <table class="mt-6">
-                                  <thead class="bg-gray-50">
-                                  <tr>
-                                    <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ROLE</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION ID</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION TYPE</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT NAME</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT PHONE NO.</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT EMAIL</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">PRIVATE NOTES</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFY RECIPIENT</th>
-                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFICATION TYPE</th>
-                                  </tr>
-                                  </thead>
-                                  <tbody class="divide-y divide-gray-200 bg-white">
-                                  <!--                                {action_id: string, action_type: string, is_embedded: boolean, private_notes: string, recipient_email: string, recipient_name: string, recipient_phonenumber: string, role: string, verification_type: string, verify_recipient: boolean}-->
-                                  <tr v-for="action in zohoRequest.templates.actions" :key="action.action_id">
-                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ action.role }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ action.action_id }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ action.action_type }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_name }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_phonenumber }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_email }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.private_notes }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verify_recipient }}</td>
-                                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verification_type }}</td>
-                                  </tr>
-                                  </tbody>
-                                </table>
-                              </div>
+                    </div>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
+      <TransitionRoot as="template" :show="guarantorApprovalOpen">
+        <Dialog as="div" class="relative z-10" @close="guarantorApprovalOpen = false">
+          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                  <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+                    <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="guarantorApprovalOpen = false">
+                      <span class="sr-only">Close</span>
+                      <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <div>
+                    <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
+                    <dl class="sm:divide-y sm:divide-gray-100">
+                      <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                        <dt class="text-sm font-medium text-gray-500">Name</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                          {{ selectedGuarantor?.firstName }}
+                          <br>
+                          {{ selectedGuarantor?.lastName }}
+                        </dd>
+                      </div>
+                      <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                        <dt class="text-sm font-medium text-gray-500">Member No.</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                          {{ selectedGuarantor?.memberNumber }}
+                        </dd>
+                      </div>
+                      <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                        <dt class="text-sm font-medium text-gray-500">Deposits</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                          {{ $filters.currencyKES(selectedGuarantor?.totalDeposits) }}
+                        </dd>
+                      </div>
+                      <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                        <dt class="text-sm font-medium text-gray-500">Committed</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                          {{ $filters.currencyKES(selectedGuarantor?.committedAmount) }}
+                        </dd>
+                      </div>
+                      <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                        <dt class="text-sm font-medium text-gray-500">Available</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                          {{ $filters.currencyKES(selectedGuarantor?.availableAmount) }}
+                        </dd>
+                      </div>
+                      <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
+                        <dt class="text-sm font-medium text-gray-500">Required</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                          {{ selectedGuarantor ? $filters.currencyKES(selectedGuarantor?.availableAmount - selectedGuarantor?.committedAmount) : 0 }}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" @click="approveGuarantor(true)">Approve</button>
+                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-transparent bg-red-400 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" @click="approveGuarantor(false)" ref="cancelButtonRef">Decline</button>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
+      <TransitionRoot as="template" :show="zohoRequestOpen">
+        <Dialog as="div" class="relative z-10" @close="zohoRequestOpen = false">
+          <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <TransitionChild
+                  as="template"
+                  enter="ease-out duration-300"
+                  enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  enter-to="opacity-100 translate-y-0 sm:scale-100"
+                  leave="ease-in duration-200"
+                  leave-from="opacity-100 translate-y-0 sm:scale-100"
+                  leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-5xl sm:p-6">
+                  <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+                    <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="zohoRequestOpen = false">
+                      <span class="sr-only">Close</span>
+                      <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left overflow-hidden">
+                      <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Zoho Request Detail</DialogTitle>
+                      <div class="mt-2 space-y-4">
+                        <div class="text-sm text-gray-500">
+                          <span class="font-semibold">Actions:</span>
+                          <div class="overflow-x-scroll">
+                            <table class="mt-6">
+                              <thead class="bg-gray-50">
+                              <tr>
+                                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ROLE</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION ID</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION TYPE</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT NAME</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT PHONE NO.</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT EMAIL</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">PRIVATE NOTES</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFY RECIPIENT</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFICATION TYPE</th>
+                              </tr>
+                              </thead>
+                              <tbody class="divide-y divide-gray-200 bg-white">
+                              <!--                                {action_id: string, action_type: string, is_embedded: boolean, private_notes: string, recipient_email: string, recipient_name: string, recipient_phonenumber: string, role: string, verification_type: string, verify_recipient: boolean}-->
+                              <tr v-for="action in zohoRequest.templates.actions" :key="action.action_id">
+                                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ action.role }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ action.action_id }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ action.action_type }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_name }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_phonenumber }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_email }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.private_notes }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verify_recipient }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verification_type }}</td>
+                              </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        <div class="space-y-2">
+                          <div class="text-sm text-gray-500">
+                            <span class="font-semibold">Field Text Data:</span>
+                            <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_text_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">
+                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                                </div>
+                              </dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                  <input disabled :value="zohoRequest.templates.field_data.field_text_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                                </div>
+                              </dd>
                             </div>
-                            <div class="space-y-2">
-                              <div class="text-sm text-gray-500">
-                                <span class="font-semibold">Field Text Data:</span>
-                                <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_text_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
-                                  <dt class="text-sm font-medium text-gray-500">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
-                                    </div>
-                                  </dt>
-                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                      <input disabled :value="zohoRequest.templates.field_data.field_text_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
-                                    </div>
-                                  </dd>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            <span class="font-semibold">Field Date Data:</span>
+                            <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_date_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">
+                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                 </div>
-                              </div>
-                              <div class="text-sm text-gray-500">
-                                <span class="font-semibold">Field Date Data:</span>
-                                <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_date_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
-                                  <dt class="text-sm font-medium text-gray-500">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
-                                    </div>
-                                  </dt>
-                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                      <input disabled :value="zohoRequest.templates.field_data.field_date_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
-                                    </div>
-                                  </dd>
+                              </dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                  <input disabled :value="zohoRequest.templates.field_data.field_date_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
                                 </div>
-                              </div>
-                              <div class="text-sm text-gray-500">
-                                <span class="font-semibold">Field Boolean Data:</span>
-                                <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_boolean_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
-                                  <dt class="text-sm font-medium text-gray-500">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
-                                    </div>
-                                  </dt>
-                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                      <input disabled :value="zohoRequest.templates.field_data.field_boolean_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
-                                    </div>
-                                  </dd>
+                              </dd>
+                            </div>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            <span class="font-semibold">Field Boolean Data:</span>
+                            <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_boolean_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
+                              <dt class="text-sm font-medium text-gray-500">
+                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
+                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                 </div>
+                              </dt>
+                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                  <input disabled :value="zohoRequest.templates.field_data.field_boolean_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                                </div>
+                              </dd>
+                            </div>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            <span class="font-semibold">Request name:</span>
+                            <p class="text-sm text-gray-500">{{ zohoRequest.templates.request_name }}</p>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            <span class="font-semibold">Notes:</span>
+                            <p class="text-sm text-gray-500">{{ zohoRequest.templates.notes }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm" @click="zohoRequestOpen = false">Cancel</button>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
+      <TransitionRoot appear :show="showReplaceModal" as="template">
+        <Dialog as="div" @close="showReplaceModal = false" class="relative z-10">
+          <TransitionChild
+              as="template"
+              enter="duration-300 ease-out"
+              enter-from="opacity-0"
+              enter-to="opacity-100"
+              leave="duration-200 ease-in"
+              leave-from="opacity-100"
+              leave-to="opacity-0"
+          >
+            <div class="fixed inset-0 bg-black bg-opacity-25" />
+          </TransitionChild>
+
+          <div class="fixed inset-0 overflow-y-auto">
+            <div
+                class="flex min-h-full items-center justify-center p-4 text-center"
+            >
+              <TransitionChild
+                  as="template"
+                  enter="duration-300 ease-out"
+                  enter-from="opacity-0 scale-95"
+                  enter-to="opacity-100 scale-100"
+                  leave="duration-200 ease-in"
+                  leave-from="opacity-100 scale-100"
+                  leave-to="opacity-0 scale-95"
+              >
+                <DialogPanel
+                    class="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+                >
+                  <DialogTitle
+                      as="h3"
+                      class="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Replace Guarantor
+                  </DialogTitle>
+                  <div class="mt-2">
+                    <p class="text-sm text-gray-500">
+                      Current Guarantor
+                    </p>
+                  </div>
+
+                  <div class="mt-2">
+                    <table class="min-w-full divide-y divide-gray-300">
+                      <thead class="bg-gray-50">
+                        <tr>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member No.</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Required</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200 bg-white">
+                        <tr v-for="guarantor in guarantor2Replace ? [guarantor2Replace] : []" :key="guarantor.refId">
+                          <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                            <div class="flex items-center text-eg-bg">
+                              {{ guarantor.memberNumber }}
+                            </div>
+                          </td>
+                          <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                            <button type="button">
+                              {{ guarantor.firstName }} {{ guarantor.lastName }}
+                            </button>
+                          </td>
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+                            <button type="button">
+                              {{ guarantor.committedAmount ? $filters.currencyKES(guarantor.committedAmount) : guarantor.committedAmount }}
+                            </button>
+                          </td>
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                            <button type="button">
+                              {{ guarantor.availableAmount ? $filters.currencyKES(guarantor.availableAmount) : guarantor.availableAmount }}
+                            </button>
+                          </td>
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                            <button type="button">
+                              {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
+                            </button>
+                          </td>
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                            <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
+                              <div class="w-full border border-eg-bg h-2 rounded-full flex">
+                                <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
                               </div>
-                              <div class="text-sm text-gray-500">
-                                <span class="font-semibold">Request name:</span>
-                                <p class="text-sm text-gray-500">{{ zohoRequest.templates.request_name }}</p>
-                              </div>
-                              <div class="text-sm text-gray-500">
-                                <span class="font-semibold">Notes:</span>
-                                <p class="text-sm text-gray-500">{{ zohoRequest.templates.notes }}</p>
+
+                              <div class="w-4 bg-eg-bg h-4 left-0 rounded-full absolute"></div>
+                              <div class="w-4 bg-eg-bg h-4 left-1/2 rounded-full absolute"></div>
+                              <div class="w-4 bg-eg-bg h-4 right-0 rounded-full absolute"></div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="mt-4">
+                    <p class="text-sm font-semibold text-gray-900">
+                      Search Guarantor
+                    </p>
+                  </div>
+
+                  <div class="mt-4">
+                    <form @submit.prevent="pullMember" @reset="resetPullForm" class="space-y-6">
+                      <div>
+                        <div class="grid grid-cols-6 gap-6">
+                          <div class="col-span-6">
+                            <label for="template-name" class="block text-sm font-medium text-gray-700">Template Name</label>
+                            <select v-model="pullForm.identifierType" id="template-name" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                              <option :value="null">-Select Identifier Type-</option>
+                              <option v-for="(option, i) in identifierTypes" :key="`${option.id}${i}`" :value="option.value">{{ option.name }}</option>
+                            </select>
+                            <div class="input-errors" v-for="(error, index) of v$.identifierType.$errors" :key="index">
+                              <div class="text-xs text-red-400">{{ error.$message }}</div>
+                            </div>
+                          </div>
+                          <div class="col-span-6">
+                            <label for="name" class="block text-sm font-medium text-gray-700">Member Identifier</label>
+                            <input v-model="pullForm.memberIdentifier" id="name" type="text" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
+                            <div class="input-errors" v-for="(error, index) of v$.memberIdentifier.$errors" :key="index">
+                              <div class="text-xs text-red-400">{{ error.$message }}</div>
+                            </div>
+                          </div>
+                          <div class="col-span-6">
+                            <div class="flex items-center justify-between">
+                              <div class="flex items-center">
+                                <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                                <label for="pull-cb" class="ml-2 block text-sm text-gray-900">Pull from co-banking</label>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm" @click="zohoRequestOpen = false">Cancel</button>
+                      <div class="flex justify-between">
+                        <button type="reset" class="flex justify-center rounded-md border border-transparent bg-red-400 py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">
+                          Reset Form
+                        </button>
+                        <button type="submit" class="flex justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2">
+                          Search Guarantor
+                        </button>
                       </div>
-                    </DialogPanel>
-                  </TransitionChild>
-                </div>
-              </div>
-            </Dialog>
-          </TransitionRoot>
-        </div>
-      </div>
+                    </form>
+                  </div>
+
+                  <div class="mt-4">
+                    <p class="text-sm font-semibold text-gray-900">
+                      Selected Guarantor
+                    </p>
+                  </div>
+
+                  <div class="mt-2">
+                    <table class="min-w-full divide-y divide-gray-300">
+                      <thead class="bg-gray-50">
+                      <tr>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member No.</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Required</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                      </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200 bg-white">
+                      <tr v-for="guarantor in newGuarantor ? [newGuarantor] : []" :key="guarantor.refId">
+                        <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                          <div class="flex items-center text-eg-bg">
+                            {{ guarantor.memberNumber }}
+                          </div>
+                        </td>
+                        <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                          <button type="button">
+                            {{ guarantor.firstName }} {{ guarantor.lastName }}
+                          </button>
+                        </td>
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+                          <button type="button">
+                            {{ guarantor.committedAmount ? $filters.currencyKES(guarantor.committedAmount) : guarantor.committedAmount }}
+                          </button>
+                        </td>
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                          <button type="button">
+                            {{ guarantor.availableAmount ? $filters.currencyKES(guarantor.availableAmount) : guarantor.availableAmount }}
+                          </button>
+                        </td>
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                          <button type="button">
+                            {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
+                          </button>
+                        </td>
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                          <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
+                            <div class="w-full border border-eg-bg h-2 rounded-full flex">
+                              <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
+                            </div>
+
+                            <div class="w-4 bg-eg-bg h-4 left-0 rounded-full absolute"></div>
+                            <div class="w-4 bg-eg-bg h-4 left-1/2 rounded-full absolute"></div>
+                            <div class="w-4 bg-eg-bg h-4 right-0 rounded-full absolute"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="mt-6 flex justify-between">
+                    <button
+                        type="button"
+                        class="inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                        @click="showReplaceModal = false"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                        type="button"
+                        :disabled="!newGuarantor"
+                        :class="[!newGuarantor && 'opacity-75 cursor-not-allowed']"
+                        class="inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                        @click="replaceGuarantor"
+                    >
+                      Replace Guarantor
+                    </button>
+                  </div>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </div>
+        </Dialog>
+      </TransitionRoot>
     </main>
   </div>
 </template>
