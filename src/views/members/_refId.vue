@@ -34,44 +34,44 @@
   onMounted(async () => {
     await Promise.allSettled([
       memberStore.fetchMember(`${route.params.refId}`),
-      loanRequestStore.fetchMemberLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`),
-      loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`),
-      loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`),
+      loanRequestStore.fetchMemberLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&isActive=true`),
+      loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&isActive=true`),
+      loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&isActive=true`),
     ])
   });
 
   const refreshMemberNext = (cP: number) => {
     filtersMemberLoanRequests.page = cP + 1;
-    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&isActive=true`);
   }
   const refreshMemberPrev = (cP: number) => {
     filtersMemberLoanRequests.page = cP - 1;
-    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&isActive=true`);
   }
   const refreshMemberCurrent = () => {
-    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchLoanRequests(`?memberRefId=${route.params.refId}&order=${filtersMemberLoanRequests.order}&pageSize=${filtersMemberLoanRequests.recordsPerPage}&pageIndex=${filtersMemberLoanRequests.page - 1}&isActive=true`);
   }
   const refreshGuaranteedNext = (cP: number) => {
     filtersGuaranteedLoanRequests.page = cP + 1;
-    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&isActive=true`);
   }
   const refreshGuaranteedPrev = (cP: number) => {
     filtersGuaranteedLoanRequests.page = cP - 1;
-    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&isActive=true`);
   }
   const refreshGuaranteedCurrent = () => {
-    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchMemberGuaranteedLoanRequests(`?guarantorRefId=${route.params.refId}&order=${filtersGuaranteedLoanRequests.order}&pageSize=${filtersGuaranteedLoanRequests.recordsPerPage}&pageIndex=${filtersGuaranteedLoanRequests.page - 1}&isActive=true`);
   }
   const refreshWitnessedNext = (cP: number) => {
     filtersWitnessedLoanRequests.page = cP + 1;
-    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&isActive=true`);
   }
   const refreshWitnessedPrev = (cP: number) => {
     filtersWitnessedLoanRequests.page = cP - 1;
-    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&isActive=true`);
   }
   const refreshWitnessedCurrent = () => {
-    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&includeInActive=false`);
+    loanRequestStore.fetchMemberWitnessedLoanRequests(`?witnessRefId=${route.params.refId}&order=${filtersWitnessedLoanRequests.order}&pageSize=${filtersWitnessedLoanRequests.recordsPerPage}&pageIndex=${filtersWitnessedLoanRequests.page - 1}&isActive=true`);
   }
 
   const form = reactive<any>({
