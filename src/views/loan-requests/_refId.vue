@@ -130,6 +130,8 @@
         message: 'Loan request resubmission successful!',
         success: true
       })
+
+      await reloadLR()
     } else {
       authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
