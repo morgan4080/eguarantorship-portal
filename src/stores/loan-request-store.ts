@@ -130,16 +130,16 @@ export const useLoanRequest = defineStore('loan-request-store', {
         }
     },
     actions: {
-        async replaceGuarantor(loanRequestRefId: string, guarantorRefId: string, memberRefId: string) {
+        async replaceGuarantor({loanRequestRefId, oldGuarantorRef, newGuarantorRef}: {loanRequestRefId: string, oldGuarantorRef: string, newGuarantorRef: string}) {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${loanRequestRefId}/guarantor/${guarantorRefId}`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/loan-request/${loanRequestRefId}/guarantor/${oldGuarantorRef}`, {
                     method: 'POST',
                     headers: myHeaders,
                     credentials: 'include',
                     body: JSON.stringify({
-                        memberRefId
+                        memberRefId: newGuarantorRef
                     })
                 });
 

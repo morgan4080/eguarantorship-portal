@@ -489,24 +489,26 @@
       const guarantorRefId = guarantor2Replace.value?.refId
       const memberRefId = newGuarantor.value?.refId
 
-      const [replaced] = await Promise.allSettled([
-        loanRequestStore.replaceGuarantor(`${loanRequestRefId}`, `${guarantorRefId}`, `${memberRefId}`)
-      ])
+      if (loanRequestRefId && guarantorRefId && memberRefId) {
+        const [replaced] = await Promise.allSettled([
+          loanRequestStore.replaceGuarantor({loanRequestRefId: `${loanRequestRefId}`, oldGuarantorRef: guarantorRefId, newGuarantorRef: memberRefId})
+        ])
 
-      if (replaced.status === 'fulfilled') {
-        authStore.defineNotification({
-          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Guarantor replaced successfully!',
-          success: true
-        })
-        showReplaceModal.value = false
-        await reloadLR()
-      } else {
-        authStore.defineNotification({
-          id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
-          message: 'Could not replace guarantor!',
-          error: true
-        })
+        if (replaced.status === 'fulfilled') {
+          authStore.defineNotification({
+            id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+            message: 'Guarantor replaced successfully!',
+            success: true
+          })
+          showReplaceModal.value = false
+          await reloadLR()
+        } else {
+          authStore.defineNotification({
+            id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+            message: 'Could not replace guarantor!',
+            error: true
+          })
+        }
       }
     }
   }
