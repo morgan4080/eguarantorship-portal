@@ -825,7 +825,7 @@
                 </tr>
               </tbody>
             </table>
-            <button v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" @click="submitToCoBanking" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-sm font-medium text-eg-bg hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 mt-14">
+            <button v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" @click="submitToCoBanking" type="button" class="inline-flex items-center rounded-md border border-transparent bg-eg-bgopacity px-4 py-2 text-sm font-medium text-eg-bg hover:bg-eg-bg hover:bg-text-white focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 mt-14">
               Submit Loan Form
             </button>
           </div>
