@@ -95,7 +95,7 @@ export const useLoanProduct = defineStore('loan-product-store', {
                 return Promise.reject(e.message)
             }
         },
-        async postLoanProduct(payload: {refId?: string, name: string, interestRate: string, requiredGuarantors: string, templateName: string, templateId: string, roleActions: { role: string; action_id: string; action_type: string; recipient_name: string; recipient_phonenumber: string; is_embedded: boolean; recipient_email: string; private_notes: string; verify_recipient: boolean; }[]}): Promise<any> {
+        async postLoanProduct(payload: {refId?: string, name: string, interestRate: string, requiredGuarantors: string, maxPeriod: string, coreBankingLoanTypeCode: string, templateName: string, templateId: string, roleActions: { role: string; action_id: string; action_type: string; recipient_name: string; recipient_phonenumber: string; is_embedded: boolean; recipient_email: string; private_notes: string; verify_recipient: boolean; }[]}): Promise<any> {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);

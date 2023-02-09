@@ -145,6 +145,8 @@
         success: true
       }))
     }
+
+    location.reload();
   }
 
 

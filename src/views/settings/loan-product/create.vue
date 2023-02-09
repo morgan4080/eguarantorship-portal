@@ -14,10 +14,12 @@ onMounted(async () => {
   ])
 })
 
-const loanProductForm = reactive<{name: string, interestRate: string, requiredGuarantors: string, templateName: string, templateId: string, roleActions: { role: string; action_id: string; action_type: string; recipient_name: string; recipient_phonenumber: string; is_embedded: boolean; recipient_email: string; private_notes: string; verify_recipient: boolean; }[]}>({
+const loanProductForm = reactive<{name: string, interestRate: string, requiredGuarantors: string, maxPeriod: string, coreBankingLoanTypeCode: string, templateName: string, templateId: string, roleActions: { role: string; action_id: string; action_type: string; recipient_name: string; recipient_phonenumber: string; is_embedded: boolean; recipient_email: string; private_notes: string; verify_recipient: boolean; }[]}>({
   name: '',
   interestRate: '',
   requiredGuarantors: '',
+  maxPeriod: '',
+  coreBankingLoanTypeCode: '',
   templateName: '',
   templateId: '',
   roleActions: []
@@ -32,6 +34,12 @@ const loanProductFormRules = {
   },
   requiredGuarantors: {
     required,
+  },
+  maxPeriod: {
+    required,
+  },
+  coreBankingLoanTypeCode: {
+
   },
   templateName: {
     required,
@@ -54,6 +62,8 @@ const submitLoanProduct = async () => {
       name: loanProductForm.name,
       interestRate: `${loanProductForm.interestRate}`,
       requiredGuarantors: `${loanProductForm.requiredGuarantors}`,
+      maxPeriod: loanProductForm.maxPeriod,
+      coreBankingLoanTypeCode: loanProductForm.coreBankingLoanTypeCode,
       templateName: loanProductForm.templateName,
       templateId: loanProductForm.templateId,
       roleActions: loanProductForm.roleActions,
@@ -119,6 +129,20 @@ watch(() => zohoStore.getZohoTemplateDetails, (details) => {
                             <label for="rate" class="block text-sm font-medium text-gray-700">Interest Rate (%)</label>
                             <input v-model="loanProductForm.interestRate" id="rate" type="number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                             <div class="input-errors" v-for="(error, index) of v$.interestRate.$errors" :key="index">
+                              <div class="text-xs text-red-400">{{ error.$message }}</div>
+                            </div>
+                          </div>
+                          <div class="col-span-6">
+                            <label for="rate" class="block text-sm font-medium text-gray-700">Maximum Period (Months)</label>
+                            <input v-model="loanProductForm.maxPeriod" id="rate" type="number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                            <div class="input-errors" v-for="(error, index) of v$.maxPeriod.$errors" :key="index">
+                              <div class="text-xs text-red-400">{{ error.$message }}</div>
+                            </div>
+                          </div>
+                          <div class="col-span-6">
+                            <label for="rate" class="block text-sm font-medium text-gray-700">CoreBanking Loan Type Code</label>
+                            <input v-model="loanProductForm.coreBankingLoanTypeCode" id="rate" type="number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                            <div class="input-errors" v-for="(error, index) of v$.coreBankingLoanTypeCode.$errors" :key="index">
                               <div class="text-xs text-red-400">{{ error.$message }}</div>
                             </div>
                           </div>

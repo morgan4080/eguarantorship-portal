@@ -16,10 +16,12 @@ onMounted(async () => {
   ])
 })
 
-const loanProductForm = reactive<{name: string, interestRate: string, requiredGuarantors: string, templateName: string, templateId: string, refId: string, roleActions: { role: string; action_id: string; action_type: string; recipient_name: string; recipient_phonenumber: string; is_embedded: boolean; recipient_email: string; private_notes: string; verify_recipient: boolean; }[]}>({
+const loanProductForm = reactive<{name: string, interestRate: string, requiredGuarantors: string, maxPeriod: string, coreBankingLoanTypeCode: string, templateName: string, templateId: string, refId: string, roleActions: { role: string; action_id: string; action_type: string; recipient_name: string; recipient_phonenumber: string; is_embedded: boolean; recipient_email: string; private_notes: string; verify_recipient: boolean; }[]}>({
   name: '',
   interestRate: '',
   requiredGuarantors: '',
+  maxPeriod: '',
+  coreBankingLoanTypeCode: '',
   templateName: '',
   templateId: '',
   refId: '',
@@ -38,6 +40,12 @@ const loanProductFormRules = {
   },
   requiredGuarantors: {
     required,
+  },
+  maxPeriod: {
+    required,
+  },
+  coreBankingLoanTypeCode: {
+
   },
   templateName: {
     required,
@@ -86,6 +94,8 @@ const updateLoanProduct = async () => {
       name: loanProductForm.name,
       interestRate: `${loanProductForm.interestRate}`,
       requiredGuarantors: `${loanProductForm.requiredGuarantors}`,
+      maxPeriod: loanProductForm.maxPeriod,
+      coreBankingLoanTypeCode: loanProductForm.coreBankingLoanTypeCode,
       templateName: loanProductForm.templateName,
       templateId: loanProductForm.templateId,
       roleActions: loanProductForm.roleActions
@@ -95,6 +105,11 @@ const updateLoanProduct = async () => {
       message: `Loan Product Updated`,
       success: true
     }))
+
+    await Promise.allSettled([
+      loanProductStore.fetchLoanProduct(route.params.refId as string),
+      zohoStore.fetchLoanProductTemplates()
+    ])
   }
 }
 </script>
