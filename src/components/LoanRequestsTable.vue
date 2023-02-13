@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:flex sm:items-center">
+  <div class="flex items-center">
     <slot></slot>
   </div>
   <div class="mt-8 flex flex-col">
@@ -23,6 +23,7 @@
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Percentage</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Application Status</th>
             <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Signing Status</th>
+            <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Active</th>
             <th scope="col" class="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-6">
               <span class="sr-only">Action</span>
             </th>
@@ -35,37 +36,40 @@
               </td>
             </tr>
             <tr v-for="item in loanRequests" :key="item.refId" :class="[selectedRequests.includes(item.loanRequestNumber) && 'bg-gray-300']">
-              <td class="relative w-12 px-6 sm:w-16 sm:px-8" :class="[!item.isActive && 'opacity-70']">
+              <td class="relative w-12 px-6 sm:w-16 sm:px-8" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <!-- Selected row marker, only show when row is selected. -->
                 <div v-if="selectedRequests.includes(item.loanRequestNumber)" class="absolute inset-y-0 left-0 w-0.5 bg-eg-bg"></div>
 
                 <input type="checkbox" class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg sm:left-6" :value="item.loanRequestNumber" v-model="selectedRequests">
               </td>
-              <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.loanRequestNumber) ? 'text-eg-blue' : 'text-gray-900', !item.isActive && 'opacity-70']" >
+              <td :class="['whitespace-nowrap py-2 pl-4 pr-3 font-medium text-sm sm:pl-6' , selectedRequests.includes(item.loanRequestNumber) ? 'text-eg-blue' : 'text-gray-900', !item.isActive && 'opacity-70 bg-gray-50']" >
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestNumber }}</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-500" :class="[!item.isActive && 'opacity-70']">
+              <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanDate }}</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70']">
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.memberFirstName }} {{ item.memberLastName }}</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70']">
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanProductName }}</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70']">
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ $filters.currencyKES(item.loanAmount) }}</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70']">
-                <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestProgress }}</router-link>
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
+                <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.loanRequestProgress }}%</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70']">
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.applicationStatus }}</router-link>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70']">
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.applicationStatus === 'INPROGRESS' && item.signingStatus === 'ERROR' ? 'PENDING' : item.signingStatus }}</router-link>
               </td>
-              <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+              <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
+                <router-link :to="`/loan-requests/${item.refId}/view`">{{ item.isActive }}</router-link>
+              </td>
+              <td class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6" :class="[!item.isActive && 'opacity-70 bg-gray-50']">
                 <DropDown :items="[
                   {
                     id: 1,

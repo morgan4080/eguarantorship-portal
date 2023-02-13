@@ -34,6 +34,7 @@
     startDate?: string | null,
     endDate?: string | null,
     includeInActive?: IncludeInactive,
+    isActive?: "true" | "false" | null,
   }
 
   const filters = reactive<Record<any, any>>({
@@ -41,7 +42,7 @@
     searchTerm: JSON.stringify(route.query) !== '{}' && route.query.searchTerm ? route.query.searchTerm : '',
     // order: 'ASC',
     page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? Number(route.query.pageIndex) + 1 :  1,
-    isActive: 'true'
+    isActive: true
   })
 
   const customFilters =  reactive<Record<any, any>>({
@@ -56,6 +57,7 @@
     loanNumber: JSON.stringify(route.query) !== '{}' && route.query.loanNumber ? route.query.loanNumber : '',
     startDate: JSON.stringify(route.query) !== '{}' && route.query.startDate ? new Date(`${route.query.startDate}`).toLocaleDateString('en-CA') : '',
     endDate: JSON.stringify(route.query) !== '{}' && route.query.endDate ? new Date(`${route.query.endDate}`).toLocaleDateString('en-CA') : '',
+    isActive: JSON.stringify(route.query) !== '{}' && route.query.isActive ? route.query.isActive : false,
   })
 
   let queryParams = reactive<Record<any, any>>({
@@ -75,6 +77,9 @@
     }
 
     for (const [key, value] of Object.entries(payload)) {
+      if (key === 'isActive') {
+        withValues['isActive'] = `${value}`
+      }
       if (value) {
         if (key === 'page') {
           // pageIndex
@@ -299,6 +304,23 @@
           <LoanRequestsTable :loanRequests="loanRequestStore.getLoanRequests">
             <div class="sm:flex-auto">
               <GlobalSearch :placeholder="'Search Loan Requests'" :filters="filters" :customFilters="customFilters" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLR" />
+            </div>
+            <div class="relative flex items-start px-2">
+              <div class="flex h-5 items-center">
+                <input
+                    id="deleted"
+                    aria-describedby="offers-description"
+                    name="deleted"
+                    type="checkbox"
+                    class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg"
+                    v-model="customFilters.isActive"
+                />
+              </div>
+              <div class="ml-3 text-sm">
+                <label class="font-normal text-gray-500">
+                  Show Deleted
+                </label>
+              </div>
             </div>
             <div class="mt-0 ml-auto flex flex-wrap space-x-4">
               <div class="flex items-center">
