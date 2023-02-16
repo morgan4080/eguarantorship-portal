@@ -77,6 +77,8 @@ watch(() => loanProductStore.getLoanProduct, (loanProduct) => {
     loanProductForm.refId = loanProduct.refId
     loanProductForm.name = loanProduct.name
     loanProductForm.interestRate = `${loanProduct.interestRate}`
+    loanProductForm.maxPeriod = loanProduct.maxPeriod ? `${loanProduct.maxPeriod}` : ``
+    loanProductForm.coreBankingLoanTypeCode = loanProduct.coreBankingLoanTypeCode ? `${loanProduct.coreBankingLoanTypeCode}` : ``
     loanProductForm.requiredGuarantors = `${loanProduct.requiredGuarantors}`
     loanProductForm.templateName = loanProduct.templateName
     loanProductForm.templateId = loanProduct.templateId
@@ -86,16 +88,14 @@ watch(() => loanProductStore.getLoanProduct, (loanProduct) => {
 
 const updateLoanProduct = async () => {
   const result = await v$.value.$validate()
-
   if (result) {
-    console.log(loanProductForm)
     const payload = {
       refId: loanProductForm.refId,
       name: loanProductForm.name,
       interestRate: `${loanProductForm.interestRate}`,
       requiredGuarantors: `${loanProductForm.requiredGuarantors}`,
-      maxPeriod: loanProductForm.maxPeriod,
-      coreBankingLoanTypeCode: loanProductForm.coreBankingLoanTypeCode,
+      maxPeriod: `${loanProductForm.maxPeriod}`,
+      coreBankingLoanTypeCode: `${loanProductForm.coreBankingLoanTypeCode}`,
       templateName: loanProductForm.templateName,
       templateId: loanProductForm.templateId,
       roleActions: loanProductForm.roleActions
@@ -153,6 +153,20 @@ const updateLoanProduct = async () => {
                             <label for="rate" class="block text-sm font-medium text-gray-700">Interest Rate (%)</label>
                             <input v-model="loanProductForm.interestRate" id="rate" type="number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                             <div class="input-errors" v-for="(error, index) of v$.interestRate.$errors" :key="index">
+                              <div class="text-xs text-red-400">{{ error.$message }}</div>
+                            </div>
+                          </div>
+                          <div class="col-span-6">
+                            <label for="rate" class="block text-sm font-medium text-gray-700">Maximum Period (Months)</label>
+                            <input v-model="loanProductForm.maxPeriod" id="rate" type="number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                            <div class="input-errors" v-for="(error, index) of v$.maxPeriod.$errors" :key="index">
+                              <div class="text-xs text-red-400">{{ error.$message }}</div>
+                            </div>
+                          </div>
+                          <div class="col-span-6">
+                            <label for="rate" class="block text-sm font-medium text-gray-700">CoreBanking Loan Type Code</label>
+                            <input v-model="loanProductForm.coreBankingLoanTypeCode" id="rate" type="number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                            <div class="input-errors" v-for="(error, index) of v$.coreBankingLoanTypeCode.$errors" :key="index">
                               <div class="text-xs text-red-400">{{ error.$message }}</div>
                             </div>
                           </div>

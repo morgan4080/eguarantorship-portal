@@ -3,13 +3,14 @@
   import stores from "../../stores";
   import {computed, onMounted, reactive, watch} from "vue";
   import Breadcrumb from "../../components/Breadcrumb.vue";
-  import {required} from "@vuelidate/validators";
+  import {email, required} from "@vuelidate/validators";
   import useVuelidate from "@vuelidate/core";
   import {FolderPlusIcon, ChevronDownIcon} from "@heroicons/vue/20/solid";
   import DropDown from "../../components/DropDown.vue";
   import {MenuButton} from "@headlessui/vue";
   import {EllipsisVerticalIcon, PencilIcon, TrashIcon} from "@heroicons/vue/20/solid";
   import Paginator from "../../components/Paginator.vue";
+  import {SettingsPayloadType} from "../../stores/client-settings-store";
   const route = useRoute()
   const router = useRouter()
   const { zohoStore, authStore, loanProductStore, clientStore } = stores
@@ -74,8 +75,27 @@
         clientStore.fetchClientSettings()
       ])
       if (clientSettings.status === 'fulfilled' && clientStore.getClientSettings) {
-        organisationSettingsForm.organizationName = clientStore.getClientSettings.organizationName
-        organisationSettingsForm.ussdShortCode = clientStore.getClientSettings.ussdShortCode
+        organisationSettingsForm.organizationName = clientStore.getClientSettings.organizationName ? clientStore.getClientSettings.organizationName : ''
+        organisationSettingsForm.ussdShortCode = clientStore.getClientSettings.ussdShortCode ? clientStore.getClientSettings.ussdShortCode : ''
+        organisationSettingsForm.organizationAlias= clientStore.getClientSettings.organizationAlias ? clientStore.getClientSettings.organizationAlias : ''
+        organisationSettingsForm.organizationEmail= clientStore.getClientSettings.organizationEmail ? clientStore.getClientSettings.organizationEmail : ''
+        organisationSettingsForm.supportEmail=  clientStore.getClientSettings.supportEmail ? clientStore.getClientSettings.supportEmail : ''
+        organisationSettingsForm.organizationPrimaryTheme = clientStore.getClientSettings.organizationPrimaryTheme ? clientStore.getClientSettings.organizationPrimaryTheme : '#ffff00'
+        organisationSettingsForm.organizationSecondaryTheme = clientStore.getClientSettings.organizationSecondaryTheme ? clientStore.getClientSettings.organizationSecondaryTheme : '#0000ff'
+        organisationSettingsForm.organizationLogoName=  clientStore.getClientSettings.organizationLogoName ? clientStore.getClientSettings.organizationLogoName : ''
+        organisationSettingsForm.organizationLogoExtension=  clientStore.getClientSettings.organizationLogoExtension ? clientStore.getClientSettings.organizationLogoExtension : ''
+        organisationSettingsForm.loanProductMaxPeriod=  clientStore.getClientSettings.loanProductMaxPeriod ? clientStore.getClientSettings.loanProductMaxPeriod : ''
+        organisationSettingsForm.coreBankingIntegration =  clientStore.getClientSettings.coreBankingIntegration ? clientStore.getClientSettings.coreBankingIntegration : 'DEFAULT'
+        organisationSettingsForm.notificationProvider =  clientStore.getClientSettings.notificationProvider ? clientStore.getClientSettings.notificationProvider : 'DEFAULT'
+        organisationSettingsForm.identifierType =  clientStore.getClientSettings.identifierType ? clientStore.getClientSettings.identifierType : 'PHONE_NUMBER'
+        organisationSettingsForm.parallelLoans =  typeof clientStore.getClientSettings.parallelLoans === 'boolean' ? clientStore.getClientSettings.parallelLoans : false
+        organisationSettingsForm.requireWitness =  typeof clientStore.getClientSettings.requireWitness === 'boolean' ? clientStore.getClientSettings.requireWitness : false
+        organisationSettingsForm.allowZeroGuarantors =  typeof clientStore.getClientSettings.allowZeroGuarantors === 'boolean' ? clientStore.getClientSettings.allowZeroGuarantors : false
+        organisationSettingsForm.allowSelfGuarantee =  typeof clientStore.getClientSettings.allowSelfGuarantee === 'boolean' ? clientStore.getClientSettings.allowSelfGuarantee : false
+        organisationSettingsForm.isGuaranteedAmountShared =  typeof clientStore.getClientSettings.isGuaranteedAmountShared === 'boolean' ? clientStore.getClientSettings.isGuaranteedAmountShared : false
+        organisationSettingsForm.useEmbeddedURL =  typeof clientStore.getClientSettings.useEmbeddedURL === 'boolean' ? clientStore.getClientSettings.useEmbeddedURL : true
+        organisationSettingsForm.containsAttachments =  typeof clientStore.getClientSettings.containsAttachments === 'boolean' ? clientStore.getClientSettings.containsAttachments : false
+        organisationSettingsForm.customSMS =  typeof clientStore.getClientSettings.customSMS === 'boolean' ? clientStore.getClientSettings.customSMS : false
       }
     }
   })
@@ -103,8 +123,27 @@
         clientStore.fetchClientSettings()
       ])
       if (clientSettings.status === 'fulfilled' && clientStore.getClientSettings) {
-        organisationSettingsForm.organizationName = clientStore.getClientSettings.organizationName
-        organisationSettingsForm.ussdShortCode = clientStore.getClientSettings.ussdShortCode
+        organisationSettingsForm.organizationName = clientStore.getClientSettings.organizationName ? clientStore.getClientSettings.organizationName : ''
+        organisationSettingsForm.ussdShortCode = clientStore.getClientSettings.ussdShortCode ? clientStore.getClientSettings.ussdShortCode : ''
+        organisationSettingsForm.organizationAlias= clientStore.getClientSettings.organizationAlias ? clientStore.getClientSettings.organizationAlias : ''
+        organisationSettingsForm.organizationEmail= clientStore.getClientSettings.organizationEmail ? clientStore.getClientSettings.organizationEmail : ''
+        organisationSettingsForm.supportEmail=  clientStore.getClientSettings.supportEmail ? clientStore.getClientSettings.supportEmail : ''
+        organisationSettingsForm.organizationPrimaryTheme = clientStore.getClientSettings.organizationPrimaryTheme ? clientStore.getClientSettings.organizationPrimaryTheme : '#ffff00'
+        organisationSettingsForm.organizationSecondaryTheme = clientStore.getClientSettings.organizationSecondaryTheme ? clientStore.getClientSettings.organizationSecondaryTheme : '#0000ff'
+        organisationSettingsForm.organizationLogoName=  clientStore.getClientSettings.organizationLogoName ? clientStore.getClientSettings.organizationLogoName : ''
+        organisationSettingsForm.organizationLogoExtension=  clientStore.getClientSettings.organizationLogoExtension ? clientStore.getClientSettings.organizationLogoExtension : ''
+        organisationSettingsForm.loanProductMaxPeriod=  clientStore.getClientSettings.loanProductMaxPeriod ? clientStore.getClientSettings.loanProductMaxPeriod : ''
+        organisationSettingsForm.coreBankingIntegration =  clientStore.getClientSettings.coreBankingIntegration ? clientStore.getClientSettings.coreBankingIntegration : 'DEFAULT'
+        organisationSettingsForm.notificationProvider =  clientStore.getClientSettings.notificationProvider ? clientStore.getClientSettings.notificationProvider : 'DEFAULT'
+        organisationSettingsForm.identifierType =  clientStore.getClientSettings.identifierType ? clientStore.getClientSettings.identifierType : 'PHONE_NUMBER'
+        organisationSettingsForm.parallelLoans =  typeof clientStore.getClientSettings.parallelLoans === 'boolean' ? clientStore.getClientSettings.parallelLoans : false
+        organisationSettingsForm.requireWitness =  typeof clientStore.getClientSettings.requireWitness === 'boolean' ? clientStore.getClientSettings.requireWitness : false
+        organisationSettingsForm.allowZeroGuarantors =  typeof clientStore.getClientSettings.allowZeroGuarantors === 'boolean' ? clientStore.getClientSettings.allowZeroGuarantors : false
+        organisationSettingsForm.allowSelfGuarantee =  typeof clientStore.getClientSettings.allowSelfGuarantee === 'boolean' ? clientStore.getClientSettings.allowSelfGuarantee : false
+        organisationSettingsForm.isGuaranteedAmountShared =  typeof clientStore.getClientSettings.isGuaranteedAmountShared === 'boolean' ? clientStore.getClientSettings.isGuaranteedAmountShared : false
+        organisationSettingsForm.useEmbeddedURL =  typeof clientStore.getClientSettings.useEmbeddedURL === 'boolean' ? clientStore.getClientSettings.useEmbeddedURL : true
+        organisationSettingsForm.containsAttachments =  typeof clientStore.getClientSettings.containsAttachments === 'boolean' ? clientStore.getClientSettings.containsAttachments : false
+        organisationSettingsForm.customSMS =  typeof clientStore.getClientSettings.customSMS === 'boolean' ? clientStore.getClientSettings.customSMS : false
       }
     }
   })
@@ -151,9 +190,28 @@
 
 
 
-  const organisationSettingsForm = reactive({
+  const organisationSettingsForm: SettingsPayloadType = reactive({
     organizationName: '',
-    ussdShortCode: ''
+    ussdShortCode: '',
+    organizationAlias: '',
+    organizationEmail: '',
+    supportEmail: '',
+    organizationPrimaryTheme: '#ffff00', // color code
+    organizationSecondaryTheme: '#0000ff', // color code
+    organizationLogoName: '',
+    organizationLogoExtension: '',
+    loanProductMaxPeriod: '',
+    coreBankingIntegration: 'DEFAULT',
+    notificationProvider: 'DEFAULT',
+    identifierType: 'PHONE_NUMBER',
+    parallelLoans: false,
+    requireWitness: false,
+    allowZeroGuarantors: false,
+    allowSelfGuarantee: false,
+    isGuaranteedAmountShared: false,
+    useEmbeddedURL: true,
+    containsAttachments: false,
+    customSMS: false,
   })
 
   const organisationSettingsFormValidationRules = {
@@ -161,6 +219,65 @@
       required,
     },
     ussdShortCode: {
+      required,
+    },
+    organizationAlias: {
+      required,
+    },
+    organizationEmail: {
+      required,
+      email
+    },
+    supportEmail: {
+      required,
+      email
+    },
+    organizationPrimaryTheme: {
+      required,
+    }, // color code
+    organizationSecondaryTheme: {
+      required,
+    }, // color code
+    organizationLogoName: {
+      required,
+    },
+    organizationLogoExtension: {
+      required,
+    },
+    loanProductMaxPeriod: {
+      required,
+    },
+    coreBankingIntegration: {
+      required,
+    },
+    notificationProvider: {
+        required,
+    },
+    identifierType: {
+      required,
+    },
+    parallelLoans: {
+      required,
+    },
+    requireWitness: {
+      required,
+    },
+    allowZeroGuarantors: {
+      required,
+    },
+    allowSelfGuarantee: {
+      required,
+    },
+    isGuaranteedAmountShared: {
+      required,
+    },
+    useEmbeddedURL: {
+      required,
+    },
+    containsAttachments: {
+      required,
+    },
+    customSMS: {
       required,
     },
   }
@@ -172,8 +289,9 @@
     const result = await x$.value.$validate()
 
     if (result) {
-      console.log(organisationSettingsForm)
-      clientStore.postClientSettings(organisationSettingsForm).then(() => clientStore.fetchClientSettings()).then(() => authStore.defineNotification({
+      clientStore.postClientSettings(organisationSettingsForm)
+      .then(() => clientStore.fetchClientSettings())
+      .then(() => authStore.defineNotification({
         id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
         message: `Client Settings Saved.`,
         success: true
@@ -350,7 +468,7 @@
                 </div>
 
                 <div class="grid grid-cols-6 gap-6">
-                  <div class="col-span-6">
+                  <div class="col-span-2">
                     <label for="organizationName" class="block text-sm font-medium text-gray-700">Organization</label>
                     <input v-model="organisationSettingsForm.organizationName" type="text" id="organizationName" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of x$.organizationName.$errors" :key="index">
@@ -358,10 +476,188 @@
                     </div>
                   </div>
 
-                  <div class="col-span-6">
+                  <div class="col-span-2">
                     <label for="ussdShortCode" class="block text-sm font-medium text-gray-700">USSD Shortcode</label>
                     <input v-model="organisationSettingsForm.ussdShortCode" type="text" id="ussdShortCode" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of x$.ussdShortCode.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-2">
+                    <label for="organizationAlias" class="block text-sm font-medium text-gray-700">Organization Alias</label>
+                    <input v-model="organisationSettingsForm.organizationAlias" type="text" id="organizationAlias" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.organizationAlias.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-2">
+                    <label for="organizationEmail" class="block text-sm font-medium text-gray-700">Organization Email</label>
+                    <input v-model="organisationSettingsForm.organizationEmail" type="email" id="organizationEmail" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.organizationEmail.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-2">
+                    <label for="supportEmail" class="block text-sm font-medium text-gray-700">Support Email</label>
+                    <input v-model="organisationSettingsForm.supportEmail" type="email" id="supportEmail" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.supportEmail.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <label for="organizationPrimaryTheme" class="block text-sm font-medium text-gray-700">Primary Theme</label>
+                    <input v-model="organisationSettingsForm.organizationPrimaryTheme" type="color" id="organizationPrimaryTheme" class="h-9 mt-1 block w-full rounded-md border border-gray-300 py-1 px-2 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.organizationPrimaryTheme.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <label for="organizationSecondaryTheme" class="block text-sm font-medium text-gray-700">Secondary Theme</label>
+                    <input v-model="organisationSettingsForm.organizationSecondaryTheme" type="color" id="organizationSecondaryTheme" class="h-9 mt-1 block w-full rounded-md border border-gray-300 py-1 px-2 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.organizationSecondaryTheme.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-2">
+                    <label for="organizationLogoName" class="block text-sm font-medium text-gray-700">Logo Name</label>
+                    <input v-model="organisationSettingsForm.organizationLogoName" type="text" id="organizationLogoName" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.organizationLogoName.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-2">
+                    <label for="organizationLogoExtension" class="block text-sm font-medium text-gray-700">Logo Extension</label>
+                    <input v-model="organisationSettingsForm.organizationLogoExtension" type="text" id="organizationLogoExtension" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.organizationLogoExtension.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-2">
+                    <label for="loanProductMaxPeriod" class="block text-sm font-medium text-gray-700">Loan Product MaxPeriod(Months)</label>
+                    <input v-model="organisationSettingsForm.loanProductMaxPeriod" type="number" id="loanProductMaxPeriod" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <div class="input-errors" v-for="(error, index) of x$.loanProductMaxPeriod.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                  <div class="col-span-2">
+                    <label for="coreBankingIntegration" class="block text-sm font-medium text-gray-700">CoreBanking Integration</label>
+                    <select v-model="organisationSettingsForm.coreBankingIntegration" id="coreBankingIntegration" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm">
+                      <option value="JUMBOSTAR">JUMBOSTAR</option>
+                      <option value="DEFAULT">DEFAULT</option>
+                      <option value="CENTRINO">CENTRINO</option>
+                    </select>
+                    <div class="input-errors" v-for="(error, index) of x$.coreBankingIntegration.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                  <div class="col-span-2">
+                    <label for="notificationProvider" class="block text-sm font-medium text-gray-700">Notification Provider</label>
+                    <select v-model="organisationSettingsForm.notificationProvider" id="notificationProvider" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm">
+                      <option value="JUMBOSTAR">JUMBOSTAR</option>
+                      <option value="DEFAULT">DEFAULT</option>
+                      <option value="CENTRINO">CENTRINO</option>
+                    </select>
+                    <div class="input-errors" v-for="(error, index) of x$.notificationProvider.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                  <div class="col-span-2">
+                    <label for="identifierType" class="block text-sm font-medium text-gray-700">Identifier Type</label>
+                    <select v-model="organisationSettingsForm.identifierType" id="identifierType" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm">
+                      <option value="EMAIL">EMAIL</option>
+                      <option value="ID_NUMBER">ID NUMBER</option>
+                      <option value="PHONE_NUMBER">PHONE NUMBER</option>
+                      <option value="MEMBER_NUMBER">MEMBER NUMBER</option>
+                    </select>
+                    <div class="input-errors" v-for="(error, index) of x$.identifierType.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="parallelLoans" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Parallel Loans</label>
+                      <input v-model="organisationSettingsForm.parallelLoans" type="checkbox" id="parallelLoans" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.parallelLoans.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="requireWitness" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Require Witness</label>
+                      <input v-model="organisationSettingsForm.requireWitness" type="checkbox" id="requireWitness" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.requireWitness.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="allowZeroGuarantors" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Allow Zero Guarantors</label>
+                      <input v-model="organisationSettingsForm.allowZeroGuarantors" type="checkbox" id="allowZeroGuarantors" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.allowZeroGuarantors.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="allowSelfGuarantee" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Allow Self Guarantee</label>
+                      <input v-model="organisationSettingsForm.allowSelfGuarantee" type="checkbox" id="allowSelfGuarantee" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.allowSelfGuarantee.$errors" :key="index">
+                    <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="isGuaranteedAmountShared" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Share Guaranteed Amount</label>
+                      <input v-model="organisationSettingsForm.isGuaranteedAmountShared" type="checkbox" id="isGuaranteedAmountShared" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.isGuaranteedAmountShared.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="useEmbeddedURL" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Use Embedded URL</label>
+                      <input v-model="organisationSettingsForm.useEmbeddedURL" type="checkbox" id="useEmbeddedURL" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.useEmbeddedURL.$errors" :key="index">
+                      <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="containsAttachments" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Contains Attachments</label>
+                      <input v-model="organisationSettingsForm.containsAttachments" type="checkbox" id="containsAttachments" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.containsAttachments.$errors" :key="index">
+                    <div class="text-xs text-red-400">{{ error.$message }}</div>
+                    </div>
+                  </div>
+
+                  <div class="col-span-1">
+                    <div class="flex flex-row-reverse">
+                      <label for="customSMS" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Custom SMS</label>
+                      <input v-model="organisationSettingsForm.customSMS" type="checkbox" id="customSMS" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                    </div>
+                    <div class="input-errors" v-for="(error, index) of x$.customSMS.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>

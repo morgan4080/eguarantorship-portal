@@ -13,6 +13,8 @@ type LoanProductItem = {
     refId: string,
     name: string,
     interestRate: number,
+    maxPeriod: string,
+    coreBankingLoanTypeCode: string,
     requiredGuarantors: number,
     roleActions: any[]
     templateId: string,

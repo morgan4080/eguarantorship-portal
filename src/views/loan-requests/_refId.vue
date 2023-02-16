@@ -530,7 +530,7 @@
               <option value="downloadPdf">Download PDF</option>
               <option value="downloadCertificate">Download Certificate</option>
               <option value="showZohoRequest">Show zoho request</option>
-              <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="voidLoanRequest">Void loan request</option>
+              <option value="voidLoanRequest">Void loan request</option>
               <option v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.applicationStatus === 'COMPLETED'" value="submitToCoBanking">Submit to co-banking</option>
             </select>
           </div>
