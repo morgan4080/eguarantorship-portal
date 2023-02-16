@@ -87,15 +87,15 @@ const menus = reactive([
     expanded: false,
     subMenus: [
       {
-        title: 'Zoho Integration',
+        title: 'ZOHO INTEGRATION',
         url: '/settings/zoho-integration'
       },
       {
-        title: 'Loan Products',
+        title: 'LOAN PRODUCTS',
         url: '/settings/loan-products'
       },
       {
-        title: 'Client Settings',
+        title: 'CLIENT SETTINGS',
         url: '/settings/client-settings'
       },
       /*{

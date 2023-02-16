@@ -1,6 +1,28 @@
 import {defineStore} from "pinia";
 import {PaginationData} from "./loan-request-store";
 
+export type LoanProductFormType = {
+    name: string;
+    interestRate: string;
+    requiredGuarantors: string;
+    maxPeriod: string;
+    coreBankingLoanTypeCode: string;
+    templateName: string;
+    templateId: string;
+    refId: string;
+    roleActions: {
+        role: string;
+        action_id: string;
+        action_type: string;
+        recipient_name: string;
+        recipient_phonenumber: string;
+        is_embedded: boolean;
+        recipient_email: string;
+        private_notes: string;
+        verify_recipient: boolean;
+    }[];
+    details: any;
+}
 interface LoanProduct {
     refId: string;
     name: string;
@@ -10,21 +32,22 @@ interface LoanProduct {
 }
 
 type LoanProductItem = {
-    refId: string,
-    name: string,
-    interestRate: number,
-    maxPeriod: string,
-    coreBankingLoanTypeCode: string,
-    requiredGuarantors: number,
-    roleActions: any[]
-    templateId: string,
-    templateName: string
+    refId: string;
+    name: string;
+    interestRate: number;
+    maxPeriod: string;
+    coreBankingLoanTypeCode: string;
+    requiredGuarantors: number;
+    roleActions: any[];
+    templateId: string;
+    templateName: string;
+    details: any;
 }
 
 interface LoanProductState {
-    loanProducts: LoanProduct[],
-    loanProduct: LoanProductItem | null
-    paginationData: PaginationData | null
+    loanProducts: LoanProduct[];
+    loanProduct: LoanProductItem | null;
+    paginationData: PaginationData | null;
 }
 export const useLoanProduct = defineStore('loan-product-store', {
     state: (): LoanProductState => ({
