@@ -78,6 +78,7 @@ const submitLoanProduct = async () => {
       templateName: loanProductForm.templateName,
       templateId: loanProductForm.templateId,
       roleActions: loanProductForm.roleActions,
+      details: loanProductForm.details,
     }
     loanProductStore.postLoanProduct(payload).then(() => router.push('/settings/loan-products')).then(() => authStore.defineNotification({
       id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
