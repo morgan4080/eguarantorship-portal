@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon, PencilIcon} from "@heroicons/vue/24/outline"
+import {ChevronDownIcon, TrashIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline"
 import Breadcrumb from "../../../components/Breadcrumb.vue"
 import {computed, onMounted, reactive, ref, watch} from "vue"
 import {useRoute, useRouter} from "vue-router"

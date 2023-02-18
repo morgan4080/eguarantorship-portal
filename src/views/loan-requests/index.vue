@@ -57,7 +57,7 @@
     loanNumber: JSON.stringify(route.query) !== '{}' && route.query.loanNumber ? route.query.loanNumber : '',
     startDate: JSON.stringify(route.query) !== '{}' && route.query.startDate ? new Date(`${route.query.startDate}`).toLocaleDateString('en-CA') : '',
     endDate: JSON.stringify(route.query) !== '{}' && route.query.endDate ? new Date(`${route.query.endDate}`).toLocaleDateString('en-CA') : '',
-    isActive: JSON.stringify(route.query) !== '{}' && route.query.isActive ? route.query.isActive : false,
+    isActive: JSON.stringify(route.query) !== '{}' && route.query.isActive ? route.query.isActive : true,
   })
 
   let queryParams = reactive<Record<any, any>>({
@@ -318,7 +318,7 @@
               </div>
               <div class="ml-3 text-sm">
                 <label class="font-normal text-gray-500">
-                  Show Deleted
+                  Hide Deleted
                 </label>
               </div>
             </div>
