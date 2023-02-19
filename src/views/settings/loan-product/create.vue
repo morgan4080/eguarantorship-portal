@@ -182,7 +182,7 @@ const loanProductDetails = computed(() => {
                           <div class="col-span-6 flex justify-between">
                             <dt class="text-sm font-medium text-gray-500"></dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                              <button @click="otherDetails = !otherDetails" type="button" class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 sm:text-sm">
+                              <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mx-1.5 items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 sm:text-sm">
                                 Other Details
                                 <ChevronDownIcon class="h-4 w-4 ml-2 text-gray-600"/>
                               </button>
@@ -197,10 +197,7 @@ const loanProductDetails = computed(() => {
                                       <h6 class="py-2 sm:py-3 sm:px-6 font-medium text-base">Other details</h6>
                                       <div class="flex items-center justify-center bg-white">
                                         <button type="button" v-if="!otherDetailsEdit" @click="otherDetailsEdit = !otherDetailsEdit" class="inline-flex cursor-pointer items-center rounded-full bg-black py-0.5 px-2 text-xs font-medium text-white">
-                                          Edit
-                                        </button>
-                                        <button type="submit" v-if="otherDetailsEdit" class="inline-flex cursor-pointer items-center rounded-full bg-green-300 py-0.5 px-2 text-xs font-medium text-eg-bg">
-                                          Save
+                                          Add
                                         </button>
                                       </div>
                                     </div>

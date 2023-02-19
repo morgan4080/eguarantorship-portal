@@ -7,27 +7,28 @@ type NotificationProviders = "JUMBOSTAR" | "DEFAULT" | "CENTRINO"
 type IdentifierTypes = "EMAIL" | "ID_NUMBER" | "PHONE_NUMBER" | "MEMBER_NUMBER"
 
 export interface SettingsPayloadType {
-    "ussdShortCode": string;
-    "organizationName": string;
-    "requireWitness": boolean;
-    "allowZeroGuarantors": boolean;
-    "allowSelfGuarantee": boolean;
-    "isGuaranteedAmountShared": boolean;
-    "useEmbeddedURL": boolean;
-    "containsAttachments": boolean;
-    "organizationAlias": string;
-    "organizationEmail": string;
-    "supportEmail": string;
-    "organizationPrimaryTheme": string;
-    "organizationSecondaryTheme": string;
-    "organizationLogoName": string;
-    "organizationLogoExtension": string;
-    "loanProductMaxPeriod": string;
-    "customSMS": boolean;
-    "parallelLoans": boolean;
-    "coreBankingIntegration": CoreBankingIntegrations;
-    "notificationProvider": NotificationProviders;
-    "identifierType": IdentifierTypes;
+    ussdShortCode: string;
+    organizationName: string;
+    requireWitness: boolean;
+    allowZeroGuarantors: boolean;
+    allowSelfGuarantee: boolean;
+    isGuaranteedAmountShared: boolean;
+    useEmbeddedURL: boolean;
+    containsAttachments: boolean;
+    organizationAlias: string;
+    organizationEmail: string;
+    supportEmail: string;
+    organizationPrimaryTheme: string;
+    organizationSecondaryTheme: string;
+    organizationLogoName: string;
+    organizationLogoExtension: string;
+    loanProductMaxPeriod: string;
+    customSMS: boolean;
+    parallelLoans: boolean;
+    coreBankingIntegration: CoreBankingIntegrations;
+    notificationProvider: NotificationProviders;
+    identifierType: IdentifierTypes;
+    details: Record<any, any>
 }
 
 type settingsType = {
@@ -41,25 +42,26 @@ type settingsType = {
     ussdShortCode:string;
     organizationName:string;
     lastModified:string;
-    "requireWitness": boolean;
-    "allowZeroGuarantors": boolean;
-    "allowSelfGuarantee": boolean;
-    "isGuaranteedAmountShared": boolean;
-    "useEmbeddedURL": boolean;
-    "containsAttachments": boolean;
-    "organizationAlias": string;
-    "organizationEmail": string;
-    "supportEmail": string;
-    "organizationPrimaryTheme": string;
-    "organizationSecondaryTheme": string;
-    "organizationLogoName": string;
-    "organizationLogoExtension": string;
-    "loanProductMaxPeriod": string;
-    "customSMS": boolean;
-    "parallelLoans": boolean;
-    "coreBankingIntegration": CoreBankingIntegrations;
-    "notificationProvider": NotificationProviders;
-    "identifierType": IdentifierTypes;
+    requireWitness: boolean;
+    allowZeroGuarantors: boolean;
+    allowSelfGuarantee: boolean;
+    isGuaranteedAmountShared: boolean;
+    useEmbeddedURL: boolean;
+    containsAttachments: boolean;
+    organizationAlias: string;
+    organizationEmail: string;
+    supportEmail: string;
+    organizationPrimaryTheme: string;
+    organizationSecondaryTheme: string;
+    organizationLogoName: string;
+    organizationLogoExtension: string;
+    loanProductMaxPeriod: string;
+    customSMS: boolean;
+    parallelLoans: boolean;
+    coreBankingIntegration: CoreBankingIntegrations;
+    notificationProvider: NotificationProviders;
+    identifierType: IdentifierTypes;
+    details: Record<any, any>;
 }
 interface ClientStore {
     clientSettings: null | settingsType
