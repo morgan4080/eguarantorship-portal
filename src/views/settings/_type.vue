@@ -710,8 +710,8 @@
                                   <dd class="mt-1 text-sm text-gray-900 sm:mt-0 col-span-2">
                                     <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
                                       <select :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].value" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm">
-                                        <option :value="null">-Select Input Type-</option>
-                                        <option value="BOOLEAN">ON/OFF</option>
+                                        <option :value="''">-Select Input Type-</option>
+                                        <option value="BOOLEAN">TRUE/FALSE</option>
                                         <option value="STRING">ALPHANUMERIC</option>
                                         <option value="NUMBER">NUMERIC</option>
                                       </select>
