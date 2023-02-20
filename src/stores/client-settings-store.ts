@@ -93,10 +93,7 @@ export const useClientStore = defineStore('client-settings-store', {
                 return Promise.reject(e.message)
             }
         },
-        async postClientSettings(payload: {
-            organizationName: string,
-            ussdShortCode: string
-        }): Promise<any> {
+        async postClientSettings(payload: SettingsPayloadType): Promise<any> {
             try {
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", `application/json`);
