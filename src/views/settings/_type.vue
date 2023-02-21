@@ -718,7 +718,7 @@
                                     </div>
                                     <div class="flex-shrink relative flex items-start">
                                       <div class="flex h-5 items-center">
-                                        <input :name="`value${i}`" :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].value" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg" />
+                                        <input :name="`value${i}`" :disabled="!otherDetailsEdit" v-model="organisationSettingsForm.details[key].value" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg" />
                                       </div>
                                       <div class="ml-3 text-sm">
                                         <label :for="`value${i}`" class="text-gray-500">Required</label>
