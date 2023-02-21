@@ -601,8 +601,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="parallelLoans" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Parallel Loans</label>
-                      <input v-model="organisationSettingsForm.parallelLoans" type="checkbox" id="parallelLoans" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="parallelLoans" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Parallel Loans</label>
+                      <input v-model="organisationSettingsForm.parallelLoans" type="checkbox" id="parallelLoans" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.parallelLoans.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -611,8 +611,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="requireWitness" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Require Witness</label>
-                      <input v-model="organisationSettingsForm.requireWitness" type="checkbox" id="requireWitness" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="requireWitness" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Require Witness</label>
+                      <input v-model="organisationSettingsForm.requireWitness" type="checkbox" id="requireWitness" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.requireWitness.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -621,8 +621,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="allowZeroGuarantors" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Allow Zero Guarantors</label>
-                      <input v-model="organisationSettingsForm.allowZeroGuarantors" type="checkbox" id="allowZeroGuarantors" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="allowZeroGuarantors" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Allow Zero Guarantors</label>
+                      <input v-model="organisationSettingsForm.allowZeroGuarantors" type="checkbox" id="allowZeroGuarantors" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.allowZeroGuarantors.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -631,8 +631,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="allowSelfGuarantee" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Allow Self Guarantee</label>
-                      <input v-model="organisationSettingsForm.allowSelfGuarantee" type="checkbox" id="allowSelfGuarantee" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="allowSelfGuarantee" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Allow Self Guarantee</label>
+                      <input v-model="organisationSettingsForm.allowSelfGuarantee" type="checkbox" id="allowSelfGuarantee" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.allowSelfGuarantee.$errors" :key="index">
                     <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -641,8 +641,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="isGuaranteedAmountShared" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Share Guaranteed Amount</label>
-                      <input v-model="organisationSettingsForm.isGuaranteedAmountShared" type="checkbox" id="isGuaranteedAmountShared" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="isGuaranteedAmountShared" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Share Guaranteed Amount</label>
+                      <input v-model="organisationSettingsForm.isGuaranteedAmountShared" type="checkbox" id="isGuaranteedAmountShared" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.isGuaranteedAmountShared.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -651,8 +651,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="useEmbeddedURL" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Use Embedded URL</label>
-                      <input v-model="organisationSettingsForm.useEmbeddedURL" type="checkbox" id="useEmbeddedURL" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="useEmbeddedURL" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Use Embedded URL</label>
+                      <input v-model="organisationSettingsForm.useEmbeddedURL" type="checkbox" id="useEmbeddedURL" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.useEmbeddedURL.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -661,8 +661,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="containsAttachments" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Contains Attachments</label>
-                      <input v-model="organisationSettingsForm.containsAttachments" type="checkbox" id="containsAttachments" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="containsAttachments" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Contains Attachments</label>
+                      <input v-model="organisationSettingsForm.containsAttachments" type="checkbox" id="containsAttachments" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.containsAttachments.$errors" :key="index">
                     <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -671,8 +671,8 @@
 
                   <div class="col-span-1">
                     <div class="flex flex-row-reverse">
-                      <label for="customSMS" class="block w-24 text-sm font-medium text-gray-700 flex-grow ml-2">Custom SMS</label>
-                      <input v-model="organisationSettingsForm.customSMS" type="checkbox" id="customSMS" class="h-4 w-4 rounded border-gray-300 text-bg-eg focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
+                      <label for="customSMS" class="block text-sm font-medium text-gray-700 flex-grow ml-2">Custom SMS</label>
+                      <input v-model="organisationSettingsForm.customSMS" type="checkbox" id="customSMS" class="h-4 w-4 rounded border-gray-300 text-bg-eg flex-shrink focus:border-bg-eg focus:outline-none focus:ring-bg-eg" />
                     </div>
                     <div class="input-errors" v-for="(error, index) of x$.customSMS.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -680,8 +680,8 @@
                   </div>
 
                   <div class="col-span-2">
-                    <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mx-1.5 items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 sm:text-sm">
-                      Custom Form Fields
+                    <button @click="otherDetails = !otherDetails" type="button" class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2 sm:text-sm">
+                      Document Fields
                       <ChevronDownIcon class="h-4 w-4 ml-2 text-gray-600"/>
                     </button>
                   </div>
@@ -692,7 +692,7 @@
                         <main class="flex-1 overflow-y-auto">
                           <section aria-labelledby="primary-heading" class="flex h-full min-w-0 flex-1 flex-col lg:order-last">
                             <div class="flex">
-                              <h6 class="py-2 sm:py-3 sm:px-6 font-medium text-base">KYC details as configured on zoho forms.</h6>
+                              <h6 class="py-2 sm:py-3 sm:px-6 font-medium text-base">Document Fields.</h6>
                               <div class="flex items-center justify-center bg-white">
                                 <button type="button" v-if="!otherDetailsEdit" @click="otherDetailsEdit = !otherDetailsEdit" class="inline-flex cursor-pointer items-center rounded-full bg-black py-0.5 px-2 text-xs font-medium text-white">
                                   Add
@@ -707,14 +707,22 @@
                                       <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                     </div>
                                   </dt>
-                                  <dd class="mt-1 text-sm text-gray-900 sm:mt-0 col-span-2">
-                                    <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                      <select :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].value" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm">
+                                  <dd class="flex space-x-2 items-center mt-1 text-sm text-gray-900 col-span-2 sm:mt-0">
+                                    <div class="flex-grow border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                      <select :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].type" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm">
                                         <option :value="''">-Select Input Type-</option>
                                         <option value="BOOLEAN">TRUE/FALSE</option>
-                                        <option value="STRING">ALPHANUMERIC</option>
-                                        <option value="NUMBER">NUMERIC</option>
+                                        <option value="TEXT">TEXT</option>
+                                        <option value="NUMBER">NUMBERS</option>
                                       </select>
+                                    </div>
+                                    <div class="flex-shrink relative flex items-start">
+                                      <div class="flex h-5 items-center">
+                                        <input :name="`value${i}`" :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].value" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:ring-eg-bg" />
+                                      </div>
+                                      <div class="ml-3 text-sm">
+                                        <label :for="`value${i}`" class="text-gray-500">Required</label>
+                                      </div>
                                     </div>
                                   </dd>
                                   <dd v-if="otherDetailsEdit" class="mt-1 flex justify-center items-center text-sm text-gray-900 sm:mt-0 col-span-1">
