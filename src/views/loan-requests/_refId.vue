@@ -742,7 +742,7 @@
                   </router-link>
                 </td>
                 <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-slate-900">{{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessName ? loanRequestStore.getLoanRequest.witnessName : '' }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
+                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3" style="min-width: 200px;">
                   <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessMemberNo" class="flex items-center relative">
                     <div class="w-full border border-eg-bg h-2 rounded-full flex">
                       <div :style="{ width: hrWidth2() + '%' }" class="bg-eg-bg"></div>
@@ -809,7 +809,7 @@
                       <PencilSquareIcon class="text-amber-900 w-5 h-5" />
                     </button>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3" style="min-width: 200px;">
                     <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
                       <div class="w-full border border-eg-bg h-2 rounded-full flex">
                         <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
@@ -1143,7 +1143,7 @@
                               {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
                             </button>
                           </td>
-                          <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3" style="min-width: 200px;">
                             <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
                               <div class="w-full border border-eg-bg h-2 rounded-full flex">
                                 <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
