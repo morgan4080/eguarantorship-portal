@@ -119,7 +119,7 @@
           </div>
 
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-            <div class="px-4 py-5">
+            <div class="sm:px-4 pb-5">
               <h3 class="text-lg font-medium leading-6 text-slate-900">Member Details</h3>
               <p class="mt-1 max-w-2xl text-sm text-slate-500">Member {{memberStore.getMemberDetails?.memberNumber}} current data.</p>
             </div>
