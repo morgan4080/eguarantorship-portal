@@ -521,7 +521,7 @@
     <main class="flex-1">
       <div class="pt-2 pb-6">
         <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
-          <div class="flex justify-between items-center">
+          <div class="flex flex-col space-y-4 md:space-y-0 md:flex-row justify-between items-center">
             <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests?pageSize=10&pageIndex=0&isActive=true"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
             <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-bg text-sm bg-slate-200 focus:outline-none focus:ring-eg-bg focus:border-eg-bg font-normal rounded-md">
               <option value="">Select Option</option>
@@ -535,27 +535,27 @@
             </select>
           </div>
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
-            <div class="py-5 px-5">
-              <h3 class="text-lg font-medium leading-6 text-slate-900">Loan Request Details.</h3>
+            <div class="py-5 px-5 text-center md:text-left">
+              <h3 class="text-xl font-semibold text-eg-bg leading-6">Loan Request Details.</h3>
               <p class="mt-1 max-w-2xl text-sm text-slate-500">Loan Request {{loanRequestStore.getLoanRequest?.loanRequestNumber}} current data.</p>
             </div>
-            <div class="flex flex-1 items-stretch overflow-hidden">
+            <div class="flex flex-col md:flex-row space-y-6 md:space-y-0 items-stretch overflow-hidden">
 
               <aside class="flex-1 overflow-y-auto border-slate-200 block relative">
-                <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pdfThumbNail" class="px-5">
+                <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pdfThumbNail" class="flex flex-col justify-center px-5">
                   <img
                       :src="`data:image/png;base64,${loanRequestStore.getLoanRequest.pdfThumbNail}`"
                       alt="Loan Application Form"
-                      class="w-64"
+                      class="w-full md:w-64"
                   >
-                  <button @click="downloadLoanRequestForm" type="button" class="absolute bottom-2 inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
+                  <button @click="downloadLoanRequestForm" type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-64">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                     </svg>
                     DOWNLOAD FORM
                   </button>
                 </div>
-                <div v-else class="px-5">
+                <div v-else class="flex flex-col justify-center px-5">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-64 h-64 text-red-400">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                   </svg>
@@ -571,7 +571,7 @@
               <main class="flex-1 overflow-y-auto">
                 <section aria-labelledby="primary-heading" class="flex h-full min-w-0 flex-1 flex-col lg:order-last">
                   <h1 id="primary-heading" class="sr-only">loan request details</h1>
-                  <dl class="sm:divide-y sm:divide-slate-100">
+                  <dl class="sm:divide-y text-center md:text-left sm:divide-slate-100">
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-slate-500">Loan Request No.</dt>
                       <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanRequestNumber }}</dd>
@@ -587,7 +587,7 @@
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
                       <dt class="text-sm font-medium text-slate-500">Member No.</dt>
                       <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
-                        <router-link :to="`/members/${loanRequestStore.getLoanRequest?.memberRefId}/view`" class="underline flex items-center text-eg-bg">
+                        <router-link :to="`/members/${loanRequestStore.getLoanRequest?.memberRefId}/view`" class="underline flex justify-center md:justify-start text-eg-bg">
                           {{ loanRequestStore.getLoanRequest?.memberNumber }}
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
@@ -633,11 +633,11 @@
               <aside class="flex-1 flex flex-col items-center overflow-y-auto border-slate-200 bg-white block">
                 <div class="flex space-x-6">
                   <div class="flex flex-col">
-                    <h3 class="text-lg text-slate-500 font-medium">Requested</h3>
+                    <h3 class="text-lg font-bold text-eg-bg">Requested</h3>
                     <p class="text-sm text-eg-bg">KES {{ loanRequestStore.getLoanRequest? $filters.currencyKES(loanRequestStore.getLoanRequest.loanAmount) : 0 }}</p>
                   </div>
                   <div class="flex flex-col">
-                    <h3 class="text-lg text-slate-500 font-medium">Deposits</h3>
+                    <h3 class="text-lg font-bold text-eg-bg">Deposits</h3>
                     <p class="text-sm text-eg-bg">KES {{ loanRequestStore.getLoanRequest? $filters.currencyKES(loanRequestStore.getLoanRequest.totalDeposits) : 0 }}</p>
                   </div>
                 </div>
@@ -662,6 +662,7 @@
                   <ChevronDownIcon class="h-4 w-4 ml-2 text-slate-600"/>
                 </button>
               </aside>
+
             </div>
             <Transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
               <div v-if="otherDetails" class="flex flex-1 items-stretch overflow-hidden mt-6">
@@ -718,7 +719,7 @@
               </div>
             </Transition>
           </div>
-          <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+          <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6 overflow-x-auto">
             <div class="px-4 py-5 sm:px-6">
               <h3 class="text-lg font-medium leading-6 text-slate-900">Witnesses</h3>
             </div>
@@ -757,7 +758,7 @@
               </tbody>
             </table>
           </div>
-          <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
+          <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6 overflow-x-auto">
             <div class="px-4 py-5 sm:px-6">
               <h3 class="text-lg font-medium leading-6 text-slate-900">Guarantors</h3>
             </div>
