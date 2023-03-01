@@ -16,13 +16,15 @@ body {
     font-size: 14px;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
-    -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
 }
 
 .router-link-active.router-link-exact-active {
     @apply bg-eg-bg;
+    @apply text-white;
+}
+.router-link-active > svg {
     @apply text-white;
 }
 

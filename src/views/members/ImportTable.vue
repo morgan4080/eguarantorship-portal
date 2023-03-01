@@ -6,26 +6,26 @@
       </div>
       <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
         <div class="py-5">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">Import Data</h3>
-          <p class="mt-1 max-w-2xl text-sm text-gray-500">From .xls, .xlsx, or .csv file.</p>
+          <h3 class="text-lg font-medium leading-6 text-slate-900">Import Data</h3>
+          <p class="mt-1 max-w-2xl text-sm text-slate-500">From .xls, .xlsx, or .csv file.</p>
         </div>
         <div class="relative w-full overflow-x-auto">
           <table class="w-full max-w-full border-collapse table-auto">
-            <thead class="bg-gray-50">
+            <thead class="bg-slate-50">
             <tr>
-              <th v-for="(header, i) in form.columns" :key="`${header}${i}`" scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">
+              <th v-for="(header, i) in form.columns" :key="`${header}${i}`" scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">
                 <div class="flex flex-col space-y-2">
                   <span>
                     <input
                         type="checkbox"
-                        class="mr-1 focus:ring-eg-lightblue focus:border-eg-lightblue text-eg-text rounded-md bg-gray-200 border-gray-300"
+                        class="mr-1 focus:ring-eg-lightblue focus:border-eg-lightblue text-eg-text rounded-md bg-slate-200 border-slate-300"
                         :checked="header.checked"
                         @change="columnChecked(header.label)"
                     >
                   </span>
                   <span>{{ header.label }}</span>
                   <select
-                      class="block h-8 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue text-xs font-normal rounded-md"
+                      class="block h-8 text-eg-text bg-slate-200 border-slate-300 focus:outline-none focus:ring-eg-lightblue focus:border-eg-lightblue text-xs font-normal rounded-md"
                       @change="exchangeValues($event, header.label)"
                   >
                     <option hidden>Select For</option>
@@ -41,9 +41,9 @@
               </th>
             </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
+            <tbody class="divide-y divide-slate-200 bg-white">
             <tr v-for="(row, i) in form.rows" :key="`r${i}`">
-              <td v-for="(column, index) in form.columns" :key="`c${index}`" class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ row[column.label] }}</td>
+              <td v-for="(column, index) in form.columns" :key="`c${index}`" class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ row[column.label] }}</td>
             </tr>
             </tbody>
           </table>

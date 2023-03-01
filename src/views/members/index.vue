@@ -239,26 +239,28 @@
 <template>
   <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="pt-2 pb-16">
+      <div class="pt-2 pb-6">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
-          <div class="flex justify-between items-center">
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:justify-between">
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
-            <div class="flex space-x-2">
-              <button @click="openMemberTransferModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Init Transfers
-              </button>
-              <button @click="openPullMemberModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                Pull Member
-              </button>
-              <DropDown :items="actions">
-                <MenuButton class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-100">
-                  Actions
-                  <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-                </MenuButton>
-              </DropDown>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <div class="flex space-x-2">
+                <button @click="openMemberTransferModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
+                  Init Transfers
+                </button>
+                <button @click="openPullMemberModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
+                  Pull Member
+                </button>
+                <DropDown :items="actions">
+                  <MenuButton class="inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
+                    Actions
+                    <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+                  </MenuButton>
+                </DropDown>
+              </div>
             </div>
           </div>
-          <div class="sm:grid sm:grid-cols-4 sm:gap-2">
+          <div class="flex flex-col space-y-4 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-2">
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
@@ -338,32 +340,34 @@
             </div>
           </div>
           <MembersTable :members="memberStore.getMembers">
-            <div class="sm:flex-auto">
-              <GlobalSearch :placeholder="'Search Members'" :ctx="$route.name" @update="searchMembers" />
+            <div class="sm:flex-auto space-x-2 items-center">
+              <GlobalSearch
+                  :placeholder="'Search Members'"
+                  :ctx="$route.name"
+                  @update="searchMembers"
+              />
             </div>
             <div class="mt-0 ml-16 flex flex-wrap space-x-4">
               <Menu as="div" class="relative inline-block text-left">
-                <div>
-                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
-                    <span class="sr-only">export requests options</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                    </svg>
-                    Export Members
-                  </MenuButton>
-                </div>
+                <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+                  <span class="sr-only">export requests options</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                  </svg>
+                  Export Members
+                </MenuButton>
 
                 <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                   <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div class="py-1">
                       <form @submit.prevent="exportMembers('all')">
                         <MenuItem v-slot="{ active }">
-                          <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full px-4 py-2 text-left text-sm']">Export All</button>
+                          <button type="submit" :class="[active ? 'bg-slate-100 text-slate-900' : 'text-slate-700', 'block w-full px-4 py-2 text-left text-sm']">Export All</button>
                         </MenuItem>
                       </form>
                       <form @submit.prevent="exportMembers">
                         <MenuItem v-slot="{ active }">
-                          <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full px-4 py-2 text-left text-sm']">Export Filtered</button>
+                          <button type="submit" :class="[active ? 'bg-slate-100 text-slate-900' : 'text-slate-700', 'block w-full px-4 py-2 text-left text-sm']">Export Filtered</button>
                         </MenuItem>
                       </form>
                     </div>
@@ -388,20 +392,20 @@
     <TransitionRoot as="template" :show="openPullMemberModal">
       <Dialog as="div" class="relative z-10" @close="openPullMemberModal = false">
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
         </TransitionChild>
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Pull Member</DialogTitle>
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Pull Member</DialogTitle>
                 <div class="mt-4">
                   <form @submit.prevent="pullMember" class="space-y-6">
                     <div>
                       <div class="grid grid-cols-6 gap-6">
                         <div class="col-span-6">
-                          <label for="template-name" class="block text-sm font-medium text-gray-700">Template Name</label>
+                          <label for="template-name" class="block text-sm font-medium text-slate-700">Template Name</label>
                           <select v-model="pullForm.identifierType" id="template-name" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
                             <option :value="null">-Select Identifier Type-</option>
                             <option v-for="(option, i) in identifierTypes" :key="`${option.id}${i}`" :value="option.value">{{ option.name }}</option>
@@ -411,7 +415,7 @@
                           </div>
                         </div>
                         <div class="col-span-6">
-                          <label for="name" class="block text-sm font-medium text-gray-700">Member Identifier</label>
+                          <label for="name" class="block text-sm font-medium text-slate-700">Member Identifier</label>
                           <input v-model="pullForm.memberIdentifier" id="name" type="text" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
                           <div class="input-errors" v-for="(error, index) of v$.memberIdentifier.$errors" :key="index">
                             <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -420,8 +424,8 @@
                         <div class="col-span-6">
                           <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                              <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
-                              <label for="pull-cb" class="ml-2 block text-sm text-gray-900">Pull from co-banking</label>
+                              <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                              <label for="pull-cb" class="ml-2 block text-sm text-slate-900">Pull from co-banking</label>
                             </div>
                           </div>
                         </div>
@@ -442,21 +446,21 @@
     <TransitionRoot as="template" :show="openMemberTransferModal">
       <Dialog as="div" class="relative z-10" @close="openMemberTransferModal = false">
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
         </TransitionChild>
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
               <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Initialize Member Transfers</DialogTitle>
+                <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Initialize Member Transfers</DialogTitle>
                 <div class="mt-4">
                   <form @submit.prevent="initMemberTransfer" class="space-y-6">
 
                     <div class="grid grid-cols-6 gap-6">
 
                       <div class="col-span-6">
-                        <label for="joinDate" class="block text-sm font-medium text-gray-700">Join Date</label>
+                        <label for="joinDate" class="block text-sm font-medium text-slate-700">Join Date</label>
                         <input v-model="memberTransferForm.joinDate" id="joinDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
                         <div class="input-errors" v-for="(error, index) of v1$.joinDate.$errors" :key="index">
                           <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -464,7 +468,7 @@
                       </div>
 
                       <div class="col-span-6">
-                        <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
+                        <label for="endDate" class="block text-sm font-medium text-slate-700">End Date</label>
                         <input v-model="memberTransferForm.endDate" id="endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
                         <div class="input-errors" v-for="(error, index) of v1$.endDate.$errors" :key="index">
                           <div class="text-xs text-red-400">{{ error.$message }}</div>

@@ -519,11 +519,11 @@
 <template>
   <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="pt-2 pb-16">
+      <div class="pt-2 pb-6">
         <div class="mx-auto space-y-4 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Loan Requests" linkUrl="/loan-requests?pageSize=10&pageIndex=0&isActive=true"  :current="`Request ${loanRequestStore.getLoanRequest?.loanRequestNumber}`"/>
-            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-bg text-sm bg-gray-200 focus:outline-none focus:ring-eg-bg focus:border-eg-bg font-normal rounded-md">
+            <select v-model="action" class="block mr-5 pl-3 pr-10 text-eg-bg text-sm bg-slate-200 focus:outline-none focus:ring-eg-bg focus:border-eg-bg font-normal rounded-md">
               <option value="">Select Option</option>
               <option value="resubmitForSigning">Resubmit for signing</option>
               <option value="downloadAttachments">Download Attachments</option>
@@ -536,12 +536,12 @@
           </div>
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="py-5 px-5">
-              <h3 class="text-lg font-medium leading-6 text-gray-900">Loan Request Details.</h3>
-              <p class="mt-1 max-w-2xl text-sm text-gray-500">Loan Request {{loanRequestStore.getLoanRequest?.loanRequestNumber}} current data.</p>
+              <h3 class="text-lg font-medium leading-6 text-slate-900">Loan Request Details.</h3>
+              <p class="mt-1 max-w-2xl text-sm text-slate-500">Loan Request {{loanRequestStore.getLoanRequest?.loanRequestNumber}} current data.</p>
             </div>
             <div class="flex flex-1 items-stretch overflow-hidden">
 
-              <aside class="flex-1 overflow-y-auto border-gray-200 block relative">
+              <aside class="flex-1 overflow-y-auto border-slate-200 block relative">
                 <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pdfThumbNail" class="px-5">
                   <img
                       :src="`data:image/png;base64,${loanRequestStore.getLoanRequest.pdfThumbNail}`"
@@ -571,22 +571,22 @@
               <main class="flex-1 overflow-y-auto">
                 <section aria-labelledby="primary-heading" class="flex h-full min-w-0 flex-1 flex-col lg:order-last">
                   <h1 id="primary-heading" class="sr-only">loan request details</h1>
-                  <dl class="sm:divide-y sm:divide-gray-100">
+                  <dl class="sm:divide-y sm:divide-slate-100">
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Loan Request No.</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanRequestNumber }}</dd>
+                      <dt class="text-sm font-medium text-slate-500">Loan Request No.</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanRequestNumber }}</dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Application Date</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanDate }}</dd>
+                      <dt class="text-sm font-medium text-slate-500">Application Date</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.loanDate }}</dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Applicant Signed</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.applicantSigned }}</dd>
+                      <dt class="text-sm font-medium text-slate-500">Applicant Signed</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">{{ loanRequestStore.getLoanRequest?.applicantSigned }}</dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Member No.</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                      <dt class="text-sm font-medium text-slate-500">Member No.</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
                         <router-link :to="`/members/${loanRequestStore.getLoanRequest?.memberRefId}/view`" class="underline flex items-center text-eg-bg">
                           {{ loanRequestStore.getLoanRequest?.memberNumber }}
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
@@ -596,33 +596,33 @@
                       </dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Full Names</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                      <dt class="text-sm font-medium text-slate-500">Full Names</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
                         {{ loanRequestStore.getLoanRequest?.memberFirstName }}
                         {{ loanRequestStore.getLoanRequest?.memberLastName }}
                       </dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Loan Type</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                      <dt class="text-sm font-medium text-slate-500">Loan Type</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
                         {{ loanRequestStore.getLoanRequest?.loanProductName }}
                       </dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Loan Amount</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                      <dt class="text-sm font-medium text-slate-500">Loan Amount</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
                         KES {{ loanRequestStore.getLoanRequest? $filters.currencyKES(loanRequestStore.getLoanRequest.loanAmount) : 0 }}
                       </dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Total Deposits</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                      <dt class="text-sm font-medium text-slate-500">Total Deposits</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
                         KES {{ loanRequestStore.getLoanRequest? $filters.currencyKES(loanRequestStore.getLoanRequest.totalDeposits) : 0 }}
                       </dd>
                     </div>
                     <div class="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-3 sm:px-6">
-                      <dt class="text-sm font-medium text-gray-500">Guarantors</dt>
-                      <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                      <dt class="text-sm font-medium text-slate-500">Guarantors</dt>
+                      <dd class="mt-1 text-sm text-slate-900 sm:col-span-2 sm:mt-0">
                         {{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.guarantorList ? loanRequestStore.getLoanRequest.guarantorList.length : 0 }}
                       </dd>
                     </div>
@@ -630,14 +630,14 @@
                 </section>
               </main>
 
-              <aside class="flex-1 flex flex-col items-center overflow-y-auto border-gray-200 bg-white block">
+              <aside class="flex-1 flex flex-col items-center overflow-y-auto border-slate-200 bg-white block">
                 <div class="flex space-x-6">
                   <div class="flex flex-col">
-                    <h3 class="text-lg text-gray-500 font-medium">Requested</h3>
+                    <h3 class="text-lg text-slate-500 font-medium">Requested</h3>
                     <p class="text-sm text-eg-bg">KES {{ loanRequestStore.getLoanRequest? $filters.currencyKES(loanRequestStore.getLoanRequest.loanAmount) : 0 }}</p>
                   </div>
                   <div class="flex flex-col">
-                    <h3 class="text-lg text-gray-500 font-medium">Deposits</h3>
+                    <h3 class="text-lg text-slate-500 font-medium">Deposits</h3>
                     <p class="text-sm text-eg-bg">KES {{ loanRequestStore.getLoanRequest? $filters.currencyKES(loanRequestStore.getLoanRequest.totalDeposits) : 0 }}</p>
                   </div>
                 </div>
@@ -657,9 +657,9 @@
                   </div>
                 </div>
 
-                <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mt-14 items-center rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:text-sm">
+                <button @click="otherDetails = !otherDetails" type="button" class="inline-flex mt-14 items-center rounded-md border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:text-sm">
                   Other Details
-                  <ChevronDownIcon class="h-4 w-4 ml-2 text-gray-600"/>
+                  <ChevronDownIcon class="h-4 w-4 ml-2 text-slate-600"/>
                 </button>
               </aside>
             </div>
@@ -679,20 +679,20 @@
                           </button>
                         </div>
                       </div>
-                      <dl class="sm:divide-y sm:divide-gray-200">
+                      <dl class="sm:divide-y sm:divide-slate-200">
                         <TransitionGroup enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
                           <div v-for="(key, i) in LRDetails" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3 sm:px-6">
-                            <dt class="text-sm font-medium text-gray-500">
-                              <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                            <dt class="text-sm font-medium text-slate-500">
+                              <div class="border-b border-slate-300 focus-within:border-eg-bgopacity">
+                                <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-slate-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                               </div>
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                              <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                <input :disabled="!otherDetailsEdit" required v-model="form.details[key].value" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                            <dd class="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">
+                              <div class="border-b border-slate-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                <input :disabled="!otherDetailsEdit" required v-model="form.details[key].value" type="text" class="block w-full border-0 border-b border-transparent bg-slate-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
                               </div>
                             </dd>
-                            <dd v-if="otherDetailsEdit" class="mt-1 text-sm text-gray-900 sm:mt-0">
+                            <dd v-if="otherDetailsEdit" class="mt-1 text-sm text-slate-900 sm:mt-0">
                               <button type="button" @click="delete form.details[key]">
                                 <TrashIcon class="w-4 h-4" />
                               </button>
@@ -700,12 +700,12 @@
                           </div>
                         </TransitionGroup>
                       </dl>
-                      <div v-if="otherDetailsEdit" class="sm:divide-y sm:divide-gray-200 py-2 sm:py-3 sm:px-6">
+                      <div v-if="otherDetailsEdit" class="sm:divide-y sm:divide-slate-200 py-2 sm:py-3 sm:px-6">
                         <div v-if="addingKey" class="flex rounded-md shadow-sm max-w-xs">
-                          <button :disabled="keyString === ''" @click="form.details[`${keyString}`] = { value: '', type: 'TEXT' };addingKey = !addingKey" type="button" class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-green-50 px-3 text-gray-500 sm:text-sm hover:bg-green-100 focus:bg-green-200">
+                          <button :disabled="keyString === ''" @click="form.details[`${keyString}`] = { value: '', type: 'TEXT' };addingKey = !addingKey" type="button" class="inline-flex items-center rounded-l-md border border-r-0 border-slate-300 bg-green-50 px-3 text-slate-500 sm:text-sm hover:bg-green-100 focus:bg-green-200">
                             <CheckCircleIcon class="w-6 h-6" />
                           </button>
-                          <input v-model="keyString" type="text" class="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 px-3 py-2 focus:border-eg-bg focus:ring-eg-bg sm:text-sm" placeholder="detail key" />
+                          <input v-model="keyString" type="text" class="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-slate-300 px-3 py-2 focus:border-eg-bg focus:ring-eg-bg sm:text-sm" placeholder="detail key" />
                         </div>
                         <button v-else type="button" @click="addingKey = !addingKey">
                           <PlusCircleIcon class="w-6 h-6" />
@@ -720,19 +720,19 @@
           </div>
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="px-4 py-5 sm:px-6">
-              <h3 class="text-lg font-medium leading-6 text-gray-900">Witnesses</h3>
+              <h3 class="text-lg font-medium leading-6 text-slate-900">Witnesses</h3>
             </div>
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-slate-300">
+              <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Member No.</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">Member No.</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Member</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Status</th>
               </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
+              <tbody class="divide-y divide-slate-200 bg-white">
               <tr>
-                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-slate-500 sm:pl-6">
                   <router-link v-if="loanRequestStore.getLoanRequest?.witnessRefId" :to="`/members/${loanRequestStore.getLoanRequest?.witnessRefId}/view`" class="underline flex items-center text-eg-bg">
                     {{ loanRequestStore.getLoanRequest?.witnessMemberNo }}
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
@@ -740,8 +740,8 @@
                     </svg>
                   </router-link>
                 </td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessName ? loanRequestStore.getLoanRequest.witnessName : '' }}</td>
-                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-slate-900">{{ loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessName ? loanRequestStore.getLoanRequest.witnessName : '' }}</td>
+                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
                   <div v-if="loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.witnessMemberNo" class="flex items-center relative">
                     <div class="w-full border border-eg-bg h-2 rounded-full flex">
                       <div :style="{ width: hrWidth2() + '%' }" class="bg-eg-bg"></div>
@@ -759,23 +759,23 @@
           </div>
           <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:px-6">
             <div class="px-4 py-5 sm:px-6">
-              <h3 class="text-lg font-medium leading-6 text-gray-900">Guarantors</h3>
+              <h3 class="text-lg font-medium leading-6 text-slate-900">Guarantors</h3>
             </div>
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-slate-300">
+              <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Member No.</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Required</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Edit</th>
-                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">Member No.</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Member</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Committed</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Available</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Required</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Edit</th>
+                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Status</th>
               </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
+              <tbody class="divide-y divide-slate-200 bg-white">
                 <tr v-for="guarantor in loanRequestStore.getLoanRequest?.guarantorList" :key="guarantor.refId">
-                  <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                  <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-slate-500 sm:pl-6">
                     <router-link v-if="guarantor.memberRefId" :to="`/members/${guarantor.memberRefId}/view`" class="underline flex items-center text-eg-bg">
                       {{ guarantor.memberNumber }}
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2">
@@ -783,32 +783,32 @@
                       </svg>
                     </router-link>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-slate-900">
                     <button @click="setGuarantorToApprove(guarantor)" type="button">
                       {{ guarantor.firstName }} {{ guarantor.lastName }}
                     </button>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-900">
                     <button @click="setGuarantorToApprove(guarantor)" type="button">
                       {{ guarantor.committedAmount ? $filters.currencyKES(guarantor.committedAmount) : guarantor.committedAmount }}
                     </button>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                     <button @click="setGuarantorToApprove(guarantor)" type="button">
                       {{ guarantor.availableAmount ? $filters.currencyKES(guarantor.availableAmount) : guarantor.availableAmount }}
                     </button>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                     <button @click="setGuarantorToApprove(guarantor)" type="button">
                       {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
                     </button>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                     <button type="button" @click="selectGuarantorToReplace(guarantor)">
                       <PencilSquareIcon class="text-amber-900 w-5 h-5" />
                     </button>
                   </td>
-                  <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                  <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
                     <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
                       <div class="w-full border border-eg-bg h-2 rounded-full flex">
                         <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
@@ -834,7 +834,7 @@
       <TransitionRoot as="template" :show="openErrorModal">
         <Dialog as="div" class="relative z-10" @close="openErrorModal = false">
           <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
           </TransitionChild>
 
           <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -846,12 +846,12 @@
                       <ExclamationCircleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
                     </div>
                     <div class="mt-3 text-center sm:mt-5">
-                      <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Loan Request Error</DialogTitle>
+                      <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Loan Request Error</DialogTitle>
                       <div class="mt-2">
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-slate-500">
                           {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-slate-500">
                           {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.readableErrorMessage) ? loanRequestStore.getLoanRequest.readableErrorMessage : "" }}
                         </p>
                       </div>
@@ -866,7 +866,7 @@
       <TransitionRoot as="template" :show="guarantorApprovalOpen">
         <Dialog as="div" class="relative z-10" @close="guarantorApprovalOpen = false">
           <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
           </TransitionChild>
 
           <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -874,49 +874,49 @@
               <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                 <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
                   <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
-                    <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="guarantorApprovalOpen = false">
+                    <button type="button" class="rounded-md bg-white text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="guarantorApprovalOpen = false">
                       <span class="sr-only">Close</span>
                       <XMarkIcon class="h-6 w-6" aria-hidden="true" />
                     </button>
                   </div>
                   <div>
-                    <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Guarantor Approval</DialogTitle>
-                    <dl class="sm:divide-y sm:divide-gray-100">
+                    <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Guarantor Approval</DialogTitle>
+                    <dl class="sm:divide-y sm:divide-slate-100">
                       <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                        <dt class="text-sm font-medium text-gray-500">Name</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                        <dt class="text-sm font-medium text-slate-500">Name</dt>
+                        <dd class="mt-1 text-sm text-slate-900 sm:mt-0">
                           {{ selectedGuarantor?.firstName }}
                           <br>
                           {{ selectedGuarantor?.lastName }}
                         </dd>
                       </div>
                       <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                        <dt class="text-sm font-medium text-gray-500">Member No.</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                        <dt class="text-sm font-medium text-slate-500">Member No.</dt>
+                        <dd class="mt-1 text-sm text-slate-900 sm:mt-0">
                           {{ selectedGuarantor?.memberNumber }}
                         </dd>
                       </div>
                       <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                        <dt class="text-sm font-medium text-gray-500">Deposits</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                        <dt class="text-sm font-medium text-slate-500">Deposits</dt>
+                        <dd class="mt-1 text-sm text-slate-900 sm:mt-0">
                           {{ $filters.currencyKES(selectedGuarantor?.totalDeposits) }}
                         </dd>
                       </div>
                       <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                        <dt class="text-sm font-medium text-gray-500">Committed</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                        <dt class="text-sm font-medium text-slate-500">Committed</dt>
+                        <dd class="mt-1 text-sm text-slate-900 sm:mt-0">
                           {{ $filters.currencyKES(selectedGuarantor?.committedAmount) }}
                         </dd>
                       </div>
                       <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                        <dt class="text-sm font-medium text-gray-500">Available</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                        <dt class="text-sm font-medium text-slate-500">Available</dt>
+                        <dd class="mt-1 text-sm text-slate-900 sm:mt-0">
                           {{ $filters.currencyKES(selectedGuarantor?.availableAmount) }}
                         </dd>
                       </div>
                       <div class="py-2 sm:grid sm:grid-cols-2 sm:gap-4 sm:py-3">
-                        <dt class="text-sm font-medium text-gray-500">Required</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+                        <dt class="text-sm font-medium text-slate-500">Required</dt>
+                        <dd class="mt-1 text-sm text-slate-900 sm:mt-0">
                           {{ selectedGuarantor ? $filters.currencyKES(selectedGuarantor?.availableAmount - selectedGuarantor?.committedAmount) : 0 }}
                         </dd>
                       </div>
@@ -935,7 +935,7 @@
       <TransitionRoot as="template" :show="zohoRequestOpen">
         <Dialog as="div" class="relative z-10" @close="zohoRequestOpen = false">
           <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
           </TransitionChild>
 
           <div class="fixed inset-0 z-10 overflow-y-auto">
@@ -951,109 +951,109 @@
               >
                 <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-5xl sm:p-6">
                   <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
-                    <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="zohoRequestOpen = false">
+                    <button type="button" class="rounded-md bg-white text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" @click="zohoRequestOpen = false">
                       <span class="sr-only">Close</span>
                       <XMarkIcon class="h-6 w-6" aria-hidden="true" />
                     </button>
                   </div>
                   <div class="sm:flex sm:items-start">
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left overflow-hidden">
-                      <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Zoho Request Detail</DialogTitle>
+                      <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Zoho Request Detail</DialogTitle>
                       <div class="mt-2 space-y-4">
-                        <div class="text-sm text-gray-500">
+                        <div class="text-sm text-slate-500">
                           <span class="font-semibold">Actions:</span>
                           <div class="overflow-x-scroll">
                             <table class="mt-6">
-                              <thead class="bg-gray-50">
+                              <thead class="bg-slate-50">
                               <tr>
-                                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ROLE</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION ID</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">ACTION TYPE</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT NAME</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT PHONE NO.</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">RECIPIENT EMAIL</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">PRIVATE NOTES</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFY RECIPIENT</th>
-                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">VERIFICATION TYPE</th>
+                                <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-slate-900 sm:pl-6">ROLE</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">ACTION ID</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">ACTION TYPE</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">RECIPIENT NAME</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">RECIPIENT PHONE NO.</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">RECIPIENT EMAIL</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">PRIVATE NOTES</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">VERIFY RECIPIENT</th>
+                                <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">VERIFICATION TYPE</th>
                               </tr>
                               </thead>
-                              <tbody class="divide-y divide-gray-200 bg-white">
+                              <tbody class="divide-y divide-slate-200 bg-white">
                               <!--                                {action_id: string, action_type: string, is_embedded: boolean, private_notes: string, recipient_email: string, recipient_name: string, recipient_phonenumber: string, role: string, verification_type: string, verify_recipient: boolean}-->
                               <tr v-for="action in zohoRequest.templates.actions" :key="action.action_id">
-                                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">{{ action.role }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ action.action_id }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ action.action_type }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_name }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_phonenumber }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.recipient_email }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.private_notes }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verify_recipient }}</td>
-                                <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ action.verification_type }}</td>
+                                <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-slate-500 sm:pl-6">{{ action.role }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-slate-900">{{ action.action_id }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-900">{{ action.action_type }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ action.recipient_name }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ action.recipient_phonenumber }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ action.recipient_email }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ action.private_notes }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ action.verify_recipient }}</td>
+                                <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">{{ action.verification_type }}</td>
                               </tr>
                               </tbody>
                             </table>
                           </div>
                         </div>
                         <div class="space-y-2">
-                          <div class="text-sm text-gray-500">
+                          <div class="text-sm text-slate-500">
                             <span class="font-semibold">Field Text Data:</span>
                             <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_text_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">
-                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                              <dt class="text-sm font-medium text-slate-500">
+                                <div class="border-b border-slate-300 focus-within:border-eg-bgopacity">
+                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-slate-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                 </div>
                               </dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                  <input disabled :value="zohoRequest.templates.field_data.field_text_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                              <dd class="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">
+                                <div class="border-b border-slate-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                  <input disabled :value="zohoRequest.templates.field_data.field_text_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-slate-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
                                 </div>
                               </dd>
                             </div>
                           </div>
-                          <div class="text-sm text-gray-500">
+                          <div class="text-sm text-slate-500">
                             <span class="font-semibold">Field Date Data:</span>
                             <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_date_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">
-                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                              <dt class="text-sm font-medium text-slate-500">
+                                <div class="border-b border-slate-300 focus-within:border-eg-bgopacity">
+                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-slate-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                 </div>
                               </dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                  <input disabled :value="zohoRequest.templates.field_data.field_date_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                              <dd class="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">
+                                <div class="border-b border-slate-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                  <input disabled :value="zohoRequest.templates.field_data.field_date_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-slate-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
                                 </div>
                               </dd>
                             </div>
                           </div>
-                          <div class="text-sm text-gray-500">
+                          <div class="text-sm text-slate-500">
                             <span class="font-semibold">Field Boolean Data:</span>
                             <div v-for="(key, i) in Object.keys(zohoRequest.templates.field_data.field_boolean_data)" :key="key+i" class="py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:py-3">
-                              <dt class="text-sm font-medium text-gray-500">
-                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity">
-                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-gray-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                              <dt class="text-sm font-medium text-slate-500">
+                                <div class="border-b border-slate-300 focus-within:border-eg-bgopacity">
+                                  <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-slate-200 cursor-not-allowed focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                 </div>
                               </dt>
-                              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                <div class="border-b border-gray-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                  <input disabled :value="zohoRequest.templates.field_data.field_boolean_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-gray-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
+                              <dd class="mt-1 text-sm text-slate-900 sm:mt-0 sm:col-span-2">
+                                <div class="border-b border-slate-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
+                                  <input disabled :value="zohoRequest.templates.field_data.field_boolean_data[key]" type="text" class="block w-full border-0 border-b border-transparent bg-slate-50 focus:ring-eg-bg focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="value" />
                                 </div>
                               </dd>
                             </div>
                           </div>
-                          <div class="text-sm text-gray-500">
+                          <div class="text-sm text-slate-500">
                             <span class="font-semibold">Request name:</span>
-                            <p class="text-sm text-gray-500">{{ zohoRequest.templates.request_name }}</p>
+                            <p class="text-sm text-slate-500">{{ zohoRequest.templates.request_name }}</p>
                           </div>
-                          <div class="text-sm text-gray-500">
+                          <div class="text-sm text-slate-500">
                             <span class="font-semibold">Notes:</span>
-                            <p class="text-sm text-gray-500">{{ zohoRequest.templates.notes }}</p>
+                            <p class="text-sm text-slate-500">{{ zohoRequest.templates.notes }}</p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm" @click="zohoRequestOpen = false">Cancel</button>
+                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-base font-medium text-slate-700 shadow-sm hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm" @click="zohoRequestOpen = false">Cancel</button>
                   </div>
                 </DialogPanel>
               </TransitionChild>
@@ -1093,56 +1093,56 @@
                 >
                   <DialogTitle
                       as="h3"
-                      class="text-lg font-medium leading-6 text-gray-900"
+                      class="text-lg font-medium leading-6 text-slate-900"
                   >
                     Replace Guarantor
                   </DialogTitle>
                   <div class="mt-2">
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-slate-500">
                       Current Guarantor
                     </p>
                   </div>
 
                   <div class="mt-2">
-                    <table class="min-w-full divide-y divide-gray-300">
-                      <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y divide-slate-300">
+                      <thead class="bg-slate-50">
                         <tr>
-                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member No.</th>
-                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
-                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
-                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
-                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Required</th>
-                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Member No.</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Member</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Committed</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Available</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Required</th>
+                          <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Status</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-gray-200 bg-white">
+                      <tbody class="divide-y divide-slate-200 bg-white">
                         <tr v-for="guarantor in guarantor2Replace ? [guarantor2Replace] : []" :key="guarantor.refId">
-                          <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                          <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-slate-500 sm:pl-6">
                             <div class="flex items-center text-eg-bg">
                               {{ guarantor.memberNumber }}
                             </div>
                           </td>
-                          <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                          <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-slate-900">
                             <button type="button">
                               {{ guarantor.firstName }} {{ guarantor.lastName }}
                             </button>
                           </td>
-                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-900">
                             <button type="button">
                               {{ guarantor.committedAmount ? $filters.currencyKES(guarantor.committedAmount) : guarantor.committedAmount }}
                             </button>
                           </td>
-                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                             <button type="button">
                               {{ guarantor.availableAmount ? $filters.currencyKES(guarantor.availableAmount) : guarantor.availableAmount }}
                             </button>
                           </td>
-                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                             <button type="button">
                               {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
                             </button>
                           </td>
-                          <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                          <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
                             <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
                               <div class="w-full border border-eg-bg h-2 rounded-full flex">
                                 <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>
@@ -1159,7 +1159,7 @@
                   </div>
 
                   <div class="mt-4">
-                    <p class="text-sm font-semibold text-gray-900">
+                    <p class="text-sm font-semibold text-slate-900">
                       Search Guarantor
                     </p>
                   </div>
@@ -1169,7 +1169,7 @@
                       <div>
                         <div class="grid grid-cols-6 gap-6">
                           <div class="col-span-6">
-                            <label for="template-name" class="block text-sm font-medium text-gray-700">Template Name</label>
+                            <label for="template-name" class="block text-sm font-medium text-slate-700">Template Name</label>
                             <select v-model="pullForm.identifierType" id="template-name" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
                               <option :value="null">-Select Identifier Type-</option>
                               <option v-for="(option, i) in identifierTypes" :key="`${option.id}${i}`" :value="option.value">{{ option.name }}</option>
@@ -1179,7 +1179,7 @@
                             </div>
                           </div>
                           <div class="col-span-6">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Member Identifier</label>
+                            <label for="name" class="block text-sm font-medium text-slate-700">Member Identifier</label>
                             <input v-model="pullForm.memberIdentifier" id="name" type="text" class="mt-2 appearance-none text-slate-900 bg-white rounded-md block w-full px-3 h-10 shadow-sm sm:text-sm focus:border-transparent focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200" />
                             <div class="input-errors" v-for="(error, index) of v$.memberIdentifier.$errors" :key="index">
                               <div class="text-xs text-red-400">{{ error.$message }}</div>
@@ -1188,8 +1188,8 @@
                           <div class="col-span-6">
                             <div class="flex items-center justify-between">
                               <div class="flex items-center">
-                                <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
-                                <label for="pull-cb" class="ml-2 block text-sm text-gray-900">Pull from co-banking</label>
+                                <input v-model="pullForm.force" id="pull-cb" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-eg-bg focus:outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-eg-bg ring-1 ring-slate-200">
+                                <label for="pull-cb" class="ml-2 block text-sm text-slate-900">Pull from co-banking</label>
                               </div>
                             </div>
                           </div>
@@ -1207,51 +1207,51 @@
                   </div>
 
                   <div class="mt-4">
-                    <p class="text-sm font-semibold text-gray-900">
+                    <p class="text-sm font-semibold text-slate-900">
                       Selected Guarantor
                     </p>
                   </div>
 
                   <div class="mt-2">
-                    <table class="min-w-full divide-y divide-gray-300">
-                      <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y divide-slate-300">
+                      <thead class="bg-slate-50">
                       <tr>
-                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member No.</th>
-                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Member</th>
-                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Committed</th>
-                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Available</th>
-                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Required</th>
-                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Member No.</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Member</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Committed</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Available</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Required</th>
+                        <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-slate-900">Status</th>
                       </tr>
                       </thead>
-                      <tbody class="divide-y divide-gray-200 bg-white">
+                      <tbody class="divide-y divide-slate-200 bg-white">
                       <tr v-for="guarantor in newGuarantor ? [newGuarantor] : []" :key="guarantor.refId">
-                        <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6">
+                        <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-slate-500 sm:pl-6">
                           <div class="flex items-center text-eg-bg">
                             {{ guarantor.memberNumber }}
                           </div>
                         </td>
-                        <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                        <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-slate-900">
                           <button type="button">
                             {{ guarantor.firstName }} {{ guarantor.lastName }}
                           </button>
                         </td>
-                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-900">
                           <button type="button">
                             {{ guarantor.committedAmount ? $filters.currencyKES(guarantor.committedAmount) : guarantor.committedAmount }}
                           </button>
                         </td>
-                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                           <button type="button">
                             {{ guarantor.availableAmount ? $filters.currencyKES(guarantor.availableAmount) : guarantor.availableAmount }}
                           </button>
                         </td>
-                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500">
                           <button type="button">
                             {{ $filters.currencyKES(guarantor.availableAmount - guarantor.committedAmount) }}
                           </button>
                         </td>
-                        <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500 w-1/3">
+                        <td class="whitespace-nowrap px-2 py-2 text-sm text-slate-500 w-1/3">
                           <div @click="setGuarantorToApprove(guarantor)" class="flex items-center relative">
                             <div class="w-full border border-eg-bg h-2 rounded-full flex">
                               <div :style="{ width: hrWidth(guarantor) + '%' }" class="bg-eg-bg"></div>

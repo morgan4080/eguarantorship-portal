@@ -78,10 +78,10 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
     <div class="mt-4 py-6">
       <div class="flex items-center justify-between">
         <div
-            class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
+            class="flex flex-1 items-center justify-between"
         >
           <div>
-            <p class="text-sm text-gray-700">
+            <p class="text-sm text-slate-700">
               Showing
               <span class="font-medium">{{
                   currentPage === 1
@@ -125,7 +125,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                     <button
                         type="button"
                         @click="pageCountOpen = !pageCountOpen"
-                        class="relative inline-flex items-center rounded-l-none rounded-r-md bg-eg-bg p-2 text-sm font-medium text-white hover:bg-eg-bg focus:z-10 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-gray-50"
+                        class="relative inline-flex items-center rounded-l-none rounded-r-md bg-eg-bg p-2 text-sm font-medium text-white hover:bg-eg-bg focus:z-10 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-50"
                         aria-haspopup="listbox"
                         aria-expanded="true"
                         aria-labelledby="listbox-label"
@@ -152,7 +152,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                   <ul
                       ref="refDropDown"
                       v-show="pageCountOpen"
-                      class="absolute border border-gray-300 right-0 z-10 w-12 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 drop-shadow-2xl focus:outline-none"
+                      class="absolute border border-slate-300 right-0 z-10 w-12 origin-top-right divide-y divide-slate-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 drop-shadow-2xl focus:outline-none"
                       tabindex="-1"
                       role="listbox"
                       aria-labelledby="listbox-label"
@@ -166,7 +166,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                         @mouseleave="activeIndex = null"
                         :class="{
                         'bg-eg-bg text-white': activeIndex === i,
-                        'text-gray-900': !(activeIndex === i),
+                        'text-slate-900': !(activeIndex === i),
                       }"
                         class="relative cursor-pointer select-none p-4 text-sm"
                         id="listbox-option-0"
@@ -197,7 +197,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
               <button
                   @click="!(currentPage <= 1) ? changePage('subtract') : null"
                   type="button"
-                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  class="relative inline-flex items-center rounded-l-md border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
               >
                 <span class="sr-only">Previous</span>
                 <svg
@@ -218,7 +218,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
                   :class="{
                   'z-10 border-eg-bg bg-blue-50 text-eg-bg':
                     currentPage === filterForm.page,
-                  'border-gray-300 bg-white text-gray-500 hover:bg-gray-50':
+                  'border-slate-300 bg-white text-slate-500 hover:bg-slate-50':
                     currentPage !== filterForm.page,
                 }"
                   class="relative inline-flex items-center border px-4 py-2 text-sm font-medium"
@@ -228,7 +228,7 @@ const computedCurrentPage: ComputedRef<number> = computed(() => {
               <button
                   @click="!(currentPage > totalPages) ? changePage('add') : null"
                   type="button"
-                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  class="relative inline-flex items-center rounded-r-md border border-slate-300 bg-white px-2 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
               >
                 <span class="sr-only">Next</span>
                 <svg
