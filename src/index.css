@@ -27,7 +27,6 @@ body {
 .router-link-active > svg {
     @apply text-white;
 }
-
 .input-errors {
     @apply p-1;
 }
