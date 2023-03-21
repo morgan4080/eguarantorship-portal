@@ -68,7 +68,7 @@
           <span class="text-white ml-4 mt-2 hidden sm:block text-base font-light  tracking-widest">{{ organisation }}</span>
         </router-link>
       </div>
-      <div class="flex space-x-8 items-center">
+      <div class="flex space-x-2 items-center">
         <!-- Profile dropdown -->
         <div class="relative">
           <button @click="accountMenu = !accountMenu" @mousedown="onMouseDown($event)" type="button" class="flex font-light flex-row items-center space-x-2 text-white px-3 py-2 rounded-md hover:text-amber-200 focus:outline-none">
