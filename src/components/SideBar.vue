@@ -23,8 +23,8 @@
                   <span class="text-eg-bg ml-4 mt-2 block font-semibold">{{ organisation }}</span>
                 </router-link>
                 <nav class="mt-5 space-y-1 px-2">
-                  <a v-for="item in navigation" :key="item.name" :href="item.url" :class="[item.current ? 'bg-eg-bg text-white' : 'text-eg-bg hover:bg-slate-50 hover:text-gray-50', 'group flex items-center rounded-md px-2 py-2 text-base font-medium']">
-                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-white group-hover:text-gray-50', 'mr-4 h-6 w-6 flex-shrink-0']" aria-hidden="true" />
+                  <a v-for="item in navigation" :key="item.name" :href="item.url" :class="[item.current ? 'bg-eg-bg text-white' : 'text-eg-bg hover:bg-slate-50 hover:text-gray-50', 'group flex items-center rounded-md px-2 py-2 text-base font-light']">
+                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-eg-bg sm:text-white group-hover:text-gray-50', 'mr-4 h-6 w-6 flex-shrink-0']" aria-hidden="true" />
                     {{ item.name }}
                   </a>
                 </nav>
@@ -48,22 +48,22 @@
           </router-link>
           <div class="mt-6 w-full flex-1 space-y-1 px-2" aria-label="Sidebar">
             <template v-for="item in navigation" :key="item.name">
-              <RouterLink v-if="item.subMenus.length === 0" :to="item.url" :class="[item.current ? 'bg-gray-700 text-gray-100' : 'text-white hover:bg-gray-700 hover:text-gray-100', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">
+              <RouterLink v-if="item.subMenus.length === 0" :to="item.url" :class="[item.current ? 'bg-gray-700 text-gray-100' : 'text-white hover:bg-gray-700 hover:text-gray-100', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-light']" :aria-current="item.current ? 'page' : undefined">
                 <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-white group-hover:text-gray-50', 'h-6 w-6']" aria-hidden="true" />
                 <span class="mt-2">{{ item.name }}</span>
               </RouterLink>
               <Disclosure as="div" v-else class="space-y-1" v-slot="{ open }">
-                <DisclosureButton :class="[item.current ? 'bg-gray-100 text-white' : 'relative text-gray-600 hover:bg-gray-700 hover:text-gray-900', 'group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-500']">
-                  <svg :class="[open ? 'rotate-90 text-eg-bg' : 'text-gray-300', 'right-0 absolute bottom-10 h-5 w-5 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-400']" viewBox="0 0 20 20" aria-hidden="true">
+                <DisclosureButton :class="[item.current ? 'bg-gray-100 text-white' : 'relative text-gray-600 hover:bg-gray-700 hover:text-gray-900', 'group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-light focus:outline-none focus:ring-2 focus:ring-slate-500']">
+                  <svg :class="[open ? 'rotate-90 text-white' : 'text-gray-300', 'right-0 absolute bottom-10 h-5 w-5 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-400']" viewBox="0 0 20 20" aria-hidden="true">
                     <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
                   </svg>
-                  <RouterLink :to="item.url" :class="[item.current ? 'bg-gray-700 text-white' : 'text-white hover:bg-gray-700 hover:text-gray-50', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">
-                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-slate-400 group-hover:text-white', 'h-6 w-6']" aria-hidden="true" />
+                  <RouterLink :to="item.url" :class="[item.current ? 'bg-gray-700 text-white' : 'text-white hover:bg-gray-700 hover:text-gray-50', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-light']" :aria-current="item.current ? 'page' : undefined">
+                    <component :is="item.icon" :class="[item.current ? 'text-white text-amber-100' : 'text-white group-hover:text-white', 'h-6 w-6']" aria-hidden="true" />
                     <span class="mt-2">{{ item.name }}</span>
                   </RouterLink>
                 </DisclosureButton>
-                <DisclosurePanel class="space-y-1">
-                  <DisclosureButton v-for="subItem in item.subMenus" :key="subItem.title" as="a" :href="subItem.url" class="group flex w-full items-center rounded-md py-2 pr-2 text-sm text-center font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">{{ subItem.title }}</DisclosureButton>
+                <DisclosurePanel class="space-y-1 bg-white/5">
+                  <DisclosureButton v-for="subItem in item.subMenus" :key="subItem.title" as="a" :href="subItem.url" class="group flex w-full items-center rounded-md py-2 pr-2 text-sm text-center font-light text-eg-bg sm:text-amber-100 hover:bg-gray-50 hover:text-gray-900">{{ subItem.title }}</DisclosureButton>
                 </DisclosurePanel>
               </Disclosure>
             </template>

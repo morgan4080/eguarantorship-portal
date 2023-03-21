@@ -65,21 +65,21 @@
     <div class="relative flex items-center justify-between h-16">
       <div class="flex-shrink-0 flex items-center">
         <router-link to="/" class="navbar p-1 flex items-center justify-center" style="background: transparent;">
-          <span class="text-white ml-4 mt-2 hidden sm:block text-lg font-semibold">{{ organisation }}</span>
+          <span class="text-white ml-4 mt-2 hidden sm:block text-base font-light  tracking-widest">{{ organisation }}</span>
         </router-link>
       </div>
       <div class="flex space-x-8 items-center">
         <!-- Profile dropdown -->
         <div class="relative">
-          <button @click="accountMenu = !accountMenu" @mousedown="onMouseDown($event)" type="button" class="flex flex-row items-center space-x-2 text-white px-3 py-2 rounded-md hover:text-slate-400 focus:outline-none">
+          <button @click="accountMenu = !accountMenu" @mousedown="onMouseDown($event)" type="button" class="flex font-light flex-row items-center space-x-2 text-white px-3 py-2 rounded-md hover:text-amber-200 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="flex flex-col justify-start items-start">
-                <span class="inline-flex items-center text-sm leading-4 font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+            <span class="ml-2 flex flex-col justify-start items-start">
+                <span class="inline-flex items-center text-sm leading-4 font-light tracking-wide" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                   <span class="sr-only">Open user menu</span>
                   {{ user ? user.firstName + ' ' + user.lastName : 'loading..' }}
-                  <svg class="mt-1 rotate-90 flex-shrink-0 h-5 w-5 transform group-hover:text-slate-400 transition-colors ease-in-out duration-150 text-white" viewBox="0 0 20 20" aria-hidden="true" ><path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path></svg>
+                  <svg class="ml-1.5 mt-1 rotate-90 flex-shrink-0 h-5 w-5 transform group-hover:text-amber-200 transition-colors ease-in-out duration-150 text-white" viewBox="0 0 20 20" aria-hidden="true" ><path d="M6 6L14 10L6 14V6Z" fill="currentColor"></path></svg>
                 </span>
               </span>
           </button>
@@ -105,7 +105,7 @@
           </transition>
         </div>
         <div class="relative">
-          <button @click="prestaServices = !prestaServices" @mousedown="onMouseDown1($event)" type="button" class="flex flex-row items-center space-x-2 text-white px-3 py-2 rounded-md hover:text-slate-400 focus:outline-none">
+          <button @click="prestaServices = !prestaServices" @mousedown="onMouseDown1($event)" type="button" class="flex font-light flex-row items-center space-x-2 text-white px-3 py-2 rounded-md hover:text-slate-400 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
             </svg>
