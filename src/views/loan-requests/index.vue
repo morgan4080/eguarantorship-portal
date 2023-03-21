@@ -231,7 +231,7 @@
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Total Requests</span>
-                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.totalRequests }}</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? loanRequestStore.getLoanRequestsSummary.totalRequests : 0 }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -250,7 +250,7 @@
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Today Requests</span>
-                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.todayRequests }}</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? loanRequestStore.getLoanRequestsSummary.todayRequests : 0 }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -269,7 +269,7 @@
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Average Days To Complete</span>
-                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.averageDaysToComplete }}</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? loanRequestStore.getLoanRequestsSummary.averageDaysToComplete: 0 }}</span>
                 </div>
 
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -285,7 +285,7 @@
                 </svg>
               </div>
             </div>
-            <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
+            <div class="rounded-md shadow bg-white flex flex-col px-4 py-6" >
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Total Amount Requested</span>
