@@ -1,7 +1,5 @@
 echo '===> Compiling & Packaging prestaapps/eguarantorshipui ...'
-yarn install
-yarn run build
-
+npm run rebuild
 
 GIT_BRANCH=$(git name-rev --name-only HEAD | sed "s/~.*//")
 GIT_COMMIT=$(git rev-parse HEAD)
