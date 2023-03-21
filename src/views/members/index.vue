@@ -245,14 +245,14 @@
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Members"/>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <div class="flex space-x-2">
-                <button @click="openMemberTransferModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
+                <button @click="openMemberTransferModal = true" type="button" class="inline-flex w-32 justify-center items-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
                   Init Transfers
                 </button>
-                <button @click="openPullMemberModal = true" type="button" class="inline-flex w-32 justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
+                <button @click="openPullMemberModal = true" type="button" class="inline-flex w-32 justify-center items-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
                   Pull Member
                 </button>
                 <DropDown :items="actions">
-                  <MenuButton class="inline-flex w-full justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
+                  <MenuButton class="inline-flex h-10 w-full justify-center items-center rounded-md border border-slate-300 bg-white px-2 py-1 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 focus:ring-offset-slate-100">
                     Actions
                     <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
                   </MenuButton>

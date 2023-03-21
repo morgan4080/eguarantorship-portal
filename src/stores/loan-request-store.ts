@@ -44,7 +44,7 @@ export interface LoanRequestData {
     guarantorList?: GuarantorData[],
     pdfThumbNail?: string,
     pendingReason?: string,
-    errors?: {}[],
+    errors?: {message: string; code: number; errorType: string; isTechnical: boolean;}[],
     readableErrorMessage?: string,
     witnessRefId?: string,
     witnessMemberNo?: string,

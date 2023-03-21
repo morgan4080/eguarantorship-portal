@@ -23,8 +23,8 @@
                   <span class="text-eg-bg ml-4 mt-2 block font-semibold">{{ organisation }}</span>
                 </router-link>
                 <nav class="mt-5 space-y-1 px-2">
-                  <a v-for="item in navigation" :key="item.name" :href="item.url" :class="[item.current ? 'bg-eg-bg text-white' : 'text-eg-bg hover:bg-slate-50 hover:text-slate-900', 'group flex items-center rounded-md px-2 py-2 text-base font-medium']">
-                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-slate-400 group-hover:text-slate-500', 'mr-4 h-6 w-6 flex-shrink-0']" aria-hidden="true" />
+                  <a v-for="item in navigation" :key="item.name" :href="item.url" :class="[item.current ? 'bg-eg-bg text-white' : 'text-eg-bg hover:bg-slate-50 hover:text-gray-50', 'group flex items-center rounded-md px-2 py-2 text-base font-medium']">
+                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-white group-hover:text-gray-50', 'mr-4 h-6 w-6 flex-shrink-0']" aria-hidden="true" />
                     {{ item.name }}
                   </a>
                 </nav>
@@ -39,26 +39,26 @@
     </TransitionRoot>
 
     <!-- Static sidebar for desktop -->
-    <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-24 lg:flex-col">
+    <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-24 lg:flex-col bg-eg-bg">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
-      <div class="flex min-h-0 flex-1 flex-col border-r border-slate-200 bg-white">
-        <div class="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
+      <div class="flex min-h-0 flex-1 flex-col">
+        <div class="flex flex-1 flex-col overflow-y-auto py-4">
           <router-link to="/" class="flex items-center justify-center flex-shrink-0 items-center px-4">
-            <TheLogo class="h-10 w-auto" />
+            <TheLogo class="h-8 w-auto" />
           </router-link>
           <div class="mt-6 w-full flex-1 space-y-1 px-2" aria-label="Sidebar">
             <template v-for="item in navigation" :key="item.name">
-              <RouterLink v-if="item.subMenus.length === 0" :to="item.url" :class="[item.current ? 'bg-eg-bg text-white' : 'text-eg-bg hover:bg-slate-50 hover:text-slate-900', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">
-                <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-slate-400 group-hover:text-slate-500', 'h-6 w-6']" aria-hidden="true" />
+              <RouterLink v-if="item.subMenus.length === 0" :to="item.url" :class="[item.current ? 'bg-gray-700 text-gray-100' : 'text-white hover:bg-gray-700 hover:text-gray-100', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">
+                <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-white group-hover:text-gray-50', 'h-6 w-6']" aria-hidden="true" />
                 <span class="mt-2">{{ item.name }}</span>
               </RouterLink>
               <Disclosure as="div" v-else class="space-y-1" v-slot="{ open }">
-                <DisclosureButton :class="[item.current ? 'bg-gray-100 text-gray-900' : 'relative bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900', 'group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-500']">
+                <DisclosureButton :class="[item.current ? 'bg-gray-100 text-white' : 'relative text-gray-600 hover:bg-gray-700 hover:text-gray-900', 'group flex w-full items-center rounded-md py-2 pr-2 text-left text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-500']">
                   <svg :class="[open ? 'rotate-90 text-eg-bg' : 'text-gray-300', 'right-0 absolute bottom-10 h-5 w-5 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-400']" viewBox="0 0 20 20" aria-hidden="true">
                     <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
                   </svg>
-                  <RouterLink :to="item.url" :class="[item.current ? 'bg-eg-bg text-white' : 'text-eg-bg hover:bg-slate-50 hover:text-slate-900', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">
-                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-slate-400 group-hover:text-slate-500', 'h-6 w-6']" aria-hidden="true" />
+                  <RouterLink :to="item.url" :class="[item.current ? 'bg-gray-700 text-white' : 'text-white hover:bg-gray-700 hover:text-gray-50', 'group flex w-full flex-col items-center rounded-md p-3 text-sm font-medium']" :aria-current="item.current ? 'page' : undefined">
+                    <component :is="item.icon" :class="[item.current ? 'text-white' : 'text-slate-400 group-hover:text-white', 'h-6 w-6']" aria-hidden="true" />
                     <span class="mt-2">{{ item.name }}</span>
                   </RouterLink>
                 </DisclosureButton>
@@ -74,14 +74,14 @@
 
     <div class="flex flex-1 flex-col lg:pl-24">
       <div class="sticky top-0 z-10 bg-slate-100 pl-1 pt-1 sm:pl-3 sm:pt-3 lg:hidden">
-        <button type="button" class="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-slate-500 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-eg-bg" @click="sidebarOpen = true">
+        <button type="button" class="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-slate-500 hover:text-gray-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-eg-bg" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
       <main class="flex-1">
         <TheNavBar />
-        <div class="px-4 sm:px-0 py-16">
+        <div class="px-4 sm:px-0 py-18">
           <slot></slot>
         </div>
       </main>

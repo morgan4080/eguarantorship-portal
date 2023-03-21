@@ -841,25 +841,25 @@
           <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl sm:p-6">
                   <div>
                     <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
                       <ExclamationCircleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
                     </div>
                     <div class="mt-3 text-center sm:mt-5">
                       <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Loan Request Error</DialogTitle>
-                      <div class="mt-2">
-                        <p
+                      <div class="mt-2 space-y-4">
+                        <ul
                             v-if="(loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.errors)"
-                            class="text-sm text-slate-500"
+                            class="text-sm text-slate-500 list-disc list-inside space-y-2"
                         >
-                          <span
+                          <li
                               v-for="(error, i) in loanRequestStore.getLoanRequest.errors"
                               :key="i"
                           >
-                            {{ JSON.stringify(error) }}
-                          </span>
-                        </p>
+                            {{ error.errorType }} {{ error.code }}: {{ error.message }}
+                          </li>
+                        </ul>
                         <p class="text-sm text-slate-500">
                           {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
                         </p>

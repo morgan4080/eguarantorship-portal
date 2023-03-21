@@ -21,11 +21,11 @@ body {
 }
 
 .router-link-active.router-link-exact-active {
-    @apply bg-eg-bg;
-    @apply text-white;
+    @apply bg-slate-700;
+    @apply text-amber-100;
 }
 .router-link-active > svg {
-    @apply text-white;
+    @apply text-amber-100;
 }
 .input-errors {
     @apply p-1;
