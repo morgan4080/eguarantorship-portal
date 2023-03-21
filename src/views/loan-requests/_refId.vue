@@ -849,6 +849,17 @@
                     <div class="mt-3 text-center sm:mt-5">
                       <DialogTitle as="h3" class="text-lg font-medium leading-6 text-slate-900">Loan Request Error</DialogTitle>
                       <div class="mt-2">
+                        <p
+                            v-if="(loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.errors)"
+                            class="text-sm text-slate-500"
+                        >
+                          <span
+                              v-for="(error, i) in loanRequestStore.getLoanRequest.errors"
+                              :key="i"
+                          >
+                            {{ JSON.stringify(error) }}
+                          </span>
+                        </p>
                         <p class="text-sm text-slate-500">
                           {{ (loanRequestStore.getLoanRequest && loanRequestStore.getLoanRequest.pendingReason) ? loanRequestStore.getLoanRequest.pendingReason : "" }}
                         </p>

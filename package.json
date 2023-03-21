@@ -3,9 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "clean": "rm -rf node_modules",
+    "reinstall": "npm run clean && npm install",
+    "rebuild": "npm run clean && npm install && npm run build",
     "dev": "vite --port 8082",
     "build": "vue-tsc --noEmit && vite build",
-    "deploy": "vue-tsc --noEmit && vite build",
+    "deploy": "npm run rebuild",
     "preview": "vite preview"
   },
   "dependencies": {
