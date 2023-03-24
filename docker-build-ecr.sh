@@ -1,5 +1,5 @@
 echo '===> Compiling & Packaging prestaapps/eguarantorshipui ...'
-if  [[ $1 != "-a" ]]; then
+if  [[ $1 = "-a" ]]; then
   npm run rebuild
 else
   npm run buildlocal
