@@ -1,5 +1,10 @@
 echo '===> Compiling & Packaging prestaapps/eguarantorshipui ...'
-npm run rebuild
+if  [[ $1 != "-a" ]]; then
+  npm run rebuild
+else
+  npm run buildlocal
+fi;
+
 
 GIT_BRANCH=$(git name-rev --name-only HEAD | sed "s/~.*//")
 GIT_COMMIT=$(git rev-parse HEAD)
@@ -28,4 +33,6 @@ docker build \
   .
 echo "Done building prestaapps/eguarantorshipui:"$APP_VERSION
 
-docker push 665804139994.dkr.ecr.us-west-2.amazonaws.com/prestaapps/eguarantorshipui:"$APP_VERSION"
+if  [[ $1 = "-a" ]]; then
+  docker push 665804139994.dkr.ecr.us-west-2.amazonaws.com/prestaapps/eguarantorshipui:"$APP_VERSION"
+fi;

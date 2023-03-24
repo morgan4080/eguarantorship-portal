@@ -6,8 +6,10 @@
     "clean": "rm -rf node_modules",
     "reinstall": "npm run clean && npm install",
     "rebuild": "npm run clean && npm install && npm run build",
+    "buildlocal": "npm run clean && npm install && npm run buildL",
     "dev": "vite --port 8082",
     "build": "vue-tsc --noEmit && vite build",
+    "buildL": "vue-tsc --noEmit && vite build --mode development",
     "deploy": "npm run rebuild",
     "preview": "vite preview"
   },
