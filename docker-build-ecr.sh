@@ -1,6 +1,10 @@
 echo '===> Compiling & Packaging prestaapps/eguarantorshipui ...'
-npm install
-npm run deploy
+if  [[ $1 != "-a" ]]; then
+  npm run rebuild
+else
+  npm run buildlocal
+fi;
+
 
 GIT_BRANCH=$(git name-rev --name-only HEAD | sed "s/~.*//")
 GIT_COMMIT=$(git rev-parse HEAD)
@@ -8,7 +12,7 @@ APP_VERSION=$(git describe --always)
 GIT_DIRTY='false'
 BUILD_CREATOR=$(git config user.email)
 BUILD_NUMBER="${BUILDKITE_BUILD_NUMBER-0}"
-# Whether the repo has uncommitted changes
+# Whether the repo has uncommitted chan ges
 if [[ $(git status -s) ]]; then
     GIT_DIRTY='true'
 fi
@@ -29,5 +33,6 @@ docker build \
   .
 echo "Done building prestaapps/eguarantorshipui:"$APP_VERSION
 
-docker push 665804139994.dkr.ecr.us-west-2.amazonaws.com/prestaapps/eguarantorshipui:"$APP_VERSION"
-docker push 665804139994.dkr.ecr.us-west-2.amazonaws.com/prestaapps/eguarantorshipui:latest
+if  [[ $1 = "-a" ]]; then
+  docker push 665804139994.dkr.ecr.us-west-2.amazonaws.com/prestaapps/eguarantorshipui:"$APP_VERSION"
+fi;

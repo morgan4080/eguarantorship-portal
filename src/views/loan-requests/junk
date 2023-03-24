@@ -144,11 +144,11 @@
 <template>
   <div class="flex flex-1 flex-col md:pl-24">
     <main class="flex-1">
-      <div class="pt-2 pb-16">
+      <div class="pt-2 pb-6">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
-            <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+            <select v-model="customFilters.loanReqStatus" class="block h-8 pl-3 pr-10 text-eg-text bg-slate-200 border-slate-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
               <option :value="null">Select Request Status</option>
               <option value="CLOSED">CLOSED</option>
               <option value="OPEN">OPEN</option>
@@ -240,13 +240,13 @@
             </div>
             <div class="mt-0 ml-auto flex flex-wrap space-x-4">
               <div class="flex items-center">
-                <span class="mx-4 text-gray-500">From</span>
+                <span class="mx-4 text-slate-500">From</span>
                 <div>
-                  <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
+                  <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
                 </div>
-                <span class="mx-4 text-gray-500">To</span>
+                <span class="mx-4 text-slate-500">To</span>
                 <div>
-                    <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
+                    <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
                 </div>
               </div>
               <button @click="exportLoanRequests" type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-lightblue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-eg-bg focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">

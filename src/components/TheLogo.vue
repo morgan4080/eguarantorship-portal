@@ -1,5 +1,5 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" width="66.223" height="46.781" viewBox="0 0 66.223 46.781" class="text-gray-100 hover:text-white block h-9 w-auto">
+  <svg xmlns="http://www.w3.org/2000/svg" width="66.223" height="46.781" viewBox="0 0 66.223 46.781" class="text-eg-bg sm:text-white hover:text-gray-100">
     <g transform="translate(0 0)">
       <g transform="translate(20.729)">
         <path d="M709.828,106.953q7.049,12.389,14.092,24.782c.808,1.426,1.534,2.9,2.48,4.7H719.24c-2.536-4.364-5.118-8.7-7.593-13.091-3.062-5.436-6.034-10.923-9.046-16.388Z" transform="translate(-702.602 -106.953)" fill="currentColor">

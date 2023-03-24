@@ -12,9 +12,9 @@ const { authStore } = stores;
             <ExclamationTriangleIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
           </div>
           <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-            <h3 class="text-normal font-medium leading-6 text-gray-900">Error</h3>
+            <h3 class="text-normal font-medium leading-6 text-slate-900">Error</h3>
             <div class="mt-1">
-              <span class="text-xs text-gray-500">{{ notification.message }}</span>
+              <span class="text-xs text-slate-500">{{ notification.message }}</span>
             </div>
           </div>
         </div>
@@ -25,7 +25,7 @@ const { authStore } = stores;
           <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
             <h3 class="text-normal font-medium leading-6 text-orange-900">Warning</h3>
             <div class="mt-1">
-              <span class="text-xs text-gray-500">{{ notification.message }}</span>
+              <span class="text-xs text-slate-500">{{ notification.message }}</span>
             </div>
           </div>
         </div>
@@ -34,9 +34,9 @@ const { authStore } = stores;
             <CheckCircleIcon class="h-6 w-6 text-green-600" aria-hidden="true" />
           </div>
           <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-            <h3 class="text-normal font-medium leading-6 text-gray-900">Success</h3>
+            <h3 class="text-normal font-medium leading-6 text-slate-900">Success</h3>
             <div class="mt-1">
-              <span class="text-xs text-gray-500">{{ notification.message }}</span>
+              <span class="text-xs text-slate-500">{{ notification.message }}</span>
             </div>
           </div>
         </div>

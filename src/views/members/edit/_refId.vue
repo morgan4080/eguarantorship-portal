@@ -122,7 +122,7 @@ const submitMember = async () => {
 <template>
   <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="pt-2 pb-16">
+      <div class="pt-2 pb-6">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="" linkName="All Members" linkUrl="/members"  current="Edit Member"/>
@@ -131,85 +131,85 @@ const submitMember = async () => {
             <div class="shadow sm:overflow-hidden sm:rounded-md">
               <div class="space-y-6 bg-white py-6 px-4 sm:p-6">
                 <div>
-                  <h3 class="text-lg font-medium leading-6 text-gray-900">Edit Member Information</h3>
-                  <p class="mt-1 text-sm text-gray-500">Use a permanent email and phone number where member can receive alerts.</p>
+                  <h3 class="text-lg font-medium leading-6 text-slate-900">Edit Member Information</h3>
+                  <p class="mt-1 text-sm text-slate-500">Use a permanent email and phone number where member can receive alerts.</p>
                 </div>
 
                 <div class="grid grid-cols-6 gap-6">
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="first-name" class="block text-sm font-medium text-gray-700">First name</label>
-                    <input v-model="form.firstName" type="text" name="first-name" id="first-name" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="first-name" class="block text-sm font-medium text-slate-700">First name</label>
+                    <input v-model="form.firstName" type="text" name="first-name" id="first-name" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.firstName.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="last-name" class="block text-sm font-medium text-gray-700">Last name</label>
-                    <input v-model="form.lastName" type="text" name="last-name" id="last-name" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="last-name" class="block text-sm font-medium text-slate-700">Last name</label>
+                    <input v-model="form.lastName" type="text" name="last-name" id="last-name" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.lastName.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="email-address" class="block text-sm font-medium text-gray-700">Email address</label>
-                    <input v-model="form.email" type="email" name="email-address" id="email-address" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="email-address" class="block text-sm font-medium text-slate-700">Email address</label>
+                    <input v-model="form.email" type="email" name="email-address" id="email-address" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.email.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="id-number" class="block text-sm font-medium text-gray-700">ID Number</label>
-                    <input v-model="form.idNumber" type="number" name="id-number" id="id-number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="id-number" class="block text-sm font-medium text-slate-700">ID Number</label>
+                    <input v-model="form.idNumber" type="number" name="id-number" id="id-number" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.idNumber.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="phone-number" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                    <input v-model="form.phoneNumber" type="number" name="phone-number" id="phone-number" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="phone-number" class="block text-sm font-medium text-slate-700">Phone Number</label>
+                    <input v-model="form.phoneNumber" type="number" name="phone-number" id="phone-number" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.phoneNumber.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
     <!--              <div class="col-span-6 sm:col-span-3">
-                    <label for="pin-secret" class="block text-sm font-medium text-gray-700">Pin Secret</label>
-                    <input v-model="form.pinSecret" type="password" name="pin-secret" id="pin-secret" maxlength="4" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="pin-secret" class="block text-sm font-medium text-slate-700">Pin Secret</label>
+                    <input v-model="form.pinSecret" type="password" name="pin-secret" id="pin-secret" maxlength="4" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.pinSecret.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>-->
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="available-amount" class="block text-sm font-medium text-gray-700">Available Amount</label>
-                    <input v-model="form.availableAmount" type="number" name="available-amount" id="available-amount" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="available-amount" class="block text-sm font-medium text-slate-700">Available Amount</label>
+                    <input v-model="form.availableAmount" type="number" name="available-amount" id="available-amount" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.availableAmount.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="total-deposits" class="block text-sm font-medium text-gray-700">Total Deposits</label>
-                    <input v-model="form.totalDeposits" type="number" name="total-deposits" id="total-deposits" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-egfocus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="total-deposits" class="block text-sm font-medium text-slate-700">Total Deposits</label>
+                    <input v-model="form.totalDeposits" type="number" name="total-deposits" id="total-deposits" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-egfocus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.totalDeposits.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
 
                   <div class="col-span-6 sm:col-span-3">
-                    <label for="total-shares" class="block text-sm font-medium text-gray-700">Total Shares</label>
-                    <input v-model="form.totalShares" type="number" name="total-shares" id="total-shares" class="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
+                    <label for="total-shares" class="block text-sm font-medium text-slate-700">Total Shares</label>
+                    <input v-model="form.totalShares" type="number" name="total-shares" id="total-shares" class="mt-1 block w-full rounded-md border border-slate-300 py-2 px-3 shadow-sm focus:border-bg-eg focus:outline-none focus:ring-bg-eg sm:text-sm" />
                     <div class="input-errors" v-for="(error, index) of v$.totalShares.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+              <div class="bg-slate-50 px-4 py-3 text-right sm:px-6">
                 <button :disabled="authStore.getLoadingState" type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-eg-bg py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-eg-lightblue focus:outline-none focus:ring-2 focus:ring-eg-lightblue focus:ring-offset-2">Save Member</button>
               </div>
             </div>

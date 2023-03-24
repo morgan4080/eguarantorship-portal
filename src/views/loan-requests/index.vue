@@ -34,6 +34,7 @@
     startDate?: string | null,
     endDate?: string | null,
     includeInActive?: IncludeInactive,
+    isActive?: "true" | "false" | null,
   }
 
   const filters = reactive<Record<any, any>>({
@@ -41,7 +42,7 @@
     searchTerm: JSON.stringify(route.query) !== '{}' && route.query.searchTerm ? route.query.searchTerm : '',
     // order: 'ASC',
     page: JSON.stringify(route.query) !== '{}' && route.query.pageIndex ? Number(route.query.pageIndex) + 1 :  1,
-    isActive: 'true'
+    isActive: true
   })
 
   const customFilters =  reactive<Record<any, any>>({
@@ -56,6 +57,7 @@
     loanNumber: JSON.stringify(route.query) !== '{}' && route.query.loanNumber ? route.query.loanNumber : '',
     startDate: JSON.stringify(route.query) !== '{}' && route.query.startDate ? new Date(`${route.query.startDate}`).toLocaleDateString('en-CA') : '',
     endDate: JSON.stringify(route.query) !== '{}' && route.query.endDate ? new Date(`${route.query.endDate}`).toLocaleDateString('en-CA') : '',
+    isActive: JSON.stringify(route.query) !== '{}' && route.query.isActive ? route.query.isActive : true,
   })
 
   let queryParams = reactive<Record<any, any>>({
@@ -75,6 +77,9 @@
     }
 
     for (const [key, value] of Object.entries(payload)) {
+      if (key === 'isActive') {
+        withValues['isActive'] = `${value}`
+      }
       if (value) {
         if (key === 'page') {
           // pageIndex
@@ -187,42 +192,46 @@
 <template>
   <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="pt-2 pb-16">
+      <div class="pt-2 pb-6">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
-          <div class="flex justify-between items-center">
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:justify-between">
             <Breadcrumb pageName="" linkName="All Requests" linkUrl="/loan-requests"  current="Requests"/>
-            <div class="flex space-x-4">
-              <select v-model="customFilters.loanReqStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
-                <option :value="null" class="text-xs">Request Status</option>
-                <option value="CLOSED" class="text-xs">CLOSED</option>
-                <option value="OPEN" class="text-xs">OPEN</option>
-                <option value="READ" class="text-xs">READ</option>
-              </select>
-              <select v-model="customFilters.signingStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
-                <option :value="null" class="text-xs">Signing Status</option>
-                <option value="COMPLETED" class="text-xs">COMPLETED</option>
-                <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
-                <option value="ERROR" class="text-xs">PENDING</option>
-              </select>
-              <select v-model="customFilters.acceptanceStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
-                <option :value="null" class="text-xs">Acceptance Status</option>
-                <option value="COMPLETED" class="text-xs">COMPLETED</option>
-                <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
-                <option value="ANY" class="text-xs">ANY</option>
-              </select>
-              <select v-model="customFilters.applicationStatus" class="block w-48 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
-                <option :value="null" class="text-xs">Application Status</option>
-                <option value="COMPLETED" class="text-xs">COMPLETED</option>
-                <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
-              </select>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <div class="flex space-x-4">
+                <select v-model="customFilters.loanReqStatus" class="block w-48 w-full rounded-md border-slate-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                  <option :value="null" class="text-xs">Request Status</option>
+                  <option value="CLOSED" class="text-xs">CLOSED</option>
+                  <option value="OPEN" class="text-xs">OPEN</option>
+                  <option value="READ" class="text-xs">READ</option>
+                </select>
+                <select v-model="customFilters.signingStatus" class="block w-48 w-full rounded-md border-slate-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                  <option :value="null" class="text-xs">Signing Status</option>
+                  <option value="COMPLETED" class="text-xs">COMPLETED</option>
+                  <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
+                  <option value="ERROR" class="text-xs">PENDING</option>
+                </select>
+              </div>
+              <div class="flex space-x-4">
+                <select v-model="customFilters.acceptanceStatus" class="block w-48 w-full rounded-md border-slate-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                  <option :value="null" class="text-xs">Acceptance Status</option>
+                  <option value="COMPLETED" class="text-xs">COMPLETED</option>
+                  <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
+                  <option value="ANY" class="text-xs">ANY</option>
+                </select>
+                <select v-model="customFilters.applicationStatus" class="block w-48 w-full rounded-md border-slate-300 py-2 pl-3 pr-10 text-sm focus:border-eg-bg focus:outline-none focus:ring-eg-bg">
+                  <option :value="null" class="text-xs">Application Status</option>
+                  <option value="COMPLETED" class="text-xs">COMPLETED</option>
+                  <option value="INPROGRESS" class="text-xs">INPROGRESS</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="sm:grid sm:grid-cols-4 sm:gap-2">
+          <div class="flex flex-col space-y-4 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-2">
             <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Total Requests</span>
-                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.totalRequests }}</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? loanRequestStore.getLoanRequestsSummary.totalRequests : 0 }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -241,7 +250,7 @@
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Today Requests</span>
-                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.todayRequests }}</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? loanRequestStore.getLoanRequestsSummary.todayRequests : 0 }}</span>
                 </div>
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <mask id="mask0_89_1150" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="28" y="30" width="30" height="31">
@@ -260,7 +269,7 @@
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Average Days To Complete</span>
-                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.averageDaysToComplete }}</span>
+                  <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? loanRequestStore.getLoanRequestsSummary.averageDaysToComplete: 0 }}</span>
                 </div>
 
                 <svg class="w-10" width="58" height="61" viewBox="0 0 58 61" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -276,7 +285,7 @@
                 </svg>
               </div>
             </div>
-            <div class="rounded-md shadow bg-white flex flex-col px-4 py-6">
+            <div class="rounded-md shadow bg-white flex flex-col px-4 py-6" >
               <div class="flex-1 flex justify-between items-start">
                 <div class="flex flex-col space-y-2">
                   <span class="uppercase text-sm font-medium">Total Amount Requested</span>
@@ -297,49 +306,62 @@
             </div>
           </div>
           <LoanRequestsTable :loanRequests="loanRequestStore.getLoanRequests">
-            <div class="sm:flex-auto">
-              <GlobalSearch :placeholder="'Search Loan Requests'" :filters="filters" :customFilters="customFilters" :ctx="$route.name" :filterEntities="loanProductStore" has-filter @update="searchLR" />
+            <div class="sm:flex-auto flex space-x-2 items-center">
+              <GlobalSearch
+                  :placeholder="'Search Loan Requests'"
+                  :filters="filters"
+                  :customFilters="customFilters"
+                  :ctx="$route.name"
+                  :filterEntities="loanProductStore"
+                  has-filter
+                  @update="searchLR"
+              />
+              <input
+                  id="deleted"
+                  aria-describedby="offers-description"
+                  name="deleted"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-slate-300 text-eg-bg focus:ring-eg-bg"
+                  v-model="customFilters.isActive"
+              />
+              <span>Hide Deleted</span>
             </div>
-            <div class="mt-0 ml-auto flex flex-wrap space-x-4">
-              <div class="flex items-center">
-                <span class="mx-4 text-gray-500">From</span>
-                <div>
-                  <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
-                </div>
-                <span class="mx-4 text-gray-500">To</span>
-                <div>
-                  <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
-                </div>
+            <div class="flex space-x-2 items-center">
+              <span class="text-slate-500">From</span>
+              <div>
+                <input v-model="customFilters.startDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="Start date">
               </div>
-              <Menu as="div" class="relative inline-block text-left">
-                <div>
-                  <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
-                    <span class="sr-only">export requests options</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                    </svg>
-                    Export Requests
-                  </MenuButton>
-                </div>
-
-                <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
-                  <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div class="py-1">
-                      <form @submit.prevent="exportLoanRequests('all')">
-                        <MenuItem v-slot="{ active }">
-                          <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full px-4 py-2 text-left text-sm']">Export All</button>
-                        </MenuItem>
-                      </form>
-                      <form @submit.prevent="exportLoanRequests">
-                        <MenuItem v-slot="{ active }">
-                          <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full px-4 py-2 text-left text-sm']">Export Filtered</button>
-                        </MenuItem>
-                      </form>
-                    </div>
-                  </MenuItems>
-                </transition>
-              </Menu>
+              <span class="text-slate-500">To</span>
+              <div>
+                <input v-model="customFilters.endDate" :max="new Date().toLocaleDateString('en-CA')" type="date" lang="en-GB" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-eg-bg focus:border-eg-bg block w-full p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-eg-bg dark:focus:border-eg-bg" placeholder="End date">
+              </div>
             </div>
+            <Menu as="div" class="relative inline-block text-left">
+              <MenuButton type="button" class="inline-flex items-center justify-center rounded-md border border-transparent bg-eg-bg px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-eg-bg focus:ring-offset-2 sm:w-auto">
+                <span class="sr-only">export requests options</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                </svg>
+                Export Requests
+              </MenuButton>
+
+              <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div class="py-1">
+                    <form @submit.prevent="exportLoanRequests('all')">
+                      <MenuItem v-slot="{ active }">
+                        <button type="submit" :class="[active ? 'bg-slate-100 text-slate-900' : 'text-slate-700', 'block w-full px-4 py-2 text-left text-sm']">Export All</button>
+                      </MenuItem>
+                    </form>
+                    <form @submit.prevent="exportLoanRequests">
+                      <MenuItem v-slot="{ active }">
+                        <button type="submit" :class="[active ? 'bg-slate-100 text-slate-900' : 'text-slate-700', 'block w-full px-4 py-2 text-left text-sm']">Export Filtered</button>
+                      </MenuItem>
+                    </form>
+                  </div>
+                </MenuItems>
+              </transition>
+            </Menu>
           </LoanRequestsTable>
           <Paginator
               :current-page="filters.page"

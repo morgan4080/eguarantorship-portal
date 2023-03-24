@@ -64,14 +64,14 @@
 
 </script>
 <template>
-  <div class="relative">
+  <div class="relative flex-1">
     <div v-if="hasFilter" class="absolute inset-y-0 left-0 flex items-center">
       <label for="loan-products" class="sr-only">Loan Products</label>
-      <select v-model="searchFilter.productRefId" id="loan-products" autocomplete="loan-products" class="h-full rounded-full border-transparent bg-transparent py-0 pl-3 pr-10 text-gray-500 border-0 ring-0 focus:ring-eg-bg sm:text-sm">
+      <select v-model="searchFilter.productRefId" id="loan-products" autocomplete="loan-products" class="h-full rounded-full border-transparent bg-transparent text-slate-500 border-0 ring-0 focus:ring-eg-bg text-sm">
         <option :value="``" selected>All Loan Requests</option>
         <option v-for="loanProd in filterEntities.getLoanProducts" :key="loanProd.refId" :value="loanProd.refId">{{ loanProd.name }}</option>
       </select>
     </div>
-    <input @mousedown="onMouseDown($event)" v-model="searchFilter.searchTerm" type="search" :placeholder="placeholder" :class="{'pl-48' : hasFilter, 'pl-6' : !hasFilter}" class="w-full rounded-full border border-gray-300 bg-white py-2 pr-12 shadow-sm ring-0 focus:ring-eg-bg focus:border-eg-bg focus:outline-none sm:text-sm" aria-controls="options" :aria-expanded="changed">
+    <input @mousedown="onMouseDown($event)" v-model="searchFilter.searchTerm" type="search" :placeholder="placeholder" :class="{'pl-48' : hasFilter, 'pl-6' : !hasFilter}" class="w-full rounded-full border border-slate-300 bg-white py-2 pr-12 shadow-sm ring-0 focus:ring-eg-bg focus:border-eg-bg focus:outline-none sm:text-sm" aria-controls="options" :aria-expanded="changed">
   </div>
 </template>

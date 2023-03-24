@@ -156,11 +156,11 @@
 <template>
   <div class="flex flex-1 flex-col">
     <main class="flex-1">
-      <div class="pt-2 pb-16">
+      <div class="pt-2 pb-6">
         <div class="mx-auto space-y-6 sm:px-6 lg:px-5">
           <div class="flex justify-between items-center">
             <Breadcrumb pageName="Dashboard" linkName="Dashboard" linkUrl="/"  current="General"/>
-            <select v-model="filter" class="block h-8 pl-3 pr-10 text-eg-text bg-gray-200 border-gray-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
+            <select v-model="filter" class="block h-8 pl-3 pr-10 text-eg-text bg-slate-200 border-slate-300 focus:outline-none focus:ring-amber-500 focus:border-amber-500 text-xs font-normal rounded-md">
               <option value="day">Past Day</option>
               <option value="week">Past Week</option>
               <option value="month">Past Month</option>
@@ -169,7 +169,7 @@
           </div>
           <div class="sm:grid sm:gap-8 sm:grid-cols-2 text-eg-text">
             <div class="sm:grid sm:grid-cols-2 sm:gap-4">
-              <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
+              <div class="bg-white border border-slate-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
                 <div class="flex-1 flex justify-between items-start">
                   <div class="flex flex-col space-y-2">
                     <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary?.totalRequests }}</span>
@@ -188,7 +188,7 @@
                   <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
                 </div>
               </div>
-              <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
+              <div class="bg-white border border-slate-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
                 <div class="flex-1 flex justify-between items-start">
                   <div class="flex flex-col space-y-2">
                     <span class="font-semibold text-lg">{{ loanRequestStore.getLoanRequestsSummary ? $filters.currencyKES(loanRequestStore.getLoanRequestsSummary.totalRequested) : 0 }}</span>
@@ -212,7 +212,7 @@
                   <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+13000</span>
                 </div>
               </div>
-              <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
+              <div class="bg-white border border-slate-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
                 <div class="flex-1 flex justify-between items-start">
                   <div class="flex flex-col space-y-2">
                     <span class="font-semibold text-lg">{{ loanStore.getLoanSummary?.CLOSED }}</span>
@@ -235,7 +235,7 @@
                   <span class="font-light text-sm rounded-md bg-green-200 text-green-600 border border-green-600 p-2 tracking-wider">+3</span>
                 </div>
               </div>
-              <div class="bg-white border border-gray-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
+              <div class="bg-white border border-slate-200 shadow rounded-md px-4 py-6 flex flex-col justify-center">
                 <div class="flex-1 flex justify-between items-start">
                   <div class="flex flex-col space-y-2">
                     <span class="font-semibold text-lg">{{ memberStore.getMemberSummary?.ACTIVE }}</span>
@@ -263,10 +263,10 @@
                 </div>
               </div>
             </div>
-            <div class="rounded-md border border-gray-200 overflow-hidden shadow-lg bg-gradient-to-r from-eg-bg to-eg-text grid grid-cols-2 gap-0">
+            <div class="rounded-md border border-slate-200 overflow-hidden shadow-lg bg-gradient-to-r from-eg-bg to-eg-text grid grid-cols-2 gap-0">
               <div class="flex-1 p-4 space-y-2">
                 <h6 class="text-white text-sm pb-2">Latest Requests</h6>
-                <div v-for="(request , i) in loanRequests.slice(0,4)" :key="i" class="space-y-1 py-2 border-b border-gray-50 text-gray-50">
+                <div v-for="(request , i) in loanRequests.slice(0,4)" :key="i" class="space-y-1 py-2 border-b border-slate-50 text-slate-50">
                   <p class="uppercase text-sm">{{ request.memberFirstName }} {{ request.memberLastName }}</p>
                   <p class="text-sm">Requested KES {{ request.loanAmount }} <span class="font-semibold">{{ request.loanProductName }}</span></p>
                 </div>
@@ -276,13 +276,13 @@
                 <svg ref="targetD30" width="400" height="150"></svg>
               </div>
             </div>
-            <div class="rounded-md border border-gray-200 overflow-hidden shadow-lg bg-white grid grid-cols-2 gap-0">
+            <div class="rounded-md border border-slate-200 overflow-hidden shadow-lg bg-white grid grid-cols-2 gap-0">
               <h6 class="text-white px-5 pt-4 text-sm pb-2 text-eg-text">Loan Status</h6>
             </div>
-            <div class="rounded-md border border-gray-200 shadow-lg bg-gradient-to-r from-eg-bg to-eg-text h-64">
+            <div class="rounded-md border border-slate-200 shadow-lg bg-gradient-to-r from-eg-bg to-eg-text h-64">
               <h6 class="text-white px-5 pt-4 text-sm pb-2">Pending Approval</h6>
-              <div class="rounded-md border border-gray-200 overflow-hidden shadow-lg bg-eg-text bg-opacity-90 w-full h-72 py-2 ml-5 scrollCustom overflow-y-scroll">
-                <div v-for="(request , i) in loanRequests" :key="i" class="space-y-1 py-1 text-gray-50 px-3 flex items-center justify-center">
+              <div class="rounded-md border border-slate-200 overflow-hidden shadow-lg bg-eg-text bg-opacity-90 w-full h-72 py-2 ml-5 scrollCustom overflow-y-scroll">
+                <div v-for="(request , i) in loanRequests" :key="i" class="space-y-1 py-1 text-slate-50 px-3 flex items-center justify-center">
                   <div class="flex-1">
                     <p class="text-sm text-white font-thin">
                       Request NO
