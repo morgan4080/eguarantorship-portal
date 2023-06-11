@@ -568,6 +568,7 @@
                       <option value="JUMBOSTAR">JUMBOSTAR</option>
                       <option value="DEFAULT">DEFAULT</option>
                       <option value="CENTRINO">CENTRINO</option>
+                      <option value="KOPESHA">KOPESHA</option>
                     </select>
                     <div class="input-errors" v-for="(error, index) of x$.coreBankingIntegration.$errors" :key="index">
                       <div class="text-xs text-red-400">{{ error.$message }}</div>
