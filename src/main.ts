@@ -6,6 +6,7 @@ import stores from "./stores";
 import nProgress from "nprogress";
 import "../node_modules/nprogress/nprogress.css";
 import './index.css';
+import 'jsoneditor/dist/jsoneditor.css';
 
 const app = createApp(App);
 pinia.use(({ store }) => {

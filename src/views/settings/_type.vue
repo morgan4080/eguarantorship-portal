@@ -2,15 +2,16 @@
   import {ChevronDownIcon, PlusCircleIcon, CheckCircleIcon} from "@heroicons/vue/24/outline"
   import {useRoute, useRouter} from "vue-router";
   import stores from "../../stores";
-  import {computed, onMounted, reactive, ref, watch} from "vue";
+  import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from "vue";
   import Breadcrumb from "../../components/Breadcrumb.vue";
   import {email, required} from "@vuelidate/validators";
   import useVuelidate from "@vuelidate/core";
   import DropDown from "../../components/DropDown.vue";
-  import {MenuButton} from "@headlessui/vue";
-  import {FolderPlusIcon,EllipsisVerticalIcon, PencilIcon, TrashIcon} from "@heroicons/vue/20/solid";
+  import {Dialog, DialogPanel, DialogTitle, MenuButton, TransitionChild, TransitionRoot} from "@headlessui/vue";
+  import {FolderPlusIcon,EllipsisVerticalIcon, PencilIcon, TrashIcon, CodeBracketIcon} from "@heroicons/vue/20/solid";
   import Paginator from "../../components/Paginator.vue";
   import {SettingsPayloadType} from "../../stores/client-settings-store";
+  import JSONEditor, {JSONEditorOptions} from 'jsoneditor';
   const route = useRoute()
   const router = useRouter()
   const { zohoStore, authStore, loanProductStore, clientStore } = stores
@@ -331,6 +332,68 @@
       loanProductStore.fetchLoanProducts(query.value)
     ])
   }
+
+  const options: JSONEditorOptions = reactive({
+    mode: 'code',
+    mainMenuBar: false,
+    onChangeText: (json: any) => {
+      if (currentMetaKey.value !== null && json !== "") {
+        if (/^[\],:{}\s]*$/.test(json.replace(/\\["\\\/bfnrtu]/g, '@').
+        replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+        replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+          try {
+            metaData.value = JSON.parse(json)
+            organisationSettingsForm.details[currentMetaKey.value].meta = metaData.value
+          } catch (e: any) {
+            if (e.message) {
+              authStore.defineNotification({
+                id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+                message: e.message,
+                error: true
+              })
+            }
+          }
+        } else {
+          authStore.defineNotification({
+            id: (Math.random().toString(36) + Date.now().toString(36)).substring(2),
+            message: "Invalid JSON format",
+            error: true
+          })
+        }
+      }
+    }
+  })
+
+  const currentMetaKey = ref<string | null>(null)
+  const metaData = ref<Record<string, string>>({})
+  const showDialog = ref<boolean>(false)
+  const editor = ref<JSONEditor | null>(null)
+  const editor_container = ref<HTMLElement | null>(null)
+  const showMetaInput = (key: string) => {
+    currentMetaKey.value = key
+    showDialog.value = true
+    if (typeof organisationSettingsForm.details[currentMetaKey.value].meta == 'string') {
+      metaData.value = organisationSettingsForm.details[currentMetaKey.value].meta
+    }
+  }
+  const observeChange = (key: string) => {
+    if (organisationSettingsForm.details[key].type !== 'ENUM') {
+      organisationSettingsForm.details[key].meta = {}
+      metaData.value = {}
+    }
+  }
+
+  watch(editor_container, () => {
+    if (editor_container.value !== null) {
+      editor.value = new JSONEditor(editor_container.value, options, metaData.value);
+    }
+  })
+
+  onBeforeUnmount(() => {
+    if (editor.value) {
+      editor.value.destroy();
+    }
+  })
 
 </script>
 <template>
@@ -710,11 +773,14 @@
                                   </dt>
                                   <dd class="flex space-x-2 items-center mt-1 text-sm text-slate-900 col-span-2 sm:mt-0">
                                     <div class="flex-grow border-b border-slate-300 focus-within:border-eg-bgopacity mt-1 sm:mt-0">
-                                      <select :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].type" class="block w-full border-0 border-b border-transparent bg-slate-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm">
+                                      <select @change="
+                                            observeChange(key)
+                                        " :disabled="!otherDetailsEdit" required v-model="organisationSettingsForm.details[key].type" class="block w-full border-0 border-b border-transparent bg-slate-50 focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm">
                                         <option :value="''">-Select Input Type-</option>
                                         <option value="BOOLEAN">TRUE/FALSE</option>
                                         <option value="TEXT">TEXT</option>
                                         <option value="NUMBER">NUMBERS</option>
+                                        <option value="ENUM">ENUM</option>
                                       </select>
                                     </div>
                                     <div class="flex-shrink relative flex items-start">
@@ -726,10 +792,17 @@
                                       </div>
                                     </div>
                                   </dd>
-                                  <dd v-if="otherDetailsEdit" class="mt-1 flex justify-center items-center text-sm text-slate-900 sm:mt-0 col-span-1">
-                                    <button type="button" @click="delete organisationSettingsForm.details[key]">
-                                      <TrashIcon class="w-5 h-5 text-red-400" />
-                                    </button>
+                                  <dd v-if="otherDetailsEdit" class="mt-1 flex justify-center items-center space-x-4 text-sm text-slate-900 sm:mt-0 col-span-1">
+                                    <div v-if="organisationSettingsForm.details[key].type === 'ENUM'" class="border flex justify-center items-center rounded-lg bg-slate-100 h-10 w-10">
+                                      <button type="button" @click="showMetaInput(key)">
+                                        <CodeBracketIcon class="w-5 h-5 text-slate-600" />
+                                      </button>
+                                    </div>
+                                    <div class="border flex justify-center items-center rounded-lg bg-rose-50 h-10 w-10">
+                                      <button type="button" @click="delete organisationSettingsForm.details[key]">
+                                        <TrashIcon class="w-5 h-5 text-red-400" />
+                                      </button>
+                                    </div>
                                   </dd>
                                 </div>
                               </TransitionGroup>
@@ -762,5 +835,29 @@
         </div>
       </div>
     </main>
+
+    <TransitionRoot as="template" :show="showDialog">
+      <Dialog as="div" class="relative z-10" @close="showDialog = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-sm bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-3xl">
+                <div class="flex items-center justify-start rounded-t-sm bg-gray-100 p-2">
+                  <CodeBracketIcon class="h-5 w-5 text-slate-600" aria-hidden="true" />
+                  <DialogTitle as="h3" class="pl-4 text-base font-normal leading-6 text-slate-900">Input meta data for <span class="text-eg-blue underline">{{ currentMetaKey }}</span> key</DialogTitle>
+                </div>
+                <div class="bg-slate-600">
+                  <div ref="editor_container" class="flex-auto relative block text-slate-50 overflow-auto ring-0 h-96"></div>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
   </div>
 </template>
