@@ -78,7 +78,7 @@ export const useClientStore = defineStore('client-settings-store', {
     actions: {
         async fetchClientSettings(): Promise<any> {
             try {
-                const dat = await fetch(`${import.meta.env.VITE_API_URL}/clientSettings`, {
+                const dat = await fetch(`${import.meta.env.VITE_API_URL}/clientSettings/bulk`, {
                     method: 'GET',
                     credentials: 'include'
                 })
