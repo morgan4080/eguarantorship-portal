@@ -372,7 +372,7 @@
   const showMetaInput = (key: string) => {
     currentMetaKey.value = key
     showDialog.value = true
-    if (typeof organisationSettingsForm.details[currentMetaKey.value].meta == 'string') {
+    if (typeof organisationSettingsForm.details[currentMetaKey.value].meta == 'object') {
       metaData.value = organisationSettingsForm.details[currentMetaKey.value].meta
     }
   }
