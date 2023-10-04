@@ -768,7 +768,7 @@
                                 <div v-for="(key, i) in organisationDetails" :key="key+i" class="py-2 sm:grid sm:grid-cols-5 sm:gap-4 sm:py-3 sm:px-6">
                                   <dt class="text-sm font-medium text-slate-500 col-span-2">
                                     <div class="border-b border-slate-300 focus-within:border-eg-bgopacity">
-                                      <input disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-slate-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
+                                      <input @click.ctrl="$event.target ? ($event.target as any).disabled = !(($event.target as any).disabled) : ''" disabled :value="key" type="text" class="block w-full border-0 border-b border-transparent bg-slate-200 cursor-not-allowed focus:ring-eg-lightblue focus:border-eg-bgopacity focus:ring-0 sm:text-sm" placeholder="key" />
                                     </div>
                                   </dt>
                                   <dd class="flex space-x-2 items-center mt-1 text-sm text-slate-900 col-span-2 sm:mt-0">
