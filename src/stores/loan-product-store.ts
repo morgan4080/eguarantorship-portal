@@ -108,8 +108,15 @@ export const useLoanProduct = defineStore('loan-product-store', {
         async deleteLoanProduct(refId: string): Promise<any> {
             try {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/loans-products/${refId}`, {
-                    method: 'DELETE',
-                    credentials: 'include'
+                    "headers": {
+                        "accept": "*/*",
+                        "accept-language": "en-US,en;q=0.9,ja;q=0.8",
+                        "content-type": "application/json"
+                    },
+                    "referrerPolicy": "strict-origin-when-cross-origin",
+                    "method": "DELETE",
+                    "mode": "cors",
+                    "credentials": "include"
                 })
                 if (response.status === 200) {
                     return Promise.resolve(response.json())
