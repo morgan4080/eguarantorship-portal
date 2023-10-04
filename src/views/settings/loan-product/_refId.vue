@@ -71,6 +71,18 @@ const loanProductFormRules = {
 
 const v$ = useVuelidate(loanProductFormRules, loanProductForm, { $lazy: true, $autoDirty: true})
 
+onMounted(async () => {
+  if (loanProductForm.templateId) {
+    const selectedTemplate = zohoStore.getZohoTemplates.find(template => template.template_id === loanProductForm.templateId)
+    if (selectedTemplate) {
+      loanProductForm.templateName = selectedTemplate.template_name
+      await Promise.allSettled([
+        zohoStore.fetchTemplateDetails(loanProductForm.templateId)
+      ])
+    }
+  }
+})
+
 watch(() => loanProductForm.templateId, async (templateId) => {
   const selectedTemplate = zohoStore.getZohoTemplates.find(template => template.template_id === templateId)
   if (selectedTemplate) {
